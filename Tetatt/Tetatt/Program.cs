@@ -2,7 +2,7 @@ using System;
 
 namespace Tetatt
 {
-#if WINDOWS || XBOX
+#if WINDOWS || XBOX || __MonoCS__
     static class Program
     {
         /// <summary>
