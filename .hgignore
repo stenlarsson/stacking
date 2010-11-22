@@ -2,3 +2,7 @@ bin
 cachefile
 obj
 suo
+swp
+userprefs
+~
+pidb
