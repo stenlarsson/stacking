@@ -15,7 +15,6 @@ namespace Microsoft.Xna.Framework
 
 		public GraphicsDeviceManager(Game game)
 		{
-			graphicsDevice = null;
 			GraphicsProfile = GraphicsProfile.HiDef;
 			PreferredBackBufferWidth = 1280;
 			PreferredBackBufferHeight = 720;
