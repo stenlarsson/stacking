@@ -26,8 +26,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.graphicsProfile = graphicsProfile;
 			this.presentationParameters = presentationParameters;
 			
-			Sdl.SDL_Init(Sdl.SDL_INIT_EVERYTHING);
-			
 			Sdl.SDL_GL_SetAttribute(Sdl.SDL_GL_DOUBLEBUFFER, 1);
 			
 			surface = Sdl.SDL_SetVideoMode(presentationParameters.BackBufferWidth,
@@ -39,8 +37,6 @@ namespace Microsoft.Xna.Framework.Graphics
 			              presentationParameters.BackBufferWidth,
 			              presentationParameters.BackBufferHeight);
 			
-			Il.ilInit();
-			Ilu.iluInit();
 			Ilut.ilutRenderer(Ilut.ILUT_OPENGL);
 		}
 	}
