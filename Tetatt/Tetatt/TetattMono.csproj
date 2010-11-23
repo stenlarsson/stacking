@@ -61,7 +61,6 @@
     <Compile Include="Xna\GraphicsDevice.cs" />
     <Compile Include="Xna\GraphicsDeviceManager.cs" />
     <Compile Include="Xna\GameServiceContainer.cs" />
-    <Compile Include="Xna\IGraphicsDeviceManager.cs" />
     <Compile Include="Xna\GraphicsProfile.cs" />
     <Compile Include="Xna\PresentationParameters.cs" />
     <Compile Include="Xna\GraphicsAdapter.cs" />
