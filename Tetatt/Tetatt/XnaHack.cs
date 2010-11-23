@@ -42,37 +42,6 @@ namespace Microsoft.Xna.Framework
 			public virtual T Load<T> (string assetName) { return default (T); }
 		}
 	}
-	namespace Input {
-		[FlagsAttribute]
-		public enum Buttons {
-			A, B, Back, BigButton, DPadDown, DPadLeft, DPadRight, DPadUp, LeftShoulder, LeftStick,
-			LeftThumbstickDown, LeftThumbstickLeft, LeftThumbstickRight, LeftThumbstickUp,
-			LeftTrigger, RightShoulder, RightStick, RightThumbstickDown, RightThumbstickLeft,
-			RightThumbstickRight, RightThumbstickUp, RightTrigger, Start, X, Y
-		}
-		public enum ButtonState {
-			Pressed, Released
-		}
-		public struct GamePadButtons {
-			public ButtonState Back { get { return ButtonState.Pressed; } }
-		}
-		public struct GamePadState {
-			public GamePadButtons Buttons { get { return new GamePadButtons(); } }
-			public bool IsButtonDown (Buttons button) { return false; }
-		}
-		public class GamePad {
-			public static GamePadState GetState(PlayerIndex index) { return new GamePadState(); }
-		}
-		public enum Keys {
-			A, Add, Apps, Attn, B, Back, BrowserBack, BrowserFavorites, BrowserForward, BrowserHome, BrowserRefresh, BrowserSearch, BrowserStop, C, CapsLock, ChatPadGreen, ChatPadOrange, Crsel, D, D0, D1, D2, D3, D4, D5, D6, D7, D8, D9, Decimal, Delete, Divide, Down, E, End, Enter, EraseEof, Escape, Execute, Exsel, F, F1, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F2, F20, F21, F22, F23, F24, F3, F4, F5, F6, F7, F8, F9, G, H, Help, Home, I, ImeConvert, ImeNoConvert, Insert, J, K, Kana, Kanji, L, LaunchApplication1, LaunchApplication2, LaunchMail, Left, LeftAlt, LeftControl, LeftShift, LeftWindows, M, MediaNextTrack, MediaPlayPause, MediaPreviousTrack, MediaStop, Multiply, N, None, NumLock, NumPad0, NumPad1, NumPad2, NumPad3, NumPad4, NumPad5, NumPad6, NumPad7, NumPad8, NumPad9, O, Oem8, OemAuto, OemBackslash, OemClear, OemCloseBrackets, OemComma, OemCopy, OemEnlW, OemMinus, OemOpenBrackets, OemPeriod, OemPipe, OemPlus, OemQuestion, OemQuotes, OemSemicolon, OemTilde, P, Pa1, PageDown, PageUp, Pause, Play, Print, PrintScreen, ProcessKey, Q, R, Right, RightAlt, RightControl, RightShift, RightWindows, S, Scroll, Select, SelectMedia, Separator, Sleep, Space, Subtract, T, Tab, U, Up, V, VolumeDown, VolumeMute, VolumeUp, W, X, Y, Z, Zoom
-		}
-		public struct KeyboardState {
-			public bool IsKeyDown(Keys key) { return false; }
-		}
-		public class Keyboard {
-			public static KeyboardState GetState() { return new KeyboardState(); }
-		}
-	}
 	namespace Media {}
 
 	public class GameTime {}
