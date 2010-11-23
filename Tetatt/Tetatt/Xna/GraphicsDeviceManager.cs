@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Microsoft.Xna.Framework
 {
-	public class GraphicsDeviceManager : IGraphicsDeviceManager
+	public class GraphicsDeviceManager
 	{
 		private GraphicsDevice graphicsDevice;
 		public GraphicsDevice GraphicsDevice { get { return graphicsDevice; } }
