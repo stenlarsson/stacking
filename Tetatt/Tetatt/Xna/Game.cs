@@ -2,6 +2,8 @@ using System;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
+using Tao.Sdl;
+using Tao.DevIl;
 
 namespace Microsoft.Xna.Framework
 {
@@ -25,17 +27,30 @@ namespace Microsoft.Xna.Framework
 		
 		public void Run()
 		{
+			Sdl.SDL_Init(Sdl.SDL_INIT_EVERYTHING);
+			Il.ilInit();
+			Ilu.iluInit();
+
 			graphicsDeviceManager = (GraphicsDeviceManager)Services.GetService(typeof(GraphicsDeviceManager));
 			graphicsDeviceManager.CreateDevice();
 			Initialize();
 			LoadContent();
 			
 			
+			GameTime gameTime = new GameTime();
 			running = true;
 			while(running)
 			{
 				int ticks = Environment.TickCount;
-				GameTime gameTime = new GameTime();
+				Sdl.SDL_Event sdlEvent;
+				if (Sdl.SDL_PollEvent(out sdlEvent) != 0)
+				{
+					if (sdlEvent.type == Sdl.SDL_QUIT)
+					{
+						Exit();
+						break;
+					}
+				}
 				Update(gameTime);
 				graphicsDeviceManager.BeginDraw();
 				Draw(gameTime);
@@ -76,6 +91,7 @@ namespace Microsoft.Xna.Framework
 		
 		public void Dispose()
 		{
+			Sdl.SDL_Quit();
 		}
 	}
 }
