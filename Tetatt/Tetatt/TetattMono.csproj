@@ -66,6 +66,9 @@
     <Compile Include="Xna\PresentationParameters.cs" />
     <Compile Include="Xna\GraphicsAdapter.cs" />
     <Compile Include="Xna\Rectangle.cs" />
+    <Compile Include="Xna\Texture2D.cs" />
+    <Compile Include="Xna\ContentManager.cs" />
+    <Compile Include="Xna\SpriteBatch.cs" />
     <Compile Include="Xna\Input.cs" />
   </ItemGroup>
   <ItemGroup>

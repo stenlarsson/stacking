@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework
 {
-	public class GameServiceContainer
+	public class GameServiceContainer : IServiceProvider
 	{
 		public Dictionary<Type, Object> services;
 		
