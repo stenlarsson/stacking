@@ -13,15 +13,6 @@ namespace Microsoft.Xna.Framework
 			public static Color White { get { return new Color(255,255,255,255); } }
 			public static Color DarkGray { get { return new Color(169,169,169,255); } }
 		}
-		public class GraphicsDevice {
-			public static void Clear(Color color) {}
-			public Rectangle ScissorRectangle { get; set; }
-		}
-		public class GraphicsDeviceManager {
-			public GraphicsDeviceManager(Game game) {}
-			public int PreferredBackBufferWidth { get; set; }
-			public int PreferredBackBufferHeight { get; set; }
-		}
 		public enum SpriteSortMode { Deferred }
 		public class BlendState {}
 		public class SamplerState {}
@@ -85,26 +76,7 @@ namespace Microsoft.Xna.Framework
 	namespace Media {}
 
 	public class GameTime {}
-	public class Game : IDisposable
-	{
-		public Content.ContentManager Content { get; set; }
-		public Graphics.GraphicsDevice GraphicsDevice { get; set; }
-		public void Exit () {}
-		public void Run () {}
-		protected virtual void Initialize() {}
-		protected virtual void LoadContent() {}
-		protected virtual void UnloadContent() {}
-		protected virtual void Update(GameTime gameTime) {}
-		protected virtual void Draw(GameTime gameTime) {}
-		public void Dispose() {}
-	}
 	public enum PlayerIndex { One, Two, Three, Four }
-	public struct Rectangle {
-		public Rectangle(int x, int y, int width, int height) {
-			X = x; Y = y; Width = width; Height = height;
-		}
-		public int X, Y, Width, Height;
-	}
 	public struct Vector2 {
 		public Vector2(float x, float y) {
 			X = x; Y = y;
