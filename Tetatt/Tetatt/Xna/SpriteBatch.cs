@@ -50,8 +50,8 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				Rectangle srect = graphicsDevice.ScissorRectangle;
 				Gl.glEnable(Gl.GL_SCISSOR_TEST);
-				Gl.glScissor(srect.X,
-				             height - srect.Height - srect.Y,
+				Gl.glScissor(srect.Left,
+				             height - srect.Bottom, // Yay for inverted OpenGL
 				             srect.Width,
 				             srect.Height);
 			}
@@ -77,20 +77,20 @@ namespace Microsoft.Xna.Framework.Graphics
 			Rectangle dest = destinationRectangle;
 			Rectangle src = sourceRectangle.HasValue ? (Rectangle)sourceRectangle : texture.Bounds;
 			
-			double tx1 = src.Left / (double)texture.Width;
-			double ty1 = (texture.Height - src.Top) / (double)texture.Height;
-			double tx2 = src.Right / (double)texture.Width;
-			double ty2 = (texture.Height - src.Bottom) / (double)texture.Height;
-
+			Gl.glMatrixMode(Gl.GL_TEXTURE);
+			Gl.glLoadIdentity();
+			Gl.glScalef(1.0f/texture.Width, -1.0f/texture.Height, 1);
+			Gl.glTranslatef(0, 1, 0);
+			
 			Gl.glBindTexture(Gl.GL_TEXTURE_2D, texture.id);
 			Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
-			Gl.glTexCoord2d(tx1,ty1);
+			Gl.glTexCoord2d(src.Left, src.Top);
 			Gl.glVertex2i(dest.Left, dest.Top);
-			Gl.glTexCoord2d(tx1,ty2);
+			Gl.glTexCoord2d(src.Left, src.Bottom);
 			Gl.glVertex2i(dest.Left, dest.Bottom);
-			Gl.glTexCoord2d(tx2,ty1);
+			Gl.glTexCoord2d(src.Right, src.Top);
 			Gl.glVertex2i(dest.Right, dest.Top);
-			Gl.glTexCoord2d(tx2,ty2);
+			Gl.glTexCoord2d(src.Right, src.Bottom);
 			Gl.glVertex2i(dest.Right, dest.Bottom);
 			Gl.glEnd();
 		}
