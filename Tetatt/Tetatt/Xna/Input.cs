@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Input {
 		public static KeyboardState GetState() {
 			int dummy;
 			return new KeyboardState() {
-				keystate = Sdl.SDL_GetKeyState(out dummy)
+				keystate = (byte[])Sdl.SDL_GetKeyState(out dummy).Clone()
 			};
 		}
 	}
