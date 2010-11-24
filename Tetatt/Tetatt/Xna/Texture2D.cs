@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
 	public class Texture2D
 	{
-		private int texture;
+		internal int id;
 		
 		public int Width { get; set; }
 		public int Height { get; set; }
@@ -21,7 +21,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			}
 			Width = Il.ilGetInteger(Il.IL_IMAGE_WIDTH);
 			Height = Il.ilGetInteger(Il.IL_IMAGE_HEIGHT); 
-			texture = Ilut.ilutGLBindTexImage();
+			id = Ilut.ilutGLBindTexImage();
 			Il.ilDeleteImage(image);
 		}
 	}

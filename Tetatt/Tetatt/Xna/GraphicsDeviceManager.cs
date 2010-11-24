@@ -42,6 +42,7 @@ namespace Microsoft.Xna.Framework
 		
 		public void EndDraw()
 		{
+			graphicsDevice.Present();
 		}
 	}
 }

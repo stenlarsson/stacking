@@ -1,6 +1,6 @@
 using System;
 
-namespace Microsoft.Xna.Framework.Graphics
+namespace Microsoft.Xna.Framework
 {
 	public struct Rectangle
 	{
@@ -8,6 +8,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public int Y;
 		public int Width;
 		public int Height;
+		
+		public int Left { get { return X; } }
+		public int Right { get { return X + Width; } }
+		public int Top { get { return Y; } }
+		public int Bottom { get { return Y + Height; } }
 		
 		public Rectangle(int x, int y, int width, int height)
 		{
