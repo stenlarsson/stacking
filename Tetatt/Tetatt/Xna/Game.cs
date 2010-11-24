@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
 using Tao.Sdl;
 using Tao.DevIl;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -27,6 +28,19 @@ namespace Microsoft.Xna.Framework
 		
 		public void Run()
 		{
+			if (System.IO.File.Exists("/System/Library/Frameworks/AppKit.framework/AppKit")) {
+				// Unfortunately, SDL on OSX doesn't make the process a gui process,
+				// so we try to do that here
+				try {
+					IntPtr psn = IntPtr.Zero;
+					GetCurrentProcess (ref psn);
+					TransformProcessType (ref psn, 1);
+					SetFrontProcess (ref psn);
+				} catch (Exception ex) {
+					Console.WriteLine(ex); 
+				}
+			}
+
 			Sdl.SDL_Init(Sdl.SDL_INIT_EVERYTHING);
 			Il.ilInit();
 			Ilu.iluInit();
@@ -93,5 +107,12 @@ namespace Microsoft.Xna.Framework
 		{
 			Sdl.SDL_Quit();
 		}
+		
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		private static extern void GetCurrentProcess (ref IntPtr psn);
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		private static extern void TransformProcessType (ref IntPtr psn, uint type);
+		[DllImport ("/System/Library/Frameworks/AppKit.framework/AppKit")]
+		private static extern void SetFrontProcess (ref IntPtr psn);
 	}
 }
