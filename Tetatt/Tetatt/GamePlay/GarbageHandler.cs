@@ -9,10 +9,10 @@ namespace Tetatt.GamePlay
     {
         class GBInfo
         {
-            public GarbageBlock block;
+            public BigGarbageBlock block;
             public Chain chain;
 
-            public GBInfo(GarbageBlock block, Chain chain)
+            public GBInfo(BigGarbageBlock block, Chain chain)
             {
                 this.block = block;
                 this.chain = chain;
@@ -20,18 +20,18 @@ namespace Tetatt.GamePlay
         }
 
         /** Blocks that a currently in play. */
-        private List<GarbageBlock> activeBlocks;
+        private List<BigGarbageBlock> activeBlocks;
         /** Blocks waiting to be dropped into play. */
-        private Queue<GarbageBlock> normalDrops;
-        private Queue<GarbageBlock> chainDrops;
+        private Queue<BigGarbageBlock> normalDrops;
+        private Queue<BigGarbageBlock> chainDrops;
         /** Additional information about blocks being popped. */
         private LinkedList<GBInfo> popBlocks;
 
         public GarbageHandler()
         {
-            activeBlocks = new List<GarbageBlock>();
-            normalDrops = new Queue<GarbageBlock>();
-            chainDrops = new Queue<GarbageBlock>();
+            activeBlocks = new List<BigGarbageBlock>();
+            normalDrops = new Queue<BigGarbageBlock>();
+            chainDrops = new Queue<BigGarbageBlock>();
             popBlocks = new LinkedList<GBInfo>();
         }
 
@@ -40,7 +40,7 @@ namespace Tetatt.GamePlay
 	        switch(type)
 	        {
 	        case GarbageType.Chain:
-		        chainDrops.Enqueue(new GarbageBlock(num, GarbageType.Chain));
+		        chainDrops.Enqueue(new BigGarbageBlock(num, GarbageType.Chain));
 		        break;
 	        case GarbageType.Combo:
 		        {
@@ -48,27 +48,27 @@ namespace Tetatt.GamePlay
 			        int small = num - rows * PlayField.width;
 			        if(small >= 7) {
 				        int half = small / 2; // Divide into (3,4) (4,4) (4,5) (5,5)
-				        normalDrops.Enqueue(new GarbageBlock(half, GarbageType.Combo));
-				        normalDrops.Enqueue(new GarbageBlock(small-half, GarbageType.Combo));
+				        normalDrops.Enqueue(new BigGarbageBlock(half, GarbageType.Combo));
+				        normalDrops.Enqueue(new BigGarbageBlock(small-half, GarbageType.Combo));
 			        }
 			        else
-				        normalDrops.Enqueue(new GarbageBlock(small, GarbageType.Combo));
+				        normalDrops.Enqueue(new BigGarbageBlock(small, GarbageType.Combo));
 			        while(rows-- > 0)
-				        normalDrops.Enqueue(new GarbageBlock(PlayField.width, GarbageType.Combo));
+				        normalDrops.Enqueue(new BigGarbageBlock(PlayField.width, GarbageType.Combo));
 		        }
 		        break;
 	        case GarbageType.Evil:
 		        while(num-- > 0)
-			        normalDrops.Enqueue(new GarbageBlock(0, GarbageType.Evil));
+			        normalDrops.Enqueue(new BigGarbageBlock(0, GarbageType.Evil));
 		        break;
 	        }
         }
 
-        bool DropGarbageHelper(Queue<GarbageBlock> drops, List<GarbageBlock> active, PlayField pf)
+        bool DropGarbageHelper(Queue<BigGarbageBlock> drops, List<BigGarbageBlock> active, PlayField pf)
         {
 	        while(drops.Count != 0)
 	        {
-                GarbageBlock gb = drops.Dequeue();
+                BigGarbageBlock gb = drops.Dequeue();
 
 		        // Abort if we cannot place all garbage.
 		        if (!pf.InsertGarbage(gb))
@@ -94,13 +94,13 @@ namespace Tetatt.GamePlay
 
         public void Update()
         {
-            foreach(GarbageBlock block in activeBlocks)
+            foreach(BigGarbageBlock block in activeBlocks)
                 block.Update();
 
             activeBlocks.RemoveAll(block => block.IsEmpty());
         }
 
-        public void AddPop(GarbageBlock newPop, Chain chain, bool first)
+        public void AddPop(BigGarbageBlock newPop, Chain chain, bool first)
         {
 	        GBInfo info = new GBInfo(newPop, chain);
 	        if (first)

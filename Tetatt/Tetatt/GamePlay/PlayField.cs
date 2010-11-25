@@ -451,7 +451,7 @@ namespace Tetatt.GamePlay
 		        if(IsGarbage(field[i]))
 		        {
 			        // Replace garbage with a real block
-			        Block b = ((Garbage)field[i]).CreateBlock();
+			        Block b = ((GarbageBlock)field[i]).CreateBlock();
 			        field[i] = b;
 		        }
 		        else
@@ -699,7 +699,7 @@ namespace Tetatt.GamePlay
 				        if(field[i].IsPopped())
 					        continue;
 
-				        Garbage g = (Garbage)field[i];
+				        GarbageBlock g = (GarbageBlock)field[i];
 				        tmpChain = SamePopChain(g, field[Below(i)], tmpChain);
 				        tmpChain = SamePopChain(g, field[Above(i)], tmpChain);
 				        if(!IsRightmost(i))
@@ -779,7 +779,7 @@ namespace Tetatt.GamePlay
             return true;
         }
 
-        public bool InsertGarbage(GarbageBlock b)
+        public bool InsertGarbage(BigGarbageBlock b)
         {
 	        int pos = Math.Min(
 		        garbageDropStart,
@@ -958,7 +958,7 @@ namespace Tetatt.GamePlay
 	        return IsHoverOrIdle(candidate) && candidate.SameType(reference);
         }
 
-        Chain SamePopChain(Garbage g, Block block, Chain chain)
+        Chain SamePopChain(GarbageBlock g, Block block, Chain chain)
         {
 	        if(block != null &&
                 block.IsPopped() &&
