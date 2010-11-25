@@ -48,32 +48,21 @@ namespace Tetatt.GamePlay
 		        if(!chain.usedThisFrame)
 			        continue;
 
-		        chain.Sort();
+		        evil += chain.PopAllAndCountEvil();
 
-		        for(int curBlock = 0; curBlock < chain.numBlocks; curBlock++)
-		        {
-			        chain.blocks[curBlock].Pop(curBlock, chain.numBlocks);
-			        if(chain.blocks[curBlock].Type == BlockType.Gray)
-				        evil++;
-		        }
-	
 		        // Check add evil garbage
 		        if(evil > 0)
 		        {
-			        GarbageInfo g = new GarbageInfo(evil-2, GarbageType.Evil); // -2 to specify number of garbage lines
-			        chain.garbage.Add(g); 
-			        chain.sentCombo = true;
+			        chain.AddGarbage(new GarbageInfo(evil-2, GarbageType.Evil)); // -2 to specify number of garbage lines
 		        }
 		
-		        bool offscreen = chain.blockNum[0]/PlayField.width < (PlayField.firstVisibleRow-3); // If the block is too much offscreen
+		        bool offscreen = chain.TopMostBlockIndex/PlayField.width < (PlayField.firstVisibleRow-3); // If the block is too much offscreen
 		
 		        if(chain.numBlocks > 3)
 		        {
 			        // A combo.
 			        // -1 to specify number of garbage blocks instead of combo size
-			        GarbageInfo g = new GarbageInfo(chain.numBlocks-1, GarbageType.Combo);
-			        chain.garbage.Add(g);
-			        chain.sentCombo = true;
+			        chain.AddGarbage(new GarbageInfo(chain.numBlocks-1, GarbageType.Combo));
 			        pf.DelayScroll(chain.numBlocks*5);
 			        if(pf.GetHeight() > PlayField.stressHeight)
 				        bBonusStop = true;
@@ -84,7 +73,7 @@ namespace Tetatt.GamePlay
 			        if(!offscreen) // Only add effect if it's onscreen
 				        eh->Add(
 					        new EffCombo(
-						        (*it)->blockNum[0],
+						        (*it)->TopMostBlockIndex,
 						        COMBO_4,
 						        (*it)->numBlocks));
                     */
@@ -99,7 +88,7 @@ namespace Tetatt.GamePlay
 				        if(!offscreen)
 					        eh->Add(
 						        new EffCombo(
-							        (*it)->blockNum[0]-PF_WIDTH,
+							        (*it)->TopMostBlockIndex-PF_WIDTH,
 							        COMBO_2X,
 							        (*it)->length));
                         */
@@ -120,7 +109,7 @@ namespace Tetatt.GamePlay
 			        if(!offscreen)
 				        eh->Add(
 					        new EffCombo(
-						        (*it)->blockNum[0],
+						        (*it)->TopMostBlockIndex,
 						        COMBO_2X,
 						        (*it)->length));
 			        if(pf->GetHeight() > PF_STRESS_HEIGHT)
@@ -137,9 +126,7 @@ namespace Tetatt.GamePlay
 			        // TODO: Add some nifty graphics, and perhaps not a static bonus?
 			        pf.DelayScroll(bonusStopTime);
 		        }
-		        chain.ClearBlocks();
-		        chain.numBlocks = 0;
-		        chain.usedThisFrame = false;
+		        chain.EndFrame();
 	        }
 	        newChain = null;
         }

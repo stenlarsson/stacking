@@ -7,25 +7,24 @@ namespace Tetatt.GamePlay
 {
     class Chain
     {
-        public Block[] blocks; // TODO should be a List?
-        public int[] blockNum;
-        public int numBlocks;
+        private SortedDictionary<int,Block> blocks;
+        public int numBlocks {
+            get {
+                return blocks.Count;
+            }
+        }
         public int length;
         public int activeBlocks;
         public bool sentCombo;
-        public int popCount;
         public bool usedThisFrame;
         public List<GarbageInfo> garbage;
 
         public Chain()
         {
-            blocks = new Block[100];
-            blockNum = new int[100];
-            numBlocks = 0;
+            blocks = new SortedDictionary<int, Block>();
             length = 0;
             activeBlocks = 0;
             sentCombo = false;
-            popCount = 0;
             usedThisFrame = false;
             garbage = new List<GarbageInfo>();
         }
@@ -35,64 +34,46 @@ namespace Tetatt.GamePlay
             return activeBlocks > 0;
         }
 
-	    public void ClearBlocks()
-	    {
-            for (int i = 0; i < 100; i++)
-            {
-                blocks[i] = null;
-                blockNum[i] = -1;
-            }
-	    }
+        public void EndFrame()
+        {
+            blocks.Clear();
+            usedThisFrame = false;
+        }
 
         public void AddBlock(Block block, int blocknum)
         {
-            blocks[numBlocks] = block;
-            blockNum[numBlocks] = blocknum;
-            numBlocks++;
+            blocks[blocknum] = block;
             if (!usedThisFrame)
             {
                 // Increases chain length every frame it's involved in popping new blocks
                 length++;
-                popCount = 0;
                 usedThisFrame = true;
             }
         }
 
-        public void Sort()
-	    {
-		    bool changed = true;
-		    while(changed)
-		    {
-			    changed = false;
-			    for(int i = 0; i < numBlocks-1; i++)
-			    {
-				    if(blockNum[i+1] < blockNum[i])
-				    {
-                        // swap
-                        int tmpNum = blockNum[i];
-                        blockNum[i] = blockNum[i+1];
-                        blockNum[i+1] = tmpNum;
-                        Block tmpBlock = blocks[i];
-                        blocks[i] = blocks[i+1];
-                        blocks[i+1] = tmpBlock;
-					    changed = true;
-				    }
-				    else if(blockNum[i] == blockNum[i+1])
-				    {
-					    for(int ii = i; ii < numBlocks-1; ii++)
-					    {
-						    blockNum[ii] = blockNum[ii+1];
-						    blocks[ii] = blocks[ii+1];
-					    }
+        public void AddGarbage(GarbageInfo g)
+        {
+            garbage.Add(g); 
+           sentCombo = true;
+        }
 
-					    numBlocks--;
-					    blockNum[numBlocks] = -1;
-					    blocks[numBlocks] = null;
-
-					    changed = true;
-				    }
-			    }
-		    }
-	    }
+        public int PopAllAndCountEvil() {
+            int any = 0, evil = 0;
+            foreach( KeyValuePair<int, Block> cur in blocks )
+            {
+                cur.Value.Pop(any++, blocks.Count);
+                if (cur.Value.Type == BlockType.Gray)
+                    evil++;
+            }
+            return evil;
+        }
+        
+        public int TopMostBlockIndex {
+            get {
+                foreach( KeyValuePair<int, Block> cur in blocks )
+                    return cur.Key;
+                return -1; // No block...
+            }
+        }        
     }
 }
