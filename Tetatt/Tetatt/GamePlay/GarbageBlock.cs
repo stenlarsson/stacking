@@ -2,197 +2,145 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
+using Tetatt.Graphics;
 
 namespace Tetatt.GamePlay
 {
-    class GarbageBlock
+    class GarbageBlock : Block
     {
-        private List<Garbage> blocks;
-	    private int numFalling;
-	    private BlockState state;
-	    private int popDelay;
-	    private GarbageType type;
+        private BlockType typeAfterPop;
+        private BigGarbageBlock gb;
+	    private int nextGraphic;
+	    private bool wantToDrop;
 
-        public const int tileBlue = 88;
-        public const int tileGray = 104;
-        public const int tileTopOffset = 0;
-        public const int tileMiddleOffset = 3;
-        public const int tileFlash1Offset = 6;
-        public const int tileFlash2Offset = 7;
-        public const int tileBottomOffset = 8;
-        public const int tileSingleOffset = 11;
-        public const int graphicsDisabled = -1;
-        public const int graphicsNone = 0;
-	    public const int graphicsSingle = tileBlue + tileSingleOffset;
-	    public const int graphicsTop    = tileBlue + tileTopOffset;
-	    public const int graphicsMiddle = tileBlue + tileMiddleOffset;
-	    public const int graphicsBottom = tileBlue + tileBottomOffset;
-	    public const int graphicsEvil   = tileGray;
+        private AnimFrame[] flashFrames;
 
-        public GarbageBlock(int num, GarbageType type)
+        public GarbageBlock(GarbageType garbageType, BlockType typeAfterPop, BigGarbageBlock gb)
+            : base(garbageType == GarbageType.Evil ? BlockType.EvilGarbage : BlockType.Garbage,
+            BlockState.Idle,
+            null,
+            false,
+            new Anim(BigGarbageBlock.graphicsSingle))
         {
-            blocks = new List<Garbage>();
-            numFalling = 0;
-            state = BlockState.Idle;
-            popDelay = 0;
-            this.type = type;
+            this.typeAfterPop = typeAfterPop;
+            this.gb = gb;
+            nextGraphic = BigGarbageBlock.graphicsDisabled;
+            wantToDrop = false;
 
-            int lineCount = (type != GarbageType.Chain) ? 1 : num;
-            int blockCount = (type == GarbageType.Combo) ? num : lineCount * PlayField.width;
-            Random random = new Random();
-            for (int i = 0; i < blockCount; i++)
+            flashFrames = new AnimFrame[] {
+                new AnimFrame((int)type + BigGarbageBlock.tileFlash1Offset, 1),
+                new AnimFrame((int)type + BigGarbageBlock.tileFlash2Offset, 4)
+            };
+        }
+
+        // TODO I don't think the timing is correct for the destructor
+        ~GarbageBlock()
+        {
+            gb.RemoveBlock();
+        }
+
+        public void SetGraphic(int newGraphic)
+        {
+	        anim = new Anim(newGraphic);
+        }
+
+        public override void Drop()
+        {
+	        if(!wantToDrop)
+	        {
+		        gb.Drop();
+		        wantToDrop = true;
+	        }
+        }
+
+        public override void Land()
+        {
+	        gb.Land();
+        }
+
+        public override void Hover(int delay)
+        {
+	        gb.Hover(delay);
+        }
+
+        public BigGarbageBlock GB
+        {
+            get { return gb; }
+        }
+
+ 	    public bool IsOtherGarbageType(Block block)
+        {
+		    return block.Type ==
+			    (Type == BlockType.Garbage ? BlockType.EvilGarbage : BlockType.Garbage);
+	    }
+
+        public void Pop(int num, int total, int nextGraphic)
+        {
+            base.Pop(num, total);
+            this.nextGraphic = nextGraphic;
+        }
+
+        protected override void ChangeState(BlockState newState)
+        {
+            state = newState;
+            switch (newState)
             {
-                blocks.Add(new Garbage(type, PlayField.GetRandomBlockType(random), this));
+                case BlockState.Idle:
+                    stateDelay = -1;
+                    break;
+                case BlockState.Falling:
+                    dropTimer = dropDelay;
+                    stateDelay = -1;
+                    break;
+                case BlockState.Hover:
+                    nextState = BlockState.Falling;
+                    break;
+                case BlockState.Flash:
+                    anim = new Anim(AnimType.Looping, flashFrames);
+                    nextState = BlockState.Pop;
+                    // TODO difficulty
+                    stateDelay = 40;
+                    //stateDelay = g_game->GetLevelData()->flashTime;
+                    break;
+                case BlockState.Pop:
+                    anim = new Anim((int)type + BigGarbageBlock.tileFlash1Offset);
+                    nextState = BlockState.Pop2;
+                    stateDelay = popOffset;
+                    break;
+                case BlockState.Pop2:
+                    nextState = BlockState.Pop3;
+                    stateDelay = 1;
+                    break;
+                case BlockState.Pop3:
+                    anim = new Anim(nextGraphic == BigGarbageBlock.graphicsDisabled ? (int)typeAfterPop : nextGraphic);
+                    nextState = BlockState.Dead;
+                    stateDelay = dieOffset;
+                    break;
+                case BlockState.Dead:
+                    if (nextGraphic != BigGarbageBlock.graphicsDisabled)
+                    {
+                        nextGraphic = BigGarbageBlock.graphicsDisabled;
+                        state = BlockState.Falling;
+                        dropTimer = dropDelay;
+                    }
+                    stateDelay = -1;
+                    break;
+                default:
+                    Debug.Fail(string.Format("Unexpected state {0}", state));
+                    break;
             }
         }
-
-	    public int GetNum()
+        
+        public override void Update()
         {
-            return blocks.Count;
+	        base.Update();
+	        wantToDrop = false;
         }
 
-	    public bool IsEmpty()
+        public Block CreateBlock()
         {
-            return GetNum() <= 0;
-        }
-
-        public void InitPop(Chain chain)
-        {
-            foreach(Block block in blocks)
-            {
-                block.SetPop();
-            	// Needed so adjacent garbageblocks triggered by this one gets the same chain.
-                block.Chain = chain;
-            }
-        }
-
-        /** Get the correct graphics style specific line in a block of a certain size. */
-        private int GetLineGraphic(int line, int lineCount)
-        {      
-          if (lineCount == 1)
-		        return graphicsSingle;
-	        else if (line == 0)
-		        return graphicsTop;
-	        else if (line == lineCount - 1)
-		        return graphicsBottom;
-	        else
-		        return graphicsMiddle;
-        }
-
-        /** Adjust the tile number for block ends. */
-        private int GetBlockGraphic(int type, int block, int blockCount)
-        {
-	        if(block == 0)
-		        return (int)type + 0;
-	        else if(block == blockCount - 1)
-		        return (int)type + 2;
-	        else
-		        return (int)type + 1;
-        }
-
-        /**
-         * Get the appropriate tile for block index given the number of lines and
-         * the number of blocks in each row.
-         */
-        private int GetGraphic(int index, int lineCount, int blockCount)
-        {
-	        return GetBlockGraphic(
-		        GetLineGraphic(index / PlayField.width, lineCount), index % PlayField.width, blockCount);
-        }
-
-        /**
-         * Return the number of lines given the block count.
-         * 3,4,5 => 1, n*6 => n
-         */
-        private int GetLines(int count)
-        {
-	        return (count + PlayField.width - 1) / PlayField.width;
-        }
-
-        public void Pop(int delay, int total, Chain newchain)
-        {
-	        // int required here since we're stopping on less then 0
-            int firstRemoved = Math.Max(blocks.Count, PlayField.width) - PlayField.width;
-
-            for(int i = blocks.Count - 1; i >= firstRemoved; i--)
-		        blocks[i].Pop(delay++, total, graphicsDisabled);
-
-	        for(int i = firstRemoved - 1; i >= 0; i--)
-		        blocks[i].Pop(
-			        delay++, total,
-			        GetGraphic(i, GetLines(blocks.Count) - 1, PlayField.width));
-
-	        state = BlockState.Pop;
-            // TODO difficulty
-            popDelay = 10 + 7 * total + 40;
-        }
-
-        public void SetGraphic()
-        {
-	        if(type == GarbageType.Evil)
-		        for(int i = 0; i < PlayField.width; i++)
-			        blocks[i].SetGraphic(
-				        GetBlockGraphic(graphicsEvil, i, PlayField.width));
-	        else
-		        for(int i = 0; i < blocks.Count; i++)
-			        blocks[i].SetGraphic(
-				        GetGraphic(
-					        i, GetLines(blocks.Count),
-					        blocks.Count < PlayField.width ? blocks.Count : PlayField.width));
-        }
-
-        public Block GetBlock(int num)
-        {
-	        return blocks[num];
-        }
-
-        public void Drop()
-        {
-	        numFalling++;
-	        if((numFalling == blocks.Count || numFalling == PlayField.width) && state != BlockState.Pop)
-	        {
-                foreach(Block block in blocks)
-                    block.State = BlockState.Falling;
-		        state = BlockState.Falling;
-		        numFalling = 0;
-	        }
-        }
-
-        public void Land()
-        {
-	        if(state == BlockState.Falling)
-	        {
-                foreach(Block block in blocks)
-                    block.State = BlockState.Idle;
-		        state = BlockState.Idle;
-	        }
-        }
-
-        public void Hover(int delay)
-        {
-            foreach(Block block in blocks)
-                block.State = BlockState.Idle;
-        }
-
-        public void Update()
-        {
-	        if(state == BlockState.Idle && numFalling != 0)
-                foreach(Block block in blocks)
-                    block.State = BlockState.Idle;
-
-	        if(state == BlockState.Pop && --popDelay <= 0)
-	        {
-		        state = BlockState.Falling;
-		        // Clear the chain from all but the bottom blocks
-		        for(int i = 0; i < (int)blocks.Count-PlayField.width; i++)
-			        blocks[i].Chain = null;
-	        }
-	        numFalling = 0;
-        }
-
-        public void RemoveBlock()
-        {
-            blocks.RemoveAt(blocks.Count - 1);
+	        return new Block(type, BlockState.Falling, this.Chain, false);
         }
     }
 }

@@ -115,7 +115,7 @@
     <Compile Include="GamePlay\BlockState.cs" />
     <Compile Include="GamePlay\BlockType.cs" />
     <Compile Include="GamePlay\Chain.cs" />
-    <Compile Include="GamePlay\Garbage.cs" />
+    <Compile Include="GamePlay\BigGarbageBlock.cs" />
     <Compile Include="GamePlay\GarbageBlock.cs" />
     <Compile Include="GamePlay\GarbageHandler.cs" />
     <Compile Include="GamePlay\GarbageInfo.cs" />
