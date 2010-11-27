@@ -265,12 +265,13 @@ namespace Tetatt.GamePlay
 	        }
         }
 
-        public void RemoveBlock()
+        public virtual Block ReplaceBlock()
         {
             if (chain != null)
             {
                 chain.activeBlocks--;
             }
+            return null;
         }
     }
 }
