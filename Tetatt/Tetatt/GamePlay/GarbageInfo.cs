@@ -13,7 +13,7 @@ namespace Tetatt.GamePlay
             this.type = type;
         }
 
-        int size;
-        GarbageType type;
+        public int size;
+        public GarbageType type;
     }
 }

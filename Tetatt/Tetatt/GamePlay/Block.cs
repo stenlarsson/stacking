@@ -62,12 +62,6 @@ namespace Tetatt.GamePlay
 
         }
 
-        // TODO I don't think the timing is correct for the destructor
-        ~Block()
-        {
-            Chain = null;
-        }
-
         public virtual void Update()
         {
             if (dropTimer > 0)
@@ -271,5 +265,12 @@ namespace Tetatt.GamePlay
 	        }
         }
 
+        public void RemoveBlock()
+        {
+            if (chain != null)
+            {
+                chain.activeBlocks--;
+            }
+        }
     }
 }

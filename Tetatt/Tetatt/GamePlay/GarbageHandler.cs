@@ -35,7 +35,7 @@ namespace Tetatt.GamePlay
             popBlocks = new LinkedList<GBInfo>();
         }
 
-        public void AddGarbage(int num, int player, GarbageType type)
+        public void AddGarbage(int num, GarbageType type)
         {
 	        switch(type)
 	        {
