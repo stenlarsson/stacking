@@ -449,20 +449,9 @@ namespace Tetatt.GamePlay
 		        if(field[i] == null || field[i].State != BlockState.Dead)
 			        continue;
 
-		        if(IsGarbage(field[i]))
-		        {
-			        // Replace garbage with a real block
-                    GarbageBlock gb = (GarbageBlock)field[i];
-			        Block b = gb.CreateBlock();
-                    gb.RemoveBlock();
-			        field[i] = b;
-		        }
-		        else
+                if(!IsGarbage(field[i]))
 		        {
 			        Chain chain = field[i].Chain;
-                    field[i].RemoveBlock();
-			        field[i] = null;
-			
 			        // Propagate chain upwards, and drop idle blocks
                     for (int y = Above(i); !IsTopmost(y) && IsDropable(field[y]); y = Above(y))
                     {
@@ -471,6 +460,7 @@ namespace Tetatt.GamePlay
                             field[y].Drop();
                     }
 		        }
+                field[i] = field[i].ReplaceBlock();
 	        }
         }
 
