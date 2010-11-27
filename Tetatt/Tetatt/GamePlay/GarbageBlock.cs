@@ -34,12 +34,6 @@ namespace Tetatt.GamePlay
             };
         }
 
-        // TODO I don't think the timing is correct for the destructor
-        ~GarbageBlock()
-        {
-            gb.RemoveBlock();
-        }
-
         public void SetGraphic(int newGraphic)
         {
 	        anim = new Anim(newGraphic);
@@ -140,7 +134,13 @@ namespace Tetatt.GamePlay
 
         public Block CreateBlock()
         {
-	        return new Block(type, BlockState.Falling, this.Chain, false);
+	        return new Block(typeAfterPop, BlockState.Falling, this.Chain, false);
+        }
+
+        public void RemoveBlock()
+        {
+            gb.RemoveBlock();
+            base.RemoveBlock();
         }
     }
 }

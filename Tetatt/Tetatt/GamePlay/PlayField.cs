@@ -187,13 +187,14 @@ namespace Tetatt.GamePlay
 
         public void Start()
         {
-	        state = PlayFieldState.Start;
-	        stateDelay = 150;
+            state = PlayFieldState.Start;
+            stateDelay = 150;
             // TODO effects
-	        //effects->Add(new EffReady());
+            Debug.WriteLine("Start");
+            //effects->Add(new EffReady());
             // TODO music
-	        //Sound::PlayMusic(false);
-	        musicNormal = true;
+            //Sound::PlayMusic(false);
+            musicNormal = true;
         }
 
         public void Update()
@@ -451,12 +452,15 @@ namespace Tetatt.GamePlay
 		        if(IsGarbage(field[i]))
 		        {
 			        // Replace garbage with a real block
-			        Block b = ((GarbageBlock)field[i]).CreateBlock();
+                    GarbageBlock gb = (GarbageBlock)field[i];
+			        Block b = gb.CreateBlock();
+                    gb.RemoveBlock();
 			        field[i] = b;
 		        }
 		        else
 		        {
 			        Chain chain = field[i].Chain;
+                    field[i].RemoveBlock();
 			        field[i] = null;
 			
 			        // Propagate chain upwards, and drop idle blocks
@@ -595,6 +599,7 @@ namespace Tetatt.GamePlay
 					        chainlength = field[i].Chain.length;
 				        }
                         // TODO effect
+                        Debug.WriteLine("Chain pop " + chainlength);
                         /*
 				        if(IsVisible(i))
 					        effects->Add(new EffPop(i, chainlength));
@@ -974,6 +979,11 @@ namespace Tetatt.GamePlay
         bool IsDropable(Block b)
         {
 	        return IsBlock(b) && (b.State == BlockState.Idle || IsHoverOrMove(b));
+        }
+
+        public void AddGarbage(int num, GarbageType type)
+        {
+            gh.AddGarbage(num, type);
         }
     }
 }

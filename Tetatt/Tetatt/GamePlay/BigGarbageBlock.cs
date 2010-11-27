@@ -14,13 +14,13 @@ namespace Tetatt.GamePlay
 	    private GarbageType type;
 
         public const int tileBlue = 88;
-        public const int tileGray = 104;
+        public const int tileGray = 99;
         public const int tileTopOffset = 0;
-        public const int tileMiddleOffset = 3;
-        public const int tileFlash1Offset = 6;
-        public const int tileFlash2Offset = 7;
-        public const int tileBottomOffset = 8;
-        public const int tileSingleOffset = 11;
+        public const int tileMiddleOffset = 8;
+        public const int tileFlash1Offset = 7;
+        public const int tileFlash2Offset = 6;
+        public const int tileBottomOffset = 16;
+        public const int tileSingleOffset = 3;
         public const int graphicsDisabled = -1;
         public const int graphicsNone = 0;
 	    public const int graphicsSingle = tileBlue + tileSingleOffset;
