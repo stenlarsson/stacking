@@ -38,7 +38,7 @@ namespace Tetatt
             graphics.PreferredBackBufferHeight = 720;
 
             playField = new PlayField();
-            playField.PerformedCombo += new EventHandler<ComboEventArgs>(playField_PerformedCombo);
+            playField.PerformedCombo += playField_PerformedCombo;
             playFieldOffset = new Vector2(96, 248);
         }
 
@@ -164,13 +164,7 @@ namespace Tetatt
                 ce.pos + playFieldOffset,
                 ce.isChain,
                 ce.count);
-            eff.Disposed += new EventHandler<EventArgs>(eff_Disposed);
             Components.Add(eff);
-        }
-
-        private void eff_Disposed(object sender, EventArgs e)
-        {
-            Components.Remove((IGameComponent)sender);
         }
     }
 }
