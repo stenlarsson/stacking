@@ -42,6 +42,7 @@ namespace Microsoft.Xna.Framework
 			}
 
 			Sdl.SDL_Init(Sdl.SDL_INIT_EVERYTHING);
+			SdlMixer.Mix_OpenAudio(22050, (short)Sdl.AUDIO_S16SYS, 2, 4096);
 			Il.ilInit();
 			Ilu.iluInit();
 
@@ -105,6 +106,7 @@ namespace Microsoft.Xna.Framework
 		
 		public void Dispose()
 		{
+			SdlMixer.Mix_CloseAudio();
 			Sdl.SDL_Quit();
 		}
 		
