@@ -26,7 +26,7 @@ namespace Tetatt.GamePlay
         protected const int dropDelay =  0;
         protected const int flashDelay = 40;
 
-        private const int tileBlank = 63;
+        private const int tileBlank = 127;
         private const int tileNormalOffset = 0;
         private const int tileBounce1Offset = 1;
         private const int tileBounce2Offset = 2;

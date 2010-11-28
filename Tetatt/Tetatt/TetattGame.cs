@@ -21,8 +21,10 @@ namespace Tetatt
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Texture2D background;
 
         PlayField playField;
+        Vector2 playFieldOffset;
 
         GamePadState oldGamePadState;
         KeyboardState oldKeyboardState;
@@ -36,6 +38,8 @@ namespace Tetatt
             graphics.PreferredBackBufferHeight = 720;
 
             playField = new PlayField();
+            playField.PerformedCombo += new EventHandler<ComboEventArgs>(playField_PerformedCombo);
+            playFieldOffset = new Vector2(96, 248);
         }
 
         /// <summary>
@@ -62,6 +66,7 @@ namespace Tetatt
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            background = this.Content.Load<Texture2D>("background");
             PlayField.background = this.Content.Load<Texture2D>("playfield");
             PlayField.marker = this.Content.Load<Texture2D>("marker");
             PlayField.blocksTileSet = new TileSet(
@@ -145,9 +150,27 @@ namespace Tetatt
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
-            playField.Draw(spriteBatch, 96, 248);
+            spriteBatch.Begin();
+            spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
+            spriteBatch.End();
+            playField.Draw(spriteBatch, playFieldOffset);
             base.Draw(gameTime);
+        }
+
+        private void playField_PerformedCombo(object sender, ComboEventArgs ce)
+        {
+            EffCombo eff = new EffCombo(
+                this,
+                ce.pos + playFieldOffset,
+                ce.isChain,
+                ce.count);
+            eff.Disposed += new EventHandler<EventArgs>(eff_Disposed);
+            Components.Add(eff);
+        }
+
+        private void eff_Disposed(object sender, EventArgs e)
+        {
+            Components.Remove((IGameComponent)sender);
         }
     }
 }
