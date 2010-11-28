@@ -33,12 +33,12 @@ namespace Tetatt.Graphics
 
         public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
             duration--;
             if (duration <= 0)
             {
-                Dispose();
+                Game.Components.Remove(this);
             }
-            base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
