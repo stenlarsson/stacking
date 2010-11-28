@@ -141,7 +141,7 @@ namespace Tetatt.GamePlay
             // Replace garbage with a real block
             Block b = CreateBlock();
             gb.RemoveBlock();
-            base.ReplaceBlock();
+            Chain = null;
             return b;
         }
     }
