@@ -70,6 +70,7 @@
     <Compile Include="Xna\SpriteBatch.cs" />
     <Compile Include="Xna\Input.cs" />
     <Compile Include="Xna\Color.cs" />
+    <Compile Include="Xna\SoundEffect.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TetattContent\TetattContent.mdproj">
