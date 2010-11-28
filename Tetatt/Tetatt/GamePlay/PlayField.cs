@@ -10,15 +10,6 @@ using Tetatt.Graphics;
 
 namespace Tetatt.GamePlay
 {
-    enum PlayFieldState
-    {
-        Init,
-        Start,
-        Play,
-        Die,
-        Dead
-    };
-
     class PlayField
     {
         public const int blockSize = 32;
@@ -120,7 +111,7 @@ namespace Tetatt.GamePlay
 
         public void DelayScroll(int delay)
         {
-            scrollPause = Math.Min(maxStopTime, scrollPause+delay);
+            scrollPause = Math.Min(maxStopTime, scrollPause + delay);
         }
 
         public void AddScore(int score)
@@ -130,18 +121,18 @@ namespace Tetatt.GamePlay
 
         private void RandomizeField()
         {
-	        for(int i = firstFilledRow; i < height; i++)
-		        RandomizeRow(i);
+            for (int i = firstFilledRow; i < height; i++)
+                RandomizeRow(i);
         }
 
         private void RandomizeRow(int row)
         {
             bool grayBlock = false;
-	        for (int i = row * width; i < (row + 1) * width; i++)
-	        {
-		        field[i] = null;
-		        while (field[i] == null)
-		        {
+            for (int i = row * width; i < (row + 1) * width; i++)
+            {
+                field[i] = null;
+                while (field[i] == null)
+                {
                     BlockType type;
                     if (!grayBlock &&
                         scrolledRows > grayBlockDelay &&
@@ -153,22 +144,22 @@ namespace Tetatt.GamePlay
                     {
                         type = GetRandomBlockType(random);
                     }
-			
-			        // make sure block won't pop immediately
-			
-			        if (!IsLeftmost(i,2) &&
+
+                    // make sure block won't pop immediately
+
+                    if (!IsLeftmost(i, 2) &&
                         IsOfType(field[LeftOf(i)], type) &&
                         IsOfType(field[LeftOf(i, 2)], type))
-					        continue;
+                        continue;
 
-			        if (IsOfType(field[Above(i)], type) &&
+                    if (IsOfType(field[Above(i)], type) &&
                         IsOfType(field[Above(i, 2)], type))
-				        continue;
-			
-			        grayBlock = grayBlock || (type == BlockType.Gray);
-			        field[i] = new Block(type);
-		        }
-	        }
+                        continue;
+
+                    grayBlock = grayBlock || (type == BlockType.Gray);
+                    field[i] = new Block(type);
+                }
+            }
         }
 
         // TODO ugly static method
@@ -251,47 +242,47 @@ namespace Tetatt.GamePlay
 
         public void KeyInput(InputType input)
         {
-	        switch(input)
-	        {
-	        case InputType.Up:
-		        swapTimer = 0;
-		        if(!IsTopmostVisible(markerPos, GetHeight() >= visibleHeight ? 1 : 2))
-			        markerPos = Above(markerPos);
-		        break;
+            switch (input)
+            {
+                case InputType.Up:
+                    swapTimer = 0;
+                    if (!IsTopmostVisible(markerPos, GetHeight() >= visibleHeight ? 1 : 2))
+                        markerPos = Above(markerPos);
+                    break;
 
-	        case InputType.Left:
-		        swapTimer = 0;	
-		        if(!IsLeftmost(markerPos))
-			        markerPos = LeftOf(markerPos);
-		        break;
+                case InputType.Left:
+                    swapTimer = 0;
+                    if (!IsLeftmost(markerPos))
+                        markerPos = LeftOf(markerPos);
+                    break;
 
-	        case InputType.Right:
-		        swapTimer = 0;	
-		        if(!IsRightmost(markerPos, 2))
-			        markerPos = RightOf(markerPos);
-		        break;
+                case InputType.Right:
+                    swapTimer = 0;
+                    if (!IsRightmost(markerPos, 2))
+                        markerPos = RightOf(markerPos);
+                    break;
 
-	        case InputType.Down:
-		        swapTimer = 0;
-		        if(!IsBottommostVisible(markerPos))
-			        markerPos = Below(markerPos);
-		        break;
+                case InputType.Down:
+                    swapTimer = 0;
+                    if (!IsBottommostVisible(markerPos))
+                        markerPos = Below(markerPos);
+                    break;
 
-	        case InputType.Swap:
-		        if(state != PlayFieldState.Play)
-			        break;
-		        if(!SwapBlocks(markerPos))
-			        swapTimer = 20;
-		        else
-			        swapTimer = 0;
-		        break;
+                case InputType.Swap:
+                    if (state != PlayFieldState.Play)
+                        break;
+                    if (!SwapBlocks(markerPos))
+                        swapTimer = 20;
+                    else
+                        swapTimer = 0;
+                    break;
 
-	        case InputType.Raise:
-		        fastScroll = true;
-		        if(scrollPause > 2)
-			        scrollPause = 0;
-		        break;
-	        }
+                case InputType.Raise:
+                    fastScroll = true;
+                    if (scrollPause > 2)
+                        scrollPause = 0;
+                    break;
+            }
         }
 
         private void StateCheck()
@@ -317,151 +308,151 @@ namespace Tetatt.GamePlay
 
         private bool SwapBlocks(int pos)
         {
-            if(IsForthcoming(pos))
-		        return false;
-		
-	        Block left = field[pos];
+            if (IsForthcoming(pos))
+                return false;
+
+            Block left = field[pos];
             Block right = field[RightOf(pos)];
 
-	        if(left != null && (!IsOfState(left, BlockState.Idle) || IsGarbage(left)))
-		        return false;
-	        if(right != null && (!IsOfState(right, BlockState.Idle) || IsGarbage(right)))
-		        return false;
+            if (left != null && (!IsOfState(left, BlockState.Idle) || IsGarbage(left)))
+                return false;
+            if (right != null && (!IsOfState(right, BlockState.Idle) || IsGarbage(right)))
+                return false;
 
-	        if(left == null && right == null)
-		        return false;
+            if (left == null && right == null)
+                return false;
 
-	        if(left == null)
-	        {
-		        if(IsHoverOrMove(field[Above(pos)]))
-			        return false;
+            if (left == null)
+            {
+                if (IsHoverOrMove(field[Above(pos)]))
+                    return false;
 
-		        if(IsOfState(field[RightOf(Above(pos))], BlockState.Idle))
-			        field[RightOf(Above(pos))].Hover(9);
-	        }
-	        else if(right == null)
-	        {
-		        if(IsHoverOrMove(field[RightOf(Above(pos))]))
-			        return false;
+                if (IsOfState(field[RightOf(Above(pos))], BlockState.Idle))
+                    field[RightOf(Above(pos))].Hover(9);
+            }
+            else if (right == null)
+            {
+                if (IsHoverOrMove(field[RightOf(Above(pos))]))
+                    return false;
 
-		        if(IsOfState(field[Above(pos)], BlockState.Idle))
-			        field[Above(pos)].Hover(9);
-	        }
-	
-	        field[pos] = right;
-	        field[RightOf(pos)] = left;
-	
-	        if (right != null)
-	        {
-		        right.Move();
+                if (IsOfState(field[Above(pos)], BlockState.Idle))
+                    field[Above(pos)].Hover(9);
+            }
+
+            field[pos] = right;
+            field[RightOf(pos)] = left;
+
+            if (right != null)
+            {
+                right.Move();
                 // TODO effects
-		        //effects->Add(new EffMoveBlock(DIR_LEFT, right, RightOf(pos)));
-	        }
-	        if (left != null)
-	        {
-		        left.Move();
+                //effects->Add(new EffMoveBlock(DIR_LEFT, right, RightOf(pos)));
+            }
+            if (left != null)
+            {
+                left.Move();
                 // TODO effects
-		        //effects->Add(new EffMoveBlock(DIR_RIGHT, left, pos));
-	        }
-	        return true;
+                //effects->Add(new EffMoveBlock(DIR_RIGHT, left, pos));
+            }
+            return true;
         }
 
         private bool ShouldScroll()
         {
-	        for(int i = 0; !IsForthcoming(i); i++)
-	        {
-		        if(field[i] == null)
-			        continue;
+            for (int i = 0; !IsForthcoming(i); i++)
+            {
+                if (field[i] == null)
+                    continue;
 
-		        if(field[i].State != BlockState.Idle)
-		        {
-			        fastScroll = false;
-			        return false;
-		        }
-	        }
+                if (field[i].State != BlockState.Idle)
+                {
+                    fastScroll = false;
+                    return false;
+                }
+            }
 
-	        if(scrollPause != 0)
-	        {
-		        scrollPause--;
-		        fastScroll = false;
-		        return false;
-	        }
+            if (scrollPause != 0)
+            {
+                scrollPause--;
+                fastScroll = false;
+                return false;
+            }
 
-	        return true;
+            return true;
         }
 
         void ScrollField()
         {
-	        if(!tooHigh)
-	        {
-		        scrolledRows++;
+            if (!tooHigh)
+            {
+                scrolledRows++;
 
-		        if(fastScroll)
-			        scrollOffset -= 2;
-		        else
+                if (fastScroll)
+                    scrollOffset -= 2;
+                else
                     // TODO difficulty
-			        scrollOffset -= 0.052;
+                    scrollOffset -= 0.052;
 
-		        if(scrollOffset <= -blockSize)
-		        {
-			        for(int i = 0; !IsForthcoming(i); i++)
-				        field[i] = field[Below(i)];
-			        RandomizeRow(height-1);
+                if (scrollOffset <= -blockSize)
+                {
+                    for (int i = 0; !IsForthcoming(i); i++)
+                        field[i] = field[Below(i)];
+                    RandomizeRow(height - 1);
 
-			        if((GetHeight() == firstVisibleRow) ||
-			           (markerPos > firstBlockSecondVisibleRow))
-			        {
-				        markerPos -= width;
-			        }
+                    if ((GetHeight() == firstVisibleRow) ||
+                       (markerPos > firstBlockSecondVisibleRow))
+                    {
+                        markerPos -= width;
+                    }
 
-			        if(GetHeight() == firstVisibleRow)
-			        {
-				        scrollOffset = 0;
-			        }
-			        else
-			        {
-				        scrollOffset += blockSize;
-				        if(fastScroll)
-				        {
-					        score++;
-					        scrollPause = 2;
-					        fastScroll = false;
-				        }
-			        }
-		        }
-	        }
-	        else
-	        {
-		        if(++dieTimer > deathDelay)
-		        {
-			        state = PlayFieldState.Die;
-			        stateDelay = deathDuration;
+                    if (GetHeight() == firstVisibleRow)
+                    {
+                        scrollOffset = 0;
+                    }
+                    else
+                    {
+                        scrollOffset += blockSize;
+                        if (fastScroll)
+                        {
+                            score++;
+                            scrollPause = 2;
+                            fastScroll = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (++dieTimer > deathDelay)
+                {
+                    state = PlayFieldState.Die;
+                    stateDelay = deathDuration;
                     // TODO sound
-			        //Sound::PlayDieEffect();
-		        }
-	        }
+                    //Sound::PlayDieEffect();
+                }
+            }
         }
 
         private void ClearDeadBlocks()
         {
-	        for(int i = width; !IsForthcoming(i); i++)
-	        {
-		        if(field[i] == null || field[i].State != BlockState.Dead)
-			        continue;
+            for (int i = width; !IsForthcoming(i); i++)
+            {
+                if (field[i] == null || field[i].State != BlockState.Dead)
+                    continue;
 
                 if(!IsGarbage(field[i]))
-		        {
-			        Chain chain = field[i].Chain;
-			        // Propagate chain upwards, and drop idle blocks
+                {
+                    Chain chain = field[i].Chain;
+                    // Propagate chain upwards, and drop idle blocks
                     for (int y = Above(i); !IsTopmost(y) && IsDropable(field[y]); y = Above(y))
                     {
                         field[y].Chain = chain;
                         if (field[y].State == BlockState.Idle)
                             field[y].Drop();
                     }
-		        }
+                }
                 field[i] = field[i].ReplaceBlock();
-	        }
+            }
         }
 
         private void DropBlocks()
@@ -557,37 +548,37 @@ namespace Tetatt.GamePlay
 
         private void CheckForPops()
         {
-	        bool bPop = false; //flag to see if any pops occured this tick
-	        bool bClearChain = true; //flag to clear a blocks chain
-	        Chain tmpChain = null;
+            bool bPop = false; //flag to see if any pops occured this tick
+            bool bClearChain = true; //flag to clear a blocks chain
+            Chain tmpChain = null;
 
-	        //here's a good place to update the height
+            //here's a good place to update the height
 
             for (int i = 0; i < fieldHeight.Length; i++)
             {
                 fieldHeight[i] = -1;
             }
 
-	        for(int i = width; !IsForthcoming(i); i++)//loop, top to bottom
-	        {
-		        bClearChain = true;
-		        if(field[i] == null)//skip if there's no block
-			        continue;
+            for (int i = width; !IsForthcoming(i); i++)//loop, top to bottom
+            {
+                bClearChain = true;
+                if (field[i] == null)//skip if there's no block
+                    continue;
 
-		        if(field[i].State != BlockState.Falling)// no falling blocks please
-			        if(fieldHeight[i%width] == -1)//if we haven't already found one in the same column
-				        fieldHeight[i%width] = height - i / width - 1;//set height
+                if (field[i].State != BlockState.Falling)// no falling blocks please
+                    if (fieldHeight[i % width] == -1)//if we haven't already found one in the same column
+                        fieldHeight[i % width] = height - i / width - 1;//set height
 
-		        if(IsGarbage(field[i]) || !field[i].NeedPopCheck())
-		        {
-			        if(field[i].State == BlockState.Pop2)//but we want to check if we need to 'pop' it
-			        {
-				        int chainlength = 0;
-				        if(!IsGarbage(field[i]))
-				        {
-					        score += 10;
-					        chainlength = field[i].Chain.length;
-				        }
+                if (IsGarbage(field[i]) || !field[i].NeedPopCheck())
+                {
+                    if (field[i].State == BlockState.Pop2)//but we want to check if we need to 'pop' it
+                    {
+                        int chainlength = 0;
+                        if (!IsGarbage(field[i]))
+                        {
+                            score += 10;
+                            chainlength = field[i].Chain.length;
+                        }
                         // TODO effect
                         Debug.WriteLine("Chain pop " + chainlength);
                         /*
@@ -595,152 +586,152 @@ namespace Tetatt.GamePlay
 					        effects->Add(new EffPop(i, chainlength));
 				        Sound::PlayPopEffect(field[i]->GetChain());
                         */
-			        }
-			        continue;
-		        }
+                    }
+                    continue;
+                }
 
-		        int top = i;
-		        for( ; !IsTopmost(top); top = Above(top))
-		        {
-			        if(!IsPopableWith(field[i], field[Above(top)]))
-				        break;
-		        }
+                int top = i;
+                for (; !IsTopmost(top); top = Above(top))
+                {
+                    if (!IsPopableWith(field[i], field[Above(top)]))
+                        break;
+                }
 
-		        tmpChain = null;
+                tmpChain = null;
 
-		        int bottom = top;
-		        for( ; !IsBottommostVisible(bottom); bottom = Below(bottom))
-		        {
-			        // TODO: Move the chain thing after we know the block is used
-			        if(tmpChain == null)
-				        tmpChain = field[bottom].Chain; //if one of the blocks is in a chain
-													    //this'll store that
-			        if(!IsPopableWith(field[i], field[Below(bottom)]))
-				        break;
-		        }
+                int bottom = top;
+                for (; !IsBottommostVisible(bottom); bottom = Below(bottom))
+                {
+                    // TODO: Move the chain thing after we know the block is used
+                    if (tmpChain == null)
+                        tmpChain = field[bottom].Chain; //if one of the blocks is in a chain
+                    //this'll store that
+                    if (!IsPopableWith(field[i], field[Below(bottom)]))
+                        break;
+                }
 
-		        if(bottom >= Below(top, 2)) // Distance between 3 adjacent blocks is 2
-		        {
-			        for(int check = top; check <= bottom; check = Below(check))
-			        {
-				        if(!field[check].IsPopped())
-				        {
-					        field[check].Chain = tmpChain;
- 					        popper.AddBlock(field[check], check);
-					        field[check].SetPop();
-				        }
-			        }
-			        bClearChain = false;//and make sure we don't clear the chain
-			        bPop = true;//and set popflag
-		        }
+                if (bottom >= Below(top, 2)) // Distance between 3 adjacent blocks is 2
+                {
+                    for (int check = top; check <= bottom; check = Below(check))
+                    {
+                        if (!field[check].IsPopped())
+                        {
+                            field[check].Chain = tmpChain;
+                            popper.AddBlock(field[check], check);
+                            field[check].SetPop();
+                        }
+                    }
+                    bClearChain = false;//and make sure we don't clear the chain
+                    bPop = true;//and set popflag
+                }
 
-		        int left = i;
-		        for( ; !IsLeftmost(left); left = LeftOf(left))
-		        {
-			        if(!IsPopableWith(field[i], field[LeftOf(left)]))
-				        break;
-		        }
+                int left = i;
+                for (; !IsLeftmost(left); left = LeftOf(left))
+                {
+                    if (!IsPopableWith(field[i], field[LeftOf(left)]))
+                        break;
+                }
 
-		        tmpChain = null;
+                tmpChain = null;
 
-		        int right = left;
-		        for( ; !IsRightmost(right); right = RightOf(right))
-		        {
-			        // TODO: Move until we know block should be in chain
-			        if(tmpChain == null)
-				        tmpChain = field[right].Chain;//store the chain
+                int right = left;
+                for (; !IsRightmost(right); right = RightOf(right))
+                {
+                    // TODO: Move until we know block should be in chain
+                    if (tmpChain == null)
+                        tmpChain = field[right].Chain;//store the chain
 
-			        if(!IsPopableWith(field[i], field[RightOf(right)]))
-				        break;
-		        }
+                    if (!IsPopableWith(field[i], field[RightOf(right)]))
+                        break;
+                }
 
-		        if(right >= RightOf(left, 2)) // Distance between 3 adjacent blocks is 2
-		        {
-			        for(int check = left;check <= right; check = RightOf(check))
-			        {
-				        if(!field[check].IsPopped())
-				        {
-					        field[check].Chain = tmpChain;
-					        popper.AddBlock(field[check], check);
-					        field[check].SetPop();
-				        }
-			        }
-			        bClearChain = false;
-			        bPop = true;
-		        }
+                if (right >= RightOf(left, 2)) // Distance between 3 adjacent blocks is 2
+                {
+                    for (int check = left; check <= right; check = RightOf(check))
+                    {
+                        if (!field[check].IsPopped())
+                        {
+                            field[check].Chain = tmpChain;
+                            popper.AddBlock(field[check], check);
+                            field[check].SetPop();
+                        }
+                    }
+                    bClearChain = false;
+                    bPop = true;
+                }
 
-		        field[i].PopChecked();
-		        if(bClearChain && field[i].State != BlockState.Hover)
-			        field[i].Chain = null;
-	        }
-	
-	        // TODO: Should tmpChain not be reset after the loop above?
+                field[i].PopChecked();
+                if (bClearChain && field[i].State != BlockState.Hover)
+                    field[i].Chain = null;
+            }
 
-	        if(bPop)//if something popped
-	        {
-		        popper.Pop();//initiate popping
+            // TODO: Should tmpChain not be reset after the loop above?
 
-		        bool bDoOver = true;
-		        bool bReverse = false;
-		        while(bDoOver) // Check again to catch garbage popping garbage below itself
-		        {
-			        bDoOver=false;
-			        for(int i = lastBlockSecondLastRow; !IsTopmost(i); i--)//loop, bottom to top
-			        {
-				        // This checks if there are GarbageBlocks that needs to pop
-				        // TODO: Do this in terms of the larger GarbageBlocks instead of the individual fields
-				        if(!IsGarbage(field[i]) || field[i].State != BlockState.Idle)
-					        continue;
-				        if(field[i].IsPopped())
-					        continue;
+            if (bPop)//if something popped
+            {
+                popper.Pop();//initiate popping
 
-				        GarbageBlock g = (GarbageBlock)field[i];
-				        tmpChain = SamePopChain(g, field[Below(i)], tmpChain);
-				        tmpChain = SamePopChain(g, field[Above(i)], tmpChain);
-				        if(!IsRightmost(i))
-					        tmpChain = SamePopChain(g, field[RightOf(i)], tmpChain);
-				        if(!IsLeftmost(i))
-					        tmpChain = SamePopChain(g, field[LeftOf(i)], tmpChain);
-				
-				        if(!g.IsPopped()) // If it didn't pop, next!
-					        continue;
-	
-				        if(tmpChain != null)
-				        {
-					        gh.AddPop(g.GB, tmpChain, bReverse);
-					        bDoOver = true;
-					        tmpChain = null;
-				        }
-			        }
-			        if(bDoOver && !bReverse)
-				        bReverse = true;
-		        }
-		
-		        gh.Pop();
-	        }
+                bool bDoOver = true;
+                bool bReverse = false;
+                while (bDoOver) // Check again to catch garbage popping garbage below itself
+                {
+                    bDoOver = false;
+                    for (int i = lastBlockSecondLastRow; !IsTopmost(i); i--)//loop, bottom to top
+                    {
+                        // This checks if there are GarbageBlocks that needs to pop
+                        // TODO: Do this in terms of the larger GarbageBlocks instead of the individual fields
+                        if (!IsGarbage(field[i]) || field[i].State != BlockState.Idle)
+                            continue;
+                        if (field[i].IsPopped())
+                            continue;
+
+                        GarbageBlock g = (GarbageBlock)field[i];
+                        tmpChain = SamePopChain(g, field[Below(i)], tmpChain);
+                        tmpChain = SamePopChain(g, field[Above(i)], tmpChain);
+                        if (!IsRightmost(i))
+                            tmpChain = SamePopChain(g, field[RightOf(i)], tmpChain);
+                        if (!IsLeftmost(i))
+                            tmpChain = SamePopChain(g, field[LeftOf(i)], tmpChain);
+
+                        if (!g.IsPopped()) // If it didn't pop, next!
+                            continue;
+
+                        if (tmpChain != null)
+                        {
+                            gh.AddPop(g.GB, tmpChain, bReverse);
+                            bDoOver = true;
+                            tmpChain = null;
+                        }
+                    }
+                    if (bDoOver && !bReverse)
+                        bReverse = true;
+                }
+
+                gh.Pop();
+            }
         }
 
         private void CheckHeight()
         {
-	        tooHigh = (GetHeight() >= visibleHeight);
+            tooHigh = (GetHeight() >= visibleHeight);
 
-	        if(!tooHigh)
-		        dieTimer = 0;
+            if (!tooHigh)
+                dieTimer = 0;
 
-	        for(int i = 0; i < width; i++)
-	        {
-		        StressState stress =
-			        (fieldHeight[i] >= stressHeight) ?
-				        ((tooHigh || scrollPause > 0) ? StressState.Stop : StressState.Stress) :
-				        StressState.Normal;
-		        for(int o = i; !IsForthcoming(o); o = Below(o))
-		        {
-			        if(IsBlock(field[o]))
-				        field[o].Stress = stress;
-		        }
-	        }
-	
-	        // TODO music
+            for (int i = 0; i < width; i++)
+            {
+                StressState stress =
+                    (fieldHeight[i] >= stressHeight) ?
+                        ((tooHigh || scrollPause > 0) ? StressState.Stop : StressState.Stress) :
+                        StressState.Normal;
+                for (int o = i; !IsForthcoming(o); o = Below(o))
+                {
+                    if (IsBlock(field[o]))
+                        field[o].Stress = stress;
+                }
+            }
+
+            // TODO music
             /*
 	        if(GetHeight() >= PF_STRESS_HEIGHT)
 	        {
@@ -776,52 +767,54 @@ namespace Tetatt.GamePlay
 
         public bool InsertGarbage(BigGarbageBlock b)
         {
-	        int pos = Math.Min(
-		        garbageDropStart,
-	 	        numBlocks - GetHeight() * width - 1);
+            int pos = Math.Min(
+                garbageDropStart,
+                numBlocks - GetHeight() * width - 1);
 
-	        // Get the position where we should start inserting
-	        // Unfortunately GetHeight only counts normal blocks..
-	        while (pos >= 0 && !IsLineOfFieldEmpty(pos))
-	 	        pos = Above(pos);
-	
-	        if( IsTopmost(pos - b.GetNum()) )
-	        {
-		        // Out of space to drop blocks
-		        return false;
-	        }
-	
-	        if (leftAlignGarbage && b.GetNum() < width)
-		        pos -= width - b.GetNum();
-	        for(int i = b.GetNum()-1; i >= 0; i--, pos = LeftOf(pos))
-	        {
-		        Debug.Assert(field[pos] == null);
-		        field[pos] = b.GetBlock(i);
-	        }
+            // Get the position where we should start inserting
+            // Unfortunately GetHeight only counts normal blocks..
+            while (pos >= 0 && !IsLineOfFieldEmpty(pos))
+                pos = Above(pos);
+
+            if (IsTopmost(pos - b.GetNum()))
+            {
+                // Out of space to drop blocks
+                return false;
+            }
+
+            if (leftAlignGarbage && b.GetNum() < width)
+                pos -= width - b.GetNum();
+            for (int i = b.GetNum() - 1; i >= 0; i--, pos = LeftOf(pos))
+            {
+                Debug.Assert(field[pos] == null);
+                field[pos] = b.GetBlock(i);
+            }
 
             leftAlignGarbage = !leftAlignGarbage;
-	
-	        return true;
+
+            return true;
         }
 
-        public void Draw(SpriteBatch spriteBatch, int x, int y)
+        public void Draw(SpriteBatch spriteBatch, Vector2 offset)
         {
+            offset.Y += (float)scrollOffset;
             // Draw frame and background
             spriteBatch.Begin();
             spriteBatch.Draw(
                 background,
-                new Vector2(x - 16, y - 16), // Adjust for the frame
+                offset - new Vector2(16, 16), // Adjust for the frame
                 Color.White);
             spriteBatch.End();
 
             // Setup sprite clipping using scissor test
             spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null,
-                new RasterizerState() {
+                new RasterizerState()
+                {
                     ScissorTestEnable = true
                 });
             spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
-                x,
-                y,
+                (int)offset.X,
+                (int)offset.Y,
                 width * blockSize,
                 visibleHeight * blockSize);
 
@@ -832,11 +825,12 @@ namespace Tetatt.GamePlay
                 if (block != null)
                 {
                     int tile = block.Tile;
+                    Vector2 pos = PosToVector(i) + offset;
                     spriteBatch.Draw(
                         blocksTileSet.Texture,
                         new Rectangle(
-                            (i % width) * blockSize + x,
-                            (i / width - firstVisibleRow) * blockSize + y + (int)scrollOffset,
+                            (int)pos.X,
+                            (int)pos.Y,
                             blockSize,
                             blockSize),
                         blocksTileSet.SourceRectangle(tile),
@@ -850,64 +844,62 @@ namespace Tetatt.GamePlay
             spriteBatch.Begin();
             spriteBatch.Draw(
                 marker,
-                new Vector2(
-                    (markerPos % width) * blockSize + x - 4,
-                    (markerPos / width - firstVisibleRow) * blockSize + y + (int)scrollOffset - 5),
+                PosToVector(markerPos) + offset - new Vector2(4, 5),
                 Color.White);
             spriteBatch.End();
         }
 
         private int RightOf(int i, int amount = 1)
         {
-	        return i + 1 * amount;
+            return i + 1 * amount;
         }
         private int LeftOf(int i, int amount = 1)
         {
-	        return i - 1 * amount;
+            return i - 1 * amount;
         }
         private int Above(int i, int amount = 1)
         {
-	        return i - width * amount;
+            return i - width * amount;
         }
         private int Below(int i, int amount = 1)
         {
-	        return i + width * amount;
+            return i + width * amount;
         }
         private bool IsLeftmost(int i, int amount = 1)
         {
-	        return i % width < amount;
+            return i % width < amount;
         }
         private bool IsRightmost(int i, int amount = 1)
         {
-	        return i % width >= width - amount;
+            return i % width >= width - amount;
         }
         private bool IsTopmostVisible(int pos, int amount = 1)
         {
-	        return Above(pos, amount) < firstBlockFirstVisibleRow;
+            return Above(pos, amount) < firstBlockFirstVisibleRow;
         }
         private bool IsBottommostVisible(int pos, int amount = 1)
         {
-	        return Below(pos, amount) >= firstBlockLastRow;
+            return Below(pos, amount) >= firstBlockLastRow;
         }
         private bool IsVisible(int pos)
         {
-	        return (pos >= firstBlockFirstVisibleRow);
+            return (pos >= firstBlockFirstVisibleRow);
         }
         private bool IsTopmost(int pos)
         {
-	        return pos < width;
+            return pos < width;
         }
         private bool IsForthcoming(int pos)
         {
-	        return IsBottommostVisible(pos, 0);
+            return IsBottommostVisible(pos, 0);
         }
         private bool IsOfType(Block b, BlockType t)
         {
-	        return b != null && b.Type == t;
+            return b != null && b.Type == t;
         }
         private bool IsGarbage(Block b)
         {
-	        return b != null && (b.Type == BlockType.Garbage || b.Type == BlockType.EvilGarbage);
+            return b != null && (b.Type == BlockType.Garbage || b.Type == BlockType.EvilGarbage);
         }
         private bool IsBlock(Block b)
         {
@@ -915,7 +907,7 @@ namespace Tetatt.GamePlay
         }
         private bool IsOfState(Block b, BlockState s)
         {
-	        return b != null && b.State == s;
+            return b != null && b.State == s;
         }
         public int GetHeight()
         {
@@ -923,57 +915,75 @@ namespace Tetatt.GamePlay
         }
         private bool IsHoverOrMove(Block b)
         {
-	        if (b == null)
-		        return false;
-	        switch (b.State)
-	        {
-	        case BlockState.Hover:
-	        case BlockState.Moving:
-	        case BlockState.PostMove:
-		        return true;
-	        default:
-		        return false;
-	        }
+            if (b == null)
+                return false;
+            switch (b.State)
+            {
+                case BlockState.Hover:
+                case BlockState.Moving:
+                case BlockState.PostMove:
+                    return true;
+                default:
+                    return false;
+            }
         }
         private bool IsHoverOrIdle(Block b)
         {
-	        if (b == null)
-		        return false;
-	        switch (b.State)
-	        {
-	        case BlockState.Hover:
-	        case BlockState.Idle:
-		        return true;
-	        default:
-		        return false;
-	        }	
+            if (b == null)
+                return false;
+            switch (b.State)
+            {
+                case BlockState.Hover:
+                case BlockState.Idle:
+                    return true;
+                default:
+                    return false;
+            }
         }
         private bool IsPopableWith(Block reference, Block candidate)
         {
-	        return IsHoverOrIdle(candidate) && candidate.SameType(reference);
+            return IsHoverOrIdle(candidate) && candidate.SameType(reference);
         }
 
         Chain SamePopChain(GarbageBlock g, Block block, Chain chain)
         {
-	        if(block != null &&
+            if (block != null &&
                 block.IsPopped() &&
-		        !g.IsOtherGarbageType(block))
-		    {
-			    if(chain == null)
-				    chain = block.Chain;
-			    g.GB.InitPop(chain);
-		    }
-	        return chain;
+                !g.IsOtherGarbageType(block))
+            {
+                if (chain == null)
+                    chain = block.Chain;
+                g.GB.InitPop(chain);
+            }
+            return chain;
         }
 
         bool IsDropable(Block b)
         {
-	        return IsBlock(b) && (b.State == BlockState.Idle || IsHoverOrMove(b));
+            return IsBlock(b) && (b.State == BlockState.Idle || IsHoverOrMove(b));
         }
 
         public void AddGarbage(int num, GarbageType type)
         {
             gh.AddGarbage(num, type);
         }
+
+        public Vector2 PosToVector(int pos)
+        {
+            return new Vector2(
+                (pos % width) * blockSize,
+                (pos / width - firstVisibleRow) * blockSize);
+        }
+
+        public void ActivatePerformedCombo(int pos, bool isChain, int count)
+        {
+            ComboEventArgs eventArgs = new ComboEventArgs(
+                PosToVector(pos),
+                isChain,
+                count);
+            PerformedCombo(this, eventArgs);
+        }
+
+        public event EventHandler<ComboEventArgs> PerformedCombo;
     }
 }

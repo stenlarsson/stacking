@@ -69,33 +69,28 @@ namespace Tetatt.GamePlay
                         bBonusStop = true;
                     pf.AddScore((chain.numBlocks - 1) * 10);
 
-                    // TODO effect
-                    Debug.WriteLine("Combo " + chain.numBlocks);
-                    /*
-			        if(!offscreen) // Only add effect if it's onscreen
-				        eh->Add(
-					        new EffCombo(
-						        (*it)->TopMostBlockIndex,
-						        COMBO_4,
-						        (*it)->numBlocks));
-                    */
+                    if (!offscreen) // Only add effect if it's onscreen
+                    {
+                        pf.ActivatePerformedCombo(
+                            chain.TopMostBlockIndex,
+                            false,
+                            chain.numBlocks);
+                    }
+
                     if (chain.length > 1)
                     {
                         // A chain involving the combo.
                         pf.DelayScroll(chain.numBlocks * 10);
                         pf.AddScore(50 + (chain.length - 1) * 20 * chain.length);
 
-                        // TODO effect
-                        Debug.WriteLine("Chain " + chain.length);
-                        /*
-				        if(!offscreen)
-					        eh->Add(
-						        new EffCombo(
-							        (*it)->TopMostBlockIndex-PF_WIDTH,
-							        COMBO_2X,
-							        (*it)->length));
-                        */
-                    }
+                        if (!offscreen)
+                        {
+                            pf.ActivatePerformedCombo(
+                                chain.TopMostBlockIndex - PlayField.width,
+                                true,
+                                chain.length);
+                        }
+                   }
                     // TODO sound
                     /*
 			        Sound::PlayChainStepEffect(*it);
@@ -107,18 +102,13 @@ namespace Tetatt.GamePlay
                     pf.DelayScroll(chain.numBlocks * 10);
                     pf.AddScore(50 + (chain.length - 1) * 20 * chain.length);
 
-                    // TODO effect
-                    Debug.WriteLine("Chain " + chain.length);
-                    /*
-			        if(!offscreen)
-				        eh->Add(
-					        new EffCombo(
-						        (*it)->TopMostBlockIndex,
-						        COMBO_2X,
-						        (*it)->length));
-			        if(pf->GetHeight() > PF_STRESS_HEIGHT)
-				        bBonusStop = true;
-                    */
+                    if (!offscreen)
+                    {
+                        pf.ActivatePerformedCombo(
+                            chain.TopMostBlockIndex,
+                            true,
+                            chain.length);
+                    }
                     // TODO sound
                     /*
                     Sound::PlayChainStepEffect(*it);

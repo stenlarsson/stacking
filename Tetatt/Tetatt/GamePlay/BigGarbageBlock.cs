@@ -13,8 +13,8 @@ namespace Tetatt.GamePlay
 	    private int popDelay;
 	    private GarbageType type;
 
-        public const int tileBlue = 88;
-        public const int tileGray = 99;
+        public const int tileBlue = 64;
+        public const int tileGray = 75;
         public const int tileTopOffset = 0;
         public const int tileMiddleOffset = 8;
         public const int tileFlash1Offset = 7;
