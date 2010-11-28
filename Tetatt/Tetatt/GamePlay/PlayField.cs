@@ -165,12 +165,13 @@ namespace Tetatt.GamePlay
         // TODO ugly static method
         public static BlockType GetRandomBlockType(Random random)
         {
-            BlockType[] blockTypes = {  BlockType.Green,
-                                        BlockType.Yellow,
-                                        BlockType.Red,
-                                        BlockType.Purple,
-                                        BlockType.Cyan,
-                                        BlockType.Blue
+            BlockType[] blockTypes = {
+                                         BlockType.Blue,
+                                         BlockType.Green,
+                                         BlockType.Yellow,
+                                         BlockType.Red,
+                                         BlockType.Purple,
+                                         BlockType.Cyan,
                                      };
             // TODO difficulty
             return blockTypes[random.Next(5)];
@@ -797,7 +798,6 @@ namespace Tetatt.GamePlay
 
         public void Draw(SpriteBatch spriteBatch, Vector2 offset)
         {
-            offset.Y += (float)scrollOffset;
             // Draw frame and background
             spriteBatch.Begin();
             spriteBatch.Draw(
@@ -817,6 +817,8 @@ namespace Tetatt.GamePlay
                 (int)offset.Y,
                 width * blockSize,
                 visibleHeight * blockSize);
+
+            offset.Y += (int)scrollOffset;
 
             // Draw blocks
             for (int i = firstBlockFirstVisibleRow; i < numBlocks; i++)
