@@ -7,12 +7,12 @@ namespace Tetatt.GamePlay
 {
     enum BlockType
     {
-        Green = 0,
-        Yellow = 6,
-        Red = 12,
-        Pink = 18,
-        Cyan = 24,
-        Blue = 30,
+        Blue = 0,
+        Green = 6,
+        Yellow = 12,
+        Red = 18,
+        Purple = 24,
+        Cyan = 30,
         Gray = 36,
         Garbage = 88,
         EvilGarbage = 104

@@ -177,7 +177,7 @@ namespace Tetatt.GamePlay
             BlockType[] blockTypes = {  BlockType.Green,
                                         BlockType.Yellow,
                                         BlockType.Red,
-                                        BlockType.Pink,
+                                        BlockType.Purple,
                                         BlockType.Cyan,
                                         BlockType.Blue
                                      };
