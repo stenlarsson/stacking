@@ -18,11 +18,5 @@ namespace Microsoft.Xna.Framework
 
 	public class GameTime {}
 	public enum PlayerIndex { One, Two, Three, Four }
-	public struct Vector2 {
-		public Vector2(float x, float y) {
-			X = x; Y = y;
-		}
-		public float X, Y;
-	}
 }
 #endif
