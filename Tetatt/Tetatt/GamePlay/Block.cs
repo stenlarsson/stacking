@@ -45,7 +45,7 @@ namespace Tetatt.GamePlay
             stateDelay = -1;
             nextState = BlockState.Idle;
             this.needPopCheck = needPopCheck;
-            this.chain = chain;
+            this.Chain = chain;
             popped = false;
             stress = StressState.Normal;
 
@@ -267,10 +267,7 @@ namespace Tetatt.GamePlay
 
         public virtual Block ReplaceBlock()
         {
-            if (chain != null)
-            {
-                chain.activeBlocks--;
-            }
+            Chain = null;
             return null;
         }
     }
