@@ -22,6 +22,7 @@ namespace Tetatt
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D background;
+        SoundEffect[] popEffect;
 
         PlayField playField;
         Vector2 playFieldOffset;
@@ -71,6 +72,11 @@ namespace Tetatt
             PlayField.marker = this.Content.Load<Texture2D>("marker");
             PlayField.blocksTileSet = new TileSet(
                 this.Content.Load<Texture2D>("blocks"), PlayField.blockSize);
+
+            popEffect = new SoundEffect[4];
+            for (int i = 0; i < popEffect.Length; i++) {
+                popEffect[i] = Content.Load<SoundEffect>("pop" + (i+1));
+            }
         }
 
         /// <summary>
@@ -165,6 +171,7 @@ namespace Tetatt
                 ce.isChain,
                 ce.count);
             Components.Add(eff);
+            popEffect[ce.isChain ? (ce.count <= 4 ? ce.count-1 : 3) : 0].Play();
         }
     }
 }
