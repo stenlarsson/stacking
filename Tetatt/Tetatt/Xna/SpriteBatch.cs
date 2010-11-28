@@ -67,9 +67,15 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		public void Draw(Texture2D texture, Vector2 position, Color color)
 		{
-			Draw(texture, new Rectangle((int)position.X, (int)position.Y, texture.Width, texture.Height), null, color);
+			Draw(texture, position, null, color);
 		}
 		
+		public void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color)
+		{
+			Rectangle src = sourceRectangle.HasValue ? (Rectangle)sourceRectangle : texture.Bounds;
+			Draw(texture, new Rectangle((int)position.X, (int)position.Y, src.Width, src.Height), src, color);
+		}
+
 		public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
 		{
 			Gl.glColor4ub(color.R, color.G, color.B, color.A);

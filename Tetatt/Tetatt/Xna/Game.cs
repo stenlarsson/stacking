@@ -5,6 +5,7 @@ using System.Threading;
 using Tao.Sdl;
 using Tao.DevIl;
 using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework
 {
@@ -13,6 +14,7 @@ namespace Microsoft.Xna.Framework
 		private GraphicsDeviceManager graphicsDeviceManager;
 		private bool running;
 		
+		public GameComponentCollection Components { get; set; }
 		public GameServiceContainer Services { get; set; }
 		public ContentManager Content { get; set; }
 		public GraphicsDevice GraphicsDevice { get { return graphicsDeviceManager.GraphicsDevice; } }
@@ -22,6 +24,7 @@ namespace Microsoft.Xna.Framework
 			graphicsDeviceManager = null;
 			running = false;
 			
+			Components = new GameComponentCollection();
 			Services = new GameServiceContainer();
 			Content = new ContentManager(Services);
 		}
@@ -98,10 +101,18 @@ namespace Microsoft.Xna.Framework
 		
 		protected virtual void Update(GameTime gameTime)
 		{
+			// TODO: Store sorted/filtered collection and update only on changes...
+			foreach (IUpdateable c in Components.OfType<IUpdateable>().Where(c => c.Enabled).OrderBy(c => c.UpdateOrder)) {
+				c.Update(gameTime);
+			}
 		}
 		
 		protected virtual void Draw(GameTime gameTime)
 		{
+			// TODO: Store sorted/filtered collection and update only on changes...
+			foreach (IDrawable c in Components.OfType<IDrawable>().Where(c => c.Visible).OrderBy(c => c.DrawOrder)) {
+				c.Draw(gameTime);
+			}
 		}
 		
 		public void Dispose()

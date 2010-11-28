@@ -71,6 +71,12 @@
     <Compile Include="Xna\Input.cs" />
     <Compile Include="Xna\Color.cs" />
     <Compile Include="Xna\SoundEffect.cs" />
+    <Compile Include="Graphics\EffCombo.cs" />
+    <Compile Include="GamePlay\PlayFieldState.cs" />
+    <Compile Include="GamePlay\ComboEventArgs.cs" />
+    <Compile Include="Xna\DrawableGameComponent.cs" />
+    <Compile Include="Xna\Vector2.cs" />
+    <Compile Include="Xna\GameComponentCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TetattContent\TetattContent.mdproj">
