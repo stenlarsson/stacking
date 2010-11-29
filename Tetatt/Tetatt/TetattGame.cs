@@ -23,6 +23,9 @@ namespace Tetatt
         SpriteBatch spriteBatch;
         Texture2D background;
         SoundEffect[] popEffect;
+        SoundEffect chainEffect;
+        SoundEffect fanfare1Effect;
+        SoundEffect fanfare2Effect;
 
         PlayField playField;
         Vector2 playFieldOffset;
@@ -40,6 +43,9 @@ namespace Tetatt
 
             playField = new PlayField();
             playField.PerformedCombo += playField_PerformedCombo;
+            playField.PerformedChain += playField_PerformedChain;
+            playField.Popped += playField_Popped;
+
             playFieldOffset = new Vector2(96, 248);
         }
 
@@ -77,6 +83,9 @@ namespace Tetatt
             for (int i = 0; i < popEffect.Length; i++) {
                 popEffect[i] = Content.Load<SoundEffect>("pop" + (i+1));
             }
+            chainEffect = Content.Load<SoundEffect>("chain");
+            fanfare1Effect = Content.Load<SoundEffect>("fanfare1");
+            fanfare2Effect = Content.Load<SoundEffect>("fanfare2");
         }
 
         /// <summary>
@@ -171,7 +180,38 @@ namespace Tetatt
                 ce.isChain,
                 ce.count);
             Components.Add(eff);
-            popEffect[ce.isChain ? (ce.count <= 4 ? ce.count-1 : 3) : 0].Play();
+
+            if (ce.isChain)
+            {
+                chainEffect.Play();
+            }
+        }
+
+        private void playField_PerformedChain(object sender, ChainEventArgs ce)
+        {
+            if (ce.chain.length < 4)
+            {
+                return;
+            }
+            else if (ce.chain.length == 4)
+            {
+                fanfare1Effect.Play();
+            }
+            else
+            {
+                fanfare2Effect.Play();
+            }
+        }
+
+        private void playField_Popped(object sender, PoppedEventArgs pe)
+        {
+            SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4)];
+            effect.Play(1, pe.chain.popCount / 10.0f, 0);
+
+            if (pe.chain.popCount < 10)
+            {
+                pe.chain.popCount++;
+            }
         }
     }
 }

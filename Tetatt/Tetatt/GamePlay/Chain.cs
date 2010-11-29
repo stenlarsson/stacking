@@ -18,6 +18,7 @@ namespace Tetatt.GamePlay
         public bool sentCombo;
         public bool usedThisFrame;
         public List<GarbageInfo> garbage;
+        public int popCount;
 
         public Chain()
         {
@@ -27,6 +28,7 @@ namespace Tetatt.GamePlay
             sentCombo = false;
             usedThisFrame = false;
             garbage = new List<GarbageInfo>();
+            popCount = 0;
         }
 
         public bool IsActive()

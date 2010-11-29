@@ -574,19 +574,16 @@ namespace Tetatt.GamePlay
                 {
                     if (field[i].State == BlockState.Pop2)//but we want to check if we need to 'pop' it
                     {
-                        int chainlength = 0;
                         if (!IsGarbage(field[i]))
                         {
                             score += 10;
-                            chainlength = field[i].Chain.length;
                         }
-                        // TODO effect
-                        Debug.WriteLine("Chain pop " + chainlength);
-                        /*
-				        if(IsVisible(i))
-					        effects->Add(new EffPop(i, chainlength));
-				        Sound::PlayPopEffect(field[i]->GetChain());
-                        */
+
+				        if (IsVisible(i))
+                            Popped(this, new PoppedEventArgs(
+                                PosToVector(i),
+                                IsGarbage(field[i]),
+                                field[i].Chain));
                     }
                     continue;
                 }
@@ -985,7 +982,16 @@ namespace Tetatt.GamePlay
                 count);
             PerformedCombo(this, eventArgs);
         }
-
         public event EventHandler<ComboEventArgs> PerformedCombo;
+
+        public void ActivatePerformedChain(Chain chain)
+        {
+            ChainEventArgs eventArgs = new ChainEventArgs(
+                chain);
+            PerformedChain(this, eventArgs);
+        }
+        public event EventHandler<ChainEventArgs> PerformedChain;
+
+        public event EventHandler<PoppedEventArgs> Popped;
     }
 }

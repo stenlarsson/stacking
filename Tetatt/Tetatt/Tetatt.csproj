@@ -107,7 +107,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GamePlay\ChainEventArgs.cs" />
     <Compile Include="GamePlay\ComboEventArgs.cs" />
+    <Compile Include="GamePlay\PoppedEventArgs.cs" />
     <Compile Include="Graphics\EffCombo.cs" />
     <Compile Include="GamePlay\InputType.cs" />
     <Compile Include="GamePlay\PlayFieldState.cs" />
