@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Threading;
 using Tao.Sdl;
+using Tao.OpenAl;
 using Tao.DevIl;
 using System.Runtime.InteropServices;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace Microsoft.Xna.Framework
 			}
 
 			Sdl.SDL_Init(Sdl.SDL_INIT_EVERYTHING);
-			SdlMixer.Mix_OpenAudio(22050, (short)Sdl.AUDIO_S16SYS, 2, 4096);
+			Alut.alutInit();
 			Il.ilInit();
 			Ilu.iluInit();
 
@@ -117,7 +118,7 @@ namespace Microsoft.Xna.Framework
 		
 		public void Dispose()
 		{
-			SdlMixer.Mix_CloseAudio();
+			Alut.alutExit();
 			Sdl.SDL_Quit();
 		}
 		
