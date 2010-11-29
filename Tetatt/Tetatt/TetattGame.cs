@@ -205,7 +205,7 @@ namespace Tetatt
 
         private void playField_Popped(object sender, PoppedEventArgs pe)
         {
-            SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4)];
+            SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4)-1];
             effect.Play(1, pe.chain.popCount / 10.0f, 0);
 
             if (pe.chain.popCount < 10)
