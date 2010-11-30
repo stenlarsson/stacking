@@ -79,6 +79,7 @@
     <Compile Include="Xna\GameComponentCollection.cs" />
     <Compile Include="GamePlay\ChainEventArgs.cs" />
     <Compile Include="GamePlay\PoppedEventArgs.cs" />
+    <Compile Include="Xna\MathHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TetattContent\TetattContent.mdproj">

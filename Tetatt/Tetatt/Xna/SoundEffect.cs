@@ -5,6 +5,11 @@ using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.Audio
 {
+    public enum SoundState
+    {
+        Paused, Playing, Stopped
+    }
+
     public class SoundEffectInstance : IDisposable
     {
         private int source;
@@ -24,8 +29,12 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Dispose()
         {
-            Al.alDeleteSources(1, ref source);
-            source = Al.AL_NONE;
+            if (source != Al.AL_NONE)
+            {
+                GC.SuppressFinalize(this);
+                Al.alDeleteSources(1, ref source);
+                source = Al.AL_NONE;
+            }
         }
 
         public virtual bool IsLooped {
@@ -45,17 +54,17 @@ namespace Microsoft.Xna.Framework.Audio
                 return result;
             }
             set {
-                Al.alSourcef(source, Al.AL_GAIN, Math.Max(Math.Min(value,1.0f),0.0f));
+                Al.alSourcef(source, Al.AL_GAIN, MathHelper.Clamp(value, 0.0f, 1.0f));
             }
         }
         public float Pitch {
             get {
                 float result;
                 Al.alGetSourcef(source, Al.AL_PITCH, out result);
-                return (result < 1) ? (result-1)*2 : result-1;
+                return MathHelper.Clamp((float)Math.Log( result, 2.0 ), -1.0f, 1.0f);
             }
             set {
-                Al.alSourcef(source, Al.AL_PITCH, value < 0 ? 1+value/2 : 1+value);
+                Al.alSourcef(source, Al.AL_PITCH, (float)Math.Pow(2, MathHelper.Clamp(value, -1.0f, 1.0f)));
             }
         }
         public float Pan {
@@ -67,7 +76,24 @@ namespace Microsoft.Xna.Framework.Audio
                     throw new NotImplementedException();
                 }
             }
-       }
+        }
+        public SoundState State {
+            get {
+                int result;
+                Al.alGetSourcei(source, Al.AL_SOURCE_STATE, out result);
+                switch (result) {
+                case Al.AL_PLAYING:
+                    return SoundState.Playing;
+                case Al.AL_PAUSED:
+                    return SoundState.Paused;
+                case Al.AL_INITIAL:
+                case Al.AL_STOPPED:
+                    return SoundState.Stopped;
+                default:
+                    throw new NotSupportedException();
+                }
+            }
+        }
 
         public void Play()
         {
@@ -81,7 +107,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         internal int buffer;
 
-        private List<SoundEffectInstance> instances = new List<SoundEffectInstance>();
+        private Queue<SoundEffectInstance> instances = new Queue<SoundEffectInstance>();
 
         internal SoundEffect (string file)
         {
@@ -89,15 +115,27 @@ namespace Microsoft.Xna.Framework.Audio
             if (buffer == Al.AL_NONE) {
                 throw new Exception(Alut.alutGetErrorString(Alut.alutGetError()));
             }
+            instances.Enqueue(new SoundEffectInstance(this));
+        }
+
+        ~SoundEffect()
+        {
+            Dispose();
         }
 
         public void Dispose()
         {
-            foreach (SoundEffectInstance i in instances) {
-                i.Dispose();
+            if (buffer != Al.AL_NONE)
+            {
+                GC.SuppressFinalize(this);
+                foreach (SoundEffectInstance i in instances)
+                {
+                    i.Dispose();
+                }
+                instances.Clear();
+                Al.alDeleteBuffers(1, ref buffer);
+                buffer = Al.AL_NONE;
             }
-            instances.Clear();
-            Al.alDeleteBuffers(1, ref buffer);
         }
 
         public void Play()
@@ -107,15 +145,23 @@ namespace Microsoft.Xna.Framework.Audio
 
         public void Play(float volume, float pitch, float pan)
         {
-            // TODO: Remove/Dispose all finished instances...
-            // TODO: Reuse source instead of freeing and reallocating
-            SoundEffectInstance i = new SoundEffectInstance(this){
-                Volume = volume,
-                Pitch = pitch,
-                Pan = pan
-            };
-            instances.Add(i);
+            // Either reuse existing, or create new sound effect
+            SoundEffectInstance i = instances.Peek();
+            if (i.State == SoundState.Stopped)
+            {
+                instances.Dequeue();
+            }
+            else
+            {
+                i = new SoundEffectInstance(this);
+            }
+
+            i.Volume = volume;
+            i.Pitch = pitch;
+            i.Pan = pan;
             i.Play();
+
+            instances.Enqueue(i);
         }
 
         public SoundEffectInstance CreateInstance()
