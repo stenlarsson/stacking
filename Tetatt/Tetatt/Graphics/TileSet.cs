@@ -8,7 +8,7 @@ namespace Tetatt.Graphics
     /// A tile set contains a number of equally sized images (tiles) laid ut
     /// in two dimenstions, but indexed in only one dimension. This way you can have 
     /// </summary>
-    class TileSet
+    public class TileSet
     {
         List<Rectangle> rectangles;
         Texture2D texture;

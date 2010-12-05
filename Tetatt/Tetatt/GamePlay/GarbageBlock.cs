@@ -7,7 +7,7 @@ using Tetatt.Graphics;
 
 namespace Tetatt.GamePlay
 {
-    class GarbageBlock : Block
+    public class GarbageBlock : Block
     {
         private BlockType typeAfterPop;
         private BigGarbageBlock gb;

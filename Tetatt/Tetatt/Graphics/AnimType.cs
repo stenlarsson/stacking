@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.Graphics
 {
-    enum AnimType
+    public enum AnimType
     {
         Once,
         Looping,

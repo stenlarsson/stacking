@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    enum BlockType
+    public enum BlockType
     {
         Blue = 0,
         Green = 6,

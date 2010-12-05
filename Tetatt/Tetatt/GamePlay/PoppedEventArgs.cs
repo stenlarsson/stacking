@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Tetatt.GamePlay
 {
-    class PoppedEventArgs : EventArgs
+    public class PoppedEventArgs : EventArgs
     {
         public Vector2 pos;
         public bool isGarabge;

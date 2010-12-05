@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    class Chain
+    public class Chain
     {
         private SortedDictionary<int,Block> blocks;
         public int numBlocks {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    enum PlayFieldState
+    public enum PlayFieldState
     {
         Init,
         Start,

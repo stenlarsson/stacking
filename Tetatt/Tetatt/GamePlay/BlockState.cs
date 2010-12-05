@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    enum BlockState
+    public enum BlockState
     {
         Idle,
         Falling,

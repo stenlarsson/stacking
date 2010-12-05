@@ -6,7 +6,7 @@ using Tetatt.Graphics;
 
 namespace Tetatt.GamePlay
 {
-    class Block
+    public class Block
     {
         protected Anim anim;
         protected BlockType type;

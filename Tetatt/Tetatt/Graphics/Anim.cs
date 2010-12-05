@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.Graphics
 {
-    class Anim
+    public class Anim
     {
         private LinkedList<AnimFrame> frames;
         private LinkedListNode<AnimFrame> curFrame;
