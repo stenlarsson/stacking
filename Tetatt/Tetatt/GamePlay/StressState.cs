@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    enum StressState
+    public enum StressState
     {
         Normal,
         Stop,

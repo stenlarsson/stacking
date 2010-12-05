@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    class BigGarbageBlock
+    public class BigGarbageBlock
     {
         private List<GarbageBlock> blocks;
 	    private int numFalling;

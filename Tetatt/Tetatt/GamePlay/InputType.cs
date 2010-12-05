@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    enum InputType
+    public enum InputType
     {
         Up,
         Left,

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    class ChainEventArgs : EventArgs
+    public class ChainEventArgs : EventArgs
     {
         public Chain chain;
 

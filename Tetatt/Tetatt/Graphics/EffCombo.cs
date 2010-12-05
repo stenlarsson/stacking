@@ -8,7 +8,7 @@ using Tetatt.GamePlay;
 
 namespace Tetatt.Graphics
 {
-    class EffCombo : DrawableGameComponent
+    public class EffCombo : DrawableGameComponent
     {
         private int tile;
         private int duration;

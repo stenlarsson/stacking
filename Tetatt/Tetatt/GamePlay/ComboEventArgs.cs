@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Tetatt.GamePlay
 {
-    class ComboEventArgs : EventArgs
+    public class ComboEventArgs : EventArgs
     {
         public Vector2 pos;
         public bool isChain;

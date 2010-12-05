@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.Graphics
 {
-    class AnimFrame
+    public class AnimFrame
     {
 	    public int tile;
 	    public int delay;

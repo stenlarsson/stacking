@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    struct GarbageInfo
+    public struct GarbageInfo
     {
         public GarbageInfo(int size, GarbageType type)
         {

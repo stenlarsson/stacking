@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Tetatt.GamePlay
 {
-    class Popper
+    public class Popper
     {
         List<Chain> chains;
         PlayField pf;

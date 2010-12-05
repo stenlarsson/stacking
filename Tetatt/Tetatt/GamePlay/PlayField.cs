@@ -10,7 +10,7 @@ using Tetatt.Graphics;
 
 namespace Tetatt.GamePlay
 {
-    class PlayField
+    public class PlayField
     {
         public const int blockSize = 32;
         public const int width = 6;

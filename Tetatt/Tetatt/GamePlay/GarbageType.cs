@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    enum GarbageType
+    public enum GarbageType
     {
         Combo,
         Chain,

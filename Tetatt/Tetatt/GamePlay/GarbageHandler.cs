@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tetatt.GamePlay
 {
-    class GarbageHandler
+    public class GarbageHandler
     {
         class GBInfo
         {
