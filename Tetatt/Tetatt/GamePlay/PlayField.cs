@@ -65,8 +65,6 @@ namespace Tetatt.GamePlay
 
         private bool leftAlignGarbage;
 
-        private static Random random = new Random();
-
         // TODO accessor
         public static TileSet blocksTileSet;
         public static Texture2D background;
@@ -133,18 +131,8 @@ namespace Tetatt.GamePlay
                 field[i] = null;
                 while (field[i] == null)
                 {
-                    BlockType type;
-                    if (!grayBlock &&
-                        scrolledRows > grayBlockDelay &&
-                        random.NextDouble() < grayBlockChance)
-                    {
-                        type = BlockType.Gray;
-                    }
-                    else
-                    {
-                        type = GetRandomBlockType(random);
-                    }
-
+                    BlockType type = RandomBlocks.Next(
+                        (!grayBlock && scrolledRows > grayBlockDelay) ? grayBlockChance : 0.0);
                     // make sure block won't pop immediately
 
                     if (!IsLeftmost(i, 2) &&
@@ -160,21 +148,6 @@ namespace Tetatt.GamePlay
                     field[i] = new Block(type);
                 }
             }
-        }
-
-        // TODO ugly static method
-        public static BlockType GetRandomBlockType(Random random)
-        {
-            BlockType[] blockTypes = {
-                                         BlockType.Blue,
-                                         BlockType.Green,
-                                         BlockType.Yellow,
-                                         BlockType.Red,
-                                         BlockType.Purple,
-                                         BlockType.Cyan,
-                                     };
-            // TODO difficulty
-            return blockTypes[random.Next(5)];
         }
 
         public void Start()
