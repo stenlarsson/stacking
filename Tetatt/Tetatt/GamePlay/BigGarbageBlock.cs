@@ -39,10 +39,9 @@ namespace Tetatt.GamePlay
 
             int lineCount = (type != GarbageType.Chain) ? 1 : num;
             int blockCount = (type == GarbageType.Combo) ? num : lineCount * PlayField.width;
-            Random random = new Random();
             for (int i = 0; i < blockCount; i++)
             {
-                blocks.Add(new GarbageBlock(type, PlayField.GetRandomBlockType(random), this));
+                blocks.Add(new GarbageBlock(type, RandomBlocks.Next(), this));
             }
         }
 
