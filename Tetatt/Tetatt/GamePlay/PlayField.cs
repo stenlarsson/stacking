@@ -38,8 +38,6 @@ namespace Tetatt.GamePlay
         protected double scrollOffset;
         private int scrollPause;
 
-        //private EffectHandler effects;
-
         private int swapTimer;
 
         private PlayFieldState state;
@@ -47,10 +45,6 @@ namespace Tetatt.GamePlay
 
         private bool tooHigh;
         private int dieTimer;
-
-        private bool musicNormal;
-        private bool musicDanger;
-        private int normalMusicDelay;
 
         private int score;
         private int timeTicks;
@@ -71,9 +65,6 @@ namespace Tetatt.GamePlay
             scrollPause = 0;
             scrollOffset = 0;
 
-            // TODO
-            //this.effects = effects;
-
             swapTimer = 0;
 
             state = PlayFieldState.Init;
@@ -81,10 +72,6 @@ namespace Tetatt.GamePlay
 
             tooHigh = false;
             dieTimer = 0;
-
-            musicNormal = false;
-            musicDanger = false;
-            normalMusicDelay = 0;
 
             score = 0;
             timeTicks = 0;
@@ -148,9 +135,6 @@ namespace Tetatt.GamePlay
             // TODO effects
             Debug.WriteLine("Start");
             //effects->Add(new EffReady());
-            // TODO music
-            //Sound::PlayMusic(false);
-            musicNormal = true;
         }
 
         public void Update()
@@ -198,9 +182,6 @@ namespace Tetatt.GamePlay
                     }
                 }
             }
-
-            // TODO
-            //effects->Tick();
         }
 
         public void KeyInput(InputType input)
@@ -707,29 +688,6 @@ namespace Tetatt.GamePlay
                         field[row,i].Stress = stress;
                 }
             }
-
-            // TODO music
-            /*
-	        if(GetHeight() >= PF_STRESS_HEIGHT)
-	        {
-		        if(!bMusicDanger)
-		        {
-			        Sound::PlayMusic(true);
-			        bMusicDanger = true;
-			        bMusicNormal = false;
-		        }
-		        normalMusicDelay = 20;
-	        }
-	        else
-	        {
-		        if(!bMusicNormal && --normalMusicDelay <= 0)
-		        {
-			        Sound::PlayMusic(false);
-			        bMusicNormal = true;
-			        bMusicDanger = false;
-		        }
-	        }
-            */
         }
 
         private bool IsLineOfFieldEmpty(int row)
