@@ -27,7 +27,7 @@ namespace Tetatt
         SoundEffect fanfare1Effect;
         SoundEffect fanfare2Effect;
 
-        PlayField playField;
+        DrawablePlayField playField;
         Vector2 playFieldOffset;
 
         GamePadState oldGamePadState;
@@ -41,7 +41,7 @@ namespace Tetatt
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-            playField = new PlayField();
+            playField = new DrawablePlayField();
             playField.PerformedCombo += playField_PerformedCombo;
             playField.PerformedChain += playField_PerformedChain;
             playField.Popped += playField_Popped;
@@ -74,10 +74,10 @@ namespace Tetatt
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             background = this.Content.Load<Texture2D>("background");
-            PlayField.background = this.Content.Load<Texture2D>("playfield");
-            PlayField.marker = this.Content.Load<Texture2D>("marker");
-            PlayField.blocksTileSet = new TileSet(
-                this.Content.Load<Texture2D>("blocks"), PlayField.blockSize);
+            DrawablePlayField.background = this.Content.Load<Texture2D>("playfield");
+            DrawablePlayField.marker = this.Content.Load<Texture2D>("marker");
+            DrawablePlayField.blocksTileSet = new TileSet(
+                this.Content.Load<Texture2D>("blocks"), DrawablePlayField.blockSize);
 
             popEffect = new SoundEffect[4];
             for (int i = 0; i < popEffect.Length; i++) {
@@ -176,7 +176,7 @@ namespace Tetatt
         {
             EffCombo eff = new EffCombo(
                 this,
-                ce.pos + playFieldOffset,
+                playField.PosToVector(ce.pos) + playFieldOffset,
                 ce.isChain,
                 ce.count);
             Components.Add(eff);

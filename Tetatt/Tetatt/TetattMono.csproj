@@ -81,6 +81,8 @@
     <Compile Include="GamePlay\PoppedEventArgs.cs" />
     <Compile Include="Xna\MathHelper.cs" />
     <Compile Include="GamePlay\RandomBlocks.cs" />
+    <Compile Include="GamePlay\DrawablePlayField.cs" />
+    <Compile Include="GamePlay\Pos.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TetattContent\TetattContent.mdproj">

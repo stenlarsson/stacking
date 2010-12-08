@@ -46,9 +46,9 @@ namespace Tetatt.Graphics
             pos.Y -= duration >> 5;
             spriteBatch.Begin();
             spriteBatch.Draw(
-                PlayField.blocksTileSet.Texture,
+                DrawablePlayField.blocksTileSet.Texture,
                 pos,
-                PlayField.blocksTileSet.SourceRectangle(tile),
+                DrawablePlayField.blocksTileSet.SourceRectangle(tile),
                 Color.White);
             spriteBatch.End();
             base.Draw(gameTime);
