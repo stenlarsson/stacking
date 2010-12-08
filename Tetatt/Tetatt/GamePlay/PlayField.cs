@@ -573,7 +573,7 @@ namespace Tetatt.GamePlay
                     tmpChain = null;
 
                     int bottom = top;
-                    for (; bottom >= 1; bottom--)
+                    for (; bottom >= 2; bottom--)
                     {
                         // TODO: Move the chain thing after we know the block is used
                         if (tmpChain == null)
