@@ -19,8 +19,7 @@ namespace Tetatt.GamePlay
         public const int visibleHeight = 12;
         public const int stressHeight = 10;
         public const int firstVisibleRow = (height - visibleHeight - 1);
-        public const int firstFilledRow = height - startHeight;
-        public readonly static Pos markerStart = new Pos(height - 6, width/2 - 1);
+        public readonly static Pos markerStart = new Pos(visibleHeight/2 - 1, width/2 - 1);
         public const double grayBlockChance = 0.10; // chance per block on a row of six
         public const int grayBlockDelay = 5; // number of rows to wait before they can appear
         public const int deathDelay = 50; // num frames before dying
@@ -31,6 +30,13 @@ namespace Tetatt.GamePlay
         private int[] fieldHeight;
         private Pos markerPos;
         private Popper popper;
+        private int makerHeightLimit {
+            get {
+                return (GetHeight() >= visibleHeight ? visibleHeight : visibleHeight-1);
+            }
+        }
+
+
 
         private bool fastScroll;
         private double scrollOffset;
@@ -122,10 +128,11 @@ namespace Tetatt.GamePlay
 
         private void RandomizeField()
         {
-            for (int i = firstFilledRow; i < height; i++)
+            for (int i = startHeight-1; i >= 0; i--)
                 RandomizeRow(i);
         }
 
+        // NOTE: Assumes that rows are generated top to bottom
         private void RandomizeRow(int row)
         {
             bool grayBlock = false;
@@ -143,8 +150,8 @@ namespace Tetatt.GamePlay
                         IsOfType(field[row,col-2], type))
                         continue;
 
-                    if (IsOfType(field[row-1,col], type) &&
-                        IsOfType(field[row-2,col], type))
+                    if (IsOfType(field[row+1,col], type) &&
+                        IsOfType(field[row+2,col], type))
                         continue;
 
                     grayBlock = grayBlock || (type == BlockType.Gray);
@@ -221,8 +228,8 @@ namespace Tetatt.GamePlay
             {
                 case InputType.Up:
                     swapTimer = 0;
-                    if (height - markerPos.Row < (GetHeight() >= visibleHeight ? visibleHeight+1 : visibleHeight))
-                        markerPos.Row--;
+                    if (markerPos.Row < makerHeightLimit)
+                        markerPos.Row++;
                     break;
 
                 case InputType.Left:
@@ -239,8 +246,8 @@ namespace Tetatt.GamePlay
 
                 case InputType.Down:
                     swapTimer = 0;
-                    if (markerPos.Row < height - 2)
-                        markerPos.Row++;
+                    if (markerPos.Row > 1)
+                        markerPos.Row--;
                     break;
 
                 case InputType.Swap:
@@ -283,7 +290,7 @@ namespace Tetatt.GamePlay
 
         private bool SwapBlocks()
         {
-            Debug.Assert(markerPos.Row < height - 1);
+            Debug.Assert(markerPos.Row > 0);
 
             Block left = field[markerPos.Row, markerPos.Col];
             Block right = field[markerPos.Row, markerPos.Col+1];
@@ -298,19 +305,19 @@ namespace Tetatt.GamePlay
 
             if (left == null)
             {
-                if (IsHoverOrMove(field[markerPos.Row-1,markerPos.Col]))
+                if (IsHoverOrMove(field[markerPos.Row+1,markerPos.Col]))
                     return false;
 
-                if (IsOfState(field[markerPos.Row-1,markerPos.Col+1], BlockState.Idle))
-                    field[markerPos.Row-1,markerPos.Col+1].Hover(9);
+                if (IsOfState(field[markerPos.Row+1,markerPos.Col+1], BlockState.Idle))
+                    field[markerPos.Row+1,markerPos.Col+1].Hover(9);
             }
             else if (right == null)
             {
-                if (IsHoverOrMove(field[markerPos.Row-1,markerPos.Col+1]))
+                if (IsHoverOrMove(field[markerPos.Row+1,markerPos.Col+1]))
                     return false;
 
-                if (IsOfState(field[markerPos.Row-1,markerPos.Col], BlockState.Idle))
-                    field[markerPos.Row-1,markerPos.Col].Hover(9);
+                if (IsOfState(field[markerPos.Row+1,markerPos.Col], BlockState.Idle))
+                    field[markerPos.Row+1,markerPos.Col].Hover(9);
             }
 
             field[markerPos.Row, markerPos.Col] = right;
@@ -333,7 +340,7 @@ namespace Tetatt.GamePlay
 
         private bool ShouldScroll()
         {
-            for (int row = 0; row < height - 1; row++)
+            for (int row = 1; row < height; row++)
             {
                 for (int col = 0; col < width; col++)
                 {
@@ -372,18 +379,17 @@ namespace Tetatt.GamePlay
 
                 if (scrollOffset <= -blockSize)
                 {
-                    for (int row = 0; row < height - 1; row++)
+                    for (int row = height - 1; row >= 1; row--)
                         for (int col = 0; col < width; col++)
-                            field[row,col] = field[row+1,col];
-                    RandomizeRow(height - 1);
+                            field[row,col] = field[row-1,col];
+                    RandomizeRow(0);
 
-                    if ((GetHeight() == visibleHeight) ||
-                       (markerPos.Row > height-visibleHeight))
+                    if (markerPos.Row < makerHeightLimit)
                     {
-                        markerPos.Row--;
+                        markerPos.Row++;
                     }
 
-                    if (GetHeight() == firstVisibleRow)
+                    if (GetHeight() == visibleHeight)
                     {
                         scrollOffset = 0;
                     }
@@ -413,7 +419,7 @@ namespace Tetatt.GamePlay
 
         private void ClearDeadBlocks()
         {
-            for (int row = 1; row < height-1; row++)
+            for (int row = height-2; row >= 1; row--)
             {
                 for (int col = 0; col < width; col++)
                 {
@@ -424,7 +430,7 @@ namespace Tetatt.GamePlay
                     {
                         Chain chain = field[row,col].Chain;
                         // Propagate chain upwards, and drop idle blocks
-                        for (int y = row-1; y > 0 && IsDropable(field[y,col]); y--)
+                        for (int y = row+1; y < height && IsDropable(field[y,col]); y++)
                         {
                             field[y,col].Chain = chain;
                             if (field[y,col].State == BlockState.Idle)
@@ -439,7 +445,7 @@ namespace Tetatt.GamePlay
         private void DropBlocks()
         {
             //loop through field, starting at the bottom
-            for (int row = height-2; row >= 0; row--)
+            for (int row = 1; row < height; row++)
             {
                 for (int col = width-1; col >= 0; col--)
                 {
@@ -449,7 +455,7 @@ namespace Tetatt.GamePlay
 
                     if (field[row,col].State == BlockState.PostMove)
                     {
-                        if (field[row+1,col] == null)
+                        if (field[row-1,col] == null)
                         {
                             //hover a bit before dropping  and don't pop
                             field[row,col].Hover(4);
@@ -457,34 +463,34 @@ namespace Tetatt.GamePlay
                             continue;
                         }
 
-                        if (IsOfState(field[row-1,col], BlockState.Hover))
+                        if (IsOfState(field[row+1,col], BlockState.Hover))
                         {
                             //if there's a block above, and it's hovering
                             //(which it will be if it dropped on this block while it was MOVING)
 
                             field[row,col].Land(); //land this block now instead of next tick
 
-                            for (int y = row-1; y > 0 && IsOfState(field[y,col], BlockState.Hover); y--)
+                            for (int y = row+1; y < height && IsOfState(field[y,col], BlockState.Hover); y++)
                                 field[y,col].DropAndLand();
                         }
                         continue;
                     }
 
-                    if (row < height-2 && field[row,col].State == BlockState.Idle)
+                    if (row >= 2 && field[row,col].State == BlockState.Idle)
                     {
-                        if (field[row+1,col] == null)
+                        if (field[row-1,col] == null)
                             field[row,col].Drop();
-                        else if (field[row+1,col].State == BlockState.Falling)
+                        else if (field[row-1,col].State == BlockState.Falling)
                         {
                             field[row,col].Drop();
                             if (IsBlock(field[row,col]))
-                                field[row,col].Chain = field[row+1,col].Chain;
+                                field[row,col].Chain = field[row-1,col].Chain;
                         }
                     }
 
                     if (field[row,col].State == BlockState.Falling)
                     {
-                        if (IsHoverOrMove(field[row+1, col]))
+                        if (IsHoverOrMove(field[row-1, col]))
                         {
                             field[row,col].Hover(1500);//we hover this block a while
                             //(it won't hover this long though since
@@ -493,31 +499,31 @@ namespace Tetatt.GamePlay
                             continue;
 
                         }
-                        else if (field[row+1,col] != null && field[row+1,col].State != BlockState.Falling)
+                        else if (field[row-1,col] != null && field[row-1,col].State != BlockState.Falling)
                         {
                             field[row,col].Land();
                             continue;
                         }
-                        if (row > 0 && IsHoverOrIdle(field[row-1,col]))
+                        if (row < height-1 && IsHoverOrIdle(field[row+1,col]))
                         {
                             // This happens when a stack of blocks 'landed'
                             // on a block the player moved in below the stack,
                             // and it's time to start falling again (BST_HOVER),
                             // or when a block is pulled out of a row and the
                             // block above where it was has just stopped hovering (BST_IDLE)
-                            field[row-1,col].Drop();
+                            field[row+1,col].Drop();
                         }
                     }
 
                     if (IsOfState(field[row,col], BlockState.Hover))
-                        if (IsOfState(field[row+1,col], BlockState.Idle) || IsOfState(field[row+1,col], BlockState.Flash))
+                        if (IsOfState(field[row-1,col], BlockState.Idle) || IsOfState(field[row-1,col], BlockState.Flash))
                             field[row,col].DropAndLand();
 
                 }
             }
 
             //loop through field, starting at the bottom
-            for (int row = height-2; row > 0; row--)
+            for (int row = 1; row < height-1; row++)
             {
                 for (int col = width-1; col >= 0; col--)
                 {
@@ -525,8 +531,8 @@ namespace Tetatt.GamePlay
                     {
                         if (field[row,col].CheckDrop())	//if it's time to really drop the block
                         {
-                            Debug.Assert(field[row+1,col] == null);
-                            field[row+1,col] = field[row,col];
+                            Debug.Assert(field[row-1,col] == null);
+                            field[row-1,col] = field[row,col];
                             field[row,col] = null;
                         }
                     }
@@ -541,13 +547,12 @@ namespace Tetatt.GamePlay
             Chain tmpChain = null;
 
             //here's a good place to update the height
-
             for (int i = 0; i < fieldHeight.Length; i++)
             {
                 fieldHeight[i] = -1;
             }
 
-            for (int row = 1; row < height-1; row++)
+            for (int row = height-2; row >= 1; row--)
             {
                 for (int col = 0; col < width; col++)
                 {
@@ -557,7 +562,7 @@ namespace Tetatt.GamePlay
 
                     if (field[row,col].State != BlockState.Falling)// no falling blocks please
                         if (fieldHeight[col] == -1)//if we haven't already found one in the same column
-                            fieldHeight[col] = height - row - 1;//set height
+                            fieldHeight[col] = row+1;//set height
 
                     if (IsGarbage(field[row,col]) || !field[row,col].NeedPopCheck())
                     {
@@ -568,7 +573,7 @@ namespace Tetatt.GamePlay
                                 score += 10;
                             }
 
-                            if (row > height - visibleHeight)
+                            if (row <= visibleHeight)
                                 Popped(this, new PoppedEventArgs(
                                     PosToVector(new Pos(row, col)),
                                     IsGarbage(field[row,col]),
@@ -578,33 +583,33 @@ namespace Tetatt.GamePlay
                     }
 
                     int top = row;
-                    for (; top > 0; top--)
+                    for (; top < height-1; top++)
                     {
-                        if (!IsPopableWith(field[row,col], field[top-1,col]))
+                        if (!IsPopableWith(field[row,col], field[top+1,col]))
                             break;
                     }
 
                     tmpChain = null;
 
                     int bottom = top;
-                    for (; bottom < height-2; bottom++)
+                    for (; bottom >= 1; bottom--)
                     {
                         // TODO: Move the chain thing after we know the block is used
                         if (tmpChain == null)
                             tmpChain = field[bottom,col].Chain; //if one of the blocks is in a chain
                         //this'll store that
-                        if (!IsPopableWith(field[row,col], field[bottom+1,col]))
+                        if (!IsPopableWith(field[row,col], field[bottom-1,col]))
                             break;
                     }
 
-                    if (bottom - top >= 2) // Distance between 3 adjacent blocks is 2
+                    if (top - bottom >= 2) // Distance between 3 adjacent blocks is 2
                     {
-                        for (int check = top; check <= bottom; check++)
+                        for (int check = bottom; check <= top; check++)
                         {
                             if (!field[check,col].IsPopped())
                             {
                                 field[check,col].Chain = tmpChain;
-                                popper.AddBlock(field[check,col], check*width+col);
+                                popper.AddBlock(field[check,col], (height - check)*width+col);
                                 field[check,col].SetPop();
                             }
                         }
@@ -664,7 +669,7 @@ namespace Tetatt.GamePlay
                 while (bDoOver) // Check again to catch garbage popping garbage below itself
                 {
                     bDoOver = false;
-                    for (int row = height-1; row > 0; row--)//loop, bottom to top
+                    for (int row = 0; row < height-1; row++)//loop, bottom to top
                     {
                         for (int col = width-1; col >= 0; col--)
                         {
@@ -676,8 +681,8 @@ namespace Tetatt.GamePlay
                                 continue;
 
                             GarbageBlock g = (GarbageBlock)field[row,col];
-                            tmpChain = SamePopChain(g, field[row+1,col], tmpChain);
                             tmpChain = SamePopChain(g, field[row-1,col], tmpChain);
+                            tmpChain = SamePopChain(g, field[row+1,col], tmpChain);
                             if (col < width-1)
                                 tmpChain = SamePopChain(g, field[row,col+1], tmpChain);
                             if (col > 0)
@@ -704,7 +709,7 @@ namespace Tetatt.GamePlay
 
         private void CheckHeight()
         {
-            tooHigh = (GetHeight() >= visibleHeight);
+            tooHigh = (GetHeight() > visibleHeight);
 
             if (!tooHigh)
                 dieTimer = 0;
@@ -715,7 +720,7 @@ namespace Tetatt.GamePlay
                     (fieldHeight[i] >= stressHeight) ?
                         ((tooHigh || scrollPause > 0) ? StressState.Stop : StressState.Stress) :
                         StressState.Normal;
-                for (int row = 0; row < height-1; row++)
+                for (int row = 1; row < height; row++)
                 {
                     if (IsBlock(field[row,i]))
                         field[row,i].Stress = stress;
@@ -758,15 +763,15 @@ namespace Tetatt.GamePlay
 
         public bool InsertGarbage(BigGarbageBlock b)
         {
-            int row = Math.Min(height - GetHeight() - 1, firstVisibleRow);
+            int row = Math.Min(GetHeight() + 1, visibleHeight);
 
             // Get the position where we should start inserting
             // Unfortunately GetHeight only counts normal blocks..
-            while (row >= 0 && !IsLineOfFieldEmpty(row))
-                row--;
+            while (row < height && !IsLineOfFieldEmpty(row))
+                row++;
 
             int lines = (b.GetNum()+width-1)/width;
-            if (row < lines)
+            if (row + lines >= height)
             {
                 // Out of space to drop blocks
                 return false;
@@ -780,7 +785,7 @@ namespace Tetatt.GamePlay
                 Debug.Assert(field[row,col + i % width] == null);
                 field[row,col + i % width] = b.GetBlock(i);
                 if (col + i % width == 0)
-                    row--;
+                    row++;
             }
 
             leftAlignGarbage = !leftAlignGarbage;
@@ -813,7 +818,7 @@ namespace Tetatt.GamePlay
             offset.Y += (int)scrollOffset;
 
             // Draw blocks
-            for (int row = firstVisibleRow; row < height; row++)
+            for (int row = 0; row < visibleHeight+1; row++)
             {
                 for (int col = 0; col < width; col++)
                 {
@@ -830,7 +835,7 @@ namespace Tetatt.GamePlay
                                 blockSize,
                                 blockSize),
                             blocksTileSet.SourceRectangle(tile),
-                            (row == height-1) ? Color.DarkGray : Color.White);
+                            (row == 0) ? Color.DarkGray : Color.White);
                     }
                 }
             }
@@ -925,13 +930,13 @@ namespace Tetatt.GamePlay
         {
             return new Vector2(
                 pos.Col * blockSize,
-                (pos.Row - firstVisibleRow) * blockSize);
+                (visibleHeight - pos.Row) * blockSize);
         }
 
         public void ActivatePerformedCombo(int pos, bool isChain, int count)
         {
             ComboEventArgs eventArgs = new ComboEventArgs(
-                PosToVector(new Pos(pos / width, pos % width)),
+                PosToVector(new Pos(height - pos / width, pos % width)),
                 isChain,
                 count);
             PerformedCombo(this, eventArgs);
