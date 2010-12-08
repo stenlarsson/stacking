@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using Tetatt.Graphics;
 
@@ -12,7 +9,6 @@ namespace Tetatt.GamePlay
 {
     public class PlayField
     {
-        public const int blockSize = 32;
         public const int width = 6;
         public const int height = 48;
         public const int startHeight = 8;
@@ -26,9 +22,9 @@ namespace Tetatt.GamePlay
         public const int deathDuration = 52; // num frames in Die state
         public const int maxStopTime = 180;
 
-        private Block[,] field;
+        protected Block[,] field;
         private int[] fieldHeight;
-        private Pos markerPos;
+        protected Pos markerPos;
         private Popper popper;
         private int makerHeightLimit {
             get {
@@ -39,7 +35,7 @@ namespace Tetatt.GamePlay
 
 
         private bool fastScroll;
-        private double scrollOffset;
+        protected double scrollOffset;
         private int scrollPause;
 
         //private EffectHandler effects;
@@ -63,21 +59,6 @@ namespace Tetatt.GamePlay
         private GarbageHandler gh;
 
         private bool leftAlignGarbage;
-
-        // TODO accessor
-        public static TileSet blocksTileSet;
-        public static Texture2D background;
-        public static Texture2D marker;
-
-        public struct Pos
-        {
-            public int Row, Col;
-            public Pos(int row, int col)
-            {
-                Row = row;
-                Col = col;
-            }
-        }
 
         public PlayField()
         {
@@ -211,9 +192,9 @@ namespace Tetatt.GamePlay
                     if ((stateDelay & 1) == 1)
                     {
                         if ((stateDelay & 2) == 2)
-                            scrollOffset += 5;
+                            scrollOffset += 0.15625;
                         else
-                            scrollOffset -= 5;
+                            scrollOffset -= 0.15625;
                     }
                 }
             }
@@ -372,12 +353,12 @@ namespace Tetatt.GamePlay
                 scrolledRows++;
 
                 if (fastScroll)
-                    scrollOffset -= 2;
+                    scrollOffset -= 0.0625;
                 else
                     // TODO difficulty
-                    scrollOffset -= 0.052;
+                    scrollOffset -= 0.001625;
 
-                if (scrollOffset <= -blockSize)
+                if (scrollOffset <= -1.0)
                 {
                     for (int row = height - 1; row >= 1; row--)
                         for (int col = 0; col < width; col++)
@@ -395,7 +376,7 @@ namespace Tetatt.GamePlay
                     }
                     else
                     {
-                        scrollOffset += blockSize;
+                        scrollOffset += 1.0;
                         if (fastScroll)
                         {
                             score++;
@@ -575,7 +556,7 @@ namespace Tetatt.GamePlay
 
                             if (row <= visibleHeight)
                                 Popped(this, new PoppedEventArgs(
-                                    PosToVector(new Pos(row, col)),
+                                    new Pos(row, col),
                                     IsGarbage(field[row,col]),
                                     field[row,col].Chain));
                         }
@@ -793,63 +774,7 @@ namespace Tetatt.GamePlay
             return true;
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 offset)
-        {
-            // Draw frame and background
-            spriteBatch.Begin();
-            spriteBatch.Draw(
-                background,
-                offset - new Vector2(16, 16), // Adjust for the frame
-                Color.White);
-            spriteBatch.End();
 
-            // Setup sprite clipping using scissor test
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null,
-                new RasterizerState()
-                {
-                    ScissorTestEnable = true
-                });
-            spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
-                (int)offset.X,
-                (int)offset.Y,
-                width * blockSize,
-                visibleHeight * blockSize);
-
-            offset.Y += (int)scrollOffset;
-
-            // Draw blocks
-            for (int row = 0; row < visibleHeight+1; row++)
-            {
-                for (int col = 0; col < width; col++)
-                {
-                    Block block = field[row,col];
-                    if (block != null)
-                    {
-                        int tile = block.Tile;
-                        Vector2 pos = PosToVector(new Pos(row, col)) + offset;
-                        spriteBatch.Draw(
-                            blocksTileSet.Texture,
-                            new Rectangle(
-                                (int)pos.X,
-                                (int)pos.Y,
-                                blockSize,
-                                blockSize),
-                            blocksTileSet.SourceRectangle(tile),
-                            (row == 0) ? Color.DarkGray : Color.White);
-                    }
-                }
-            }
-
-            spriteBatch.End();
-
-            // Draw frame and background
-            spriteBatch.Begin();
-            spriteBatch.Draw(
-                marker,
-                PosToVector(markerPos) + offset - new Vector2(4, 5),
-                Color.White);
-            spriteBatch.End();
-        }
 
         private bool IsOfType(Block b, BlockType t)
         {
@@ -926,17 +851,10 @@ namespace Tetatt.GamePlay
             gh.AddGarbage(num, type);
         }
 
-        public Vector2 PosToVector(Pos pos)
-        {
-            return new Vector2(
-                pos.Col * blockSize,
-                (visibleHeight - pos.Row) * blockSize);
-        }
-
         public void ActivatePerformedCombo(int pos, bool isChain, int count)
         {
             ComboEventArgs eventArgs = new ComboEventArgs(
-                PosToVector(new Pos(height - pos / width, pos % width)),
+                new Pos(height - pos / width, pos % width),
                 isChain,
                 count);
             PerformedCombo(this, eventArgs);
