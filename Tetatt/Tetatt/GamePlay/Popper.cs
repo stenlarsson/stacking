@@ -91,10 +91,6 @@ namespace Tetatt.GamePlay
                                 chain.length);
                         }
                    }
-                    // TODO sound
-                    /*
-			        Sound::PlayChainStepEffect(*it);
-                    */
                 }
                 else if (chain.length > 1)
                 {
@@ -109,10 +105,6 @@ namespace Tetatt.GamePlay
                             true,
                             chain.length);
                     }
-                    // TODO sound
-                    /*
-                    Sound::PlayChainStepEffect(*it);
-                    */
                 }
 
                 if (bBonusStop)
@@ -140,8 +132,7 @@ namespace Tetatt.GamePlay
                     {
                         pf.AddGarbage(chain.length - 1, GarbageType.Chain);
                     }
-                    // TODO sound
-                    //Sound::PlayChainEndEffect(*it);
+                    pf.ActivatePerformedChain(chain);
                 }
             }
 

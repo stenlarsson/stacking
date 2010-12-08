@@ -33,6 +33,12 @@ namespace Tetatt
         GamePadState oldGamePadState;
         KeyboardState oldKeyboardState;
 
+        SoundEffect normalMusic;
+        SoundEffect stressMusic;
+        SoundEffectInstance music;
+        int musicChangeTimer;
+        bool isStressMusic;
+
         public TetattGame()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -57,9 +63,25 @@ namespace Tetatt
         /// </summary>
         protected override void Initialize()
         {
+            popEffect = new SoundEffect[4];
+            for (int i = 0; i < popEffect.Length; i++)
+            {
+                popEffect[i] = Content.Load<SoundEffect>("pop" + (i + 1));
+            }
+            chainEffect = Content.Load<SoundEffect>("chain");
+            fanfare1Effect = Content.Load<SoundEffect>("fanfare1");
+            fanfare2Effect = Content.Load<SoundEffect>("fanfare2");
+
+            normalMusic = Content.Load<SoundEffect>("normal_music");
+            stressMusic = Content.Load<SoundEffect>("stress_music");
+
             oldGamePadState = GamePad.GetState(PlayerIndex.One);
             oldKeyboardState = Keyboard.GetState();
             playField.Start();
+
+            music = normalMusic.CreateInstance();
+            music.IsLooped = true;
+            music.Play();
 
             base.Initialize();
         }
@@ -79,13 +101,6 @@ namespace Tetatt
             DrawablePlayField.blocksTileSet = new TileSet(
                 this.Content.Load<Texture2D>("blocks"), DrawablePlayField.blockSize);
 
-            popEffect = new SoundEffect[4];
-            for (int i = 0; i < popEffect.Length; i++) {
-                popEffect[i] = Content.Load<SoundEffect>("pop" + (i+1));
-            }
-            chainEffect = Content.Load<SoundEffect>("chain");
-            fanfare1Effect = Content.Load<SoundEffect>("fanfare1");
-            fanfare2Effect = Content.Load<SoundEffect>("fanfare2");
         }
 
         /// <summary>
@@ -107,6 +122,30 @@ namespace Tetatt
             UpdateInput();
 
             playField.Update();
+
+            if (playField.GetHeight() >= PlayField.stressHeight)
+            {
+                if (!isStressMusic && musicChangeTimer <= 0)
+                {
+                    music.Dispose();
+                    music = stressMusic.CreateInstance();
+                    music.IsLooped = true;
+                    music.Play();
+                    isStressMusic = true;
+                }
+                musicChangeTimer = 20;
+            }
+            else
+            {
+                if (isStressMusic && --musicChangeTimer <= 0)
+                {
+                    music.Dispose();
+                    music = normalMusic.CreateInstance();
+                    music.IsLooped = true;
+                    music.Play();
+                    isStressMusic = false;
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -205,7 +244,7 @@ namespace Tetatt
 
         private void playField_Popped(object sender, PoppedEventArgs pe)
         {
-            SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4)-1];
+            SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4) - 1];
             effect.Play(1, pe.chain.popCount / 10.0f, 0);
 
             if (pe.chain.popCount < 10)
