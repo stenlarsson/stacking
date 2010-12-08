@@ -744,7 +744,7 @@ namespace Tetatt.GamePlay
 
         public bool InsertGarbage(BigGarbageBlock b)
         {
-            int row = Math.Min(GetHeight() + 1, visibleHeight);
+            int row = Math.Max(GetHeight() + 1, visibleHeight);
 
             // Get the position where we should start inserting
             // Unfortunately GetHeight only counts normal blocks..
