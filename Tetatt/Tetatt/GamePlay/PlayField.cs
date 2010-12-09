@@ -257,9 +257,9 @@ namespace Tetatt.GamePlay
             Block left = field[markerPos.Row, markerPos.Col];
             Block right = field[markerPos.Row, markerPos.Col+1];
 
-            if (left != null && (!IsOfState(left, BlockState.Idle) || IsGarbage(left)))
+            if (left != null && (left.State != BlockState.Idle || IsGarbage(left)))
                 return false;
-            if (right != null && (!IsOfState(right, BlockState.Idle) || IsGarbage(right)))
+            if (right != null && (right.State != BlockState.Idle || IsGarbage(right)))
                 return false;
 
             if (left == null && right == null)
@@ -421,11 +421,9 @@ namespace Tetatt.GamePlay
                         {
                             //hover a bit before dropping  and don't pop
                             field[row,col].Hover(4);
-                            field[row,col].PopChecked();
-                            continue;
+                            field[row,col].NeedPopCheck = false;
                         }
-
-                        if (IsOfState(field[row+1,col], BlockState.Hover))
+                        else if (IsOfState(field[row+1,col], BlockState.Hover))
                         {
                             //if there's a block above, and it's hovering
                             //(which it will be if it dropped on this block while it was MOVING)
@@ -477,8 +475,8 @@ namespace Tetatt.GamePlay
                         }
                     }
 
-                    if (IsOfState(field[row,col], BlockState.Hover))
-                        if (IsOfState(field[row-1,col], BlockState.Idle) || IsOfState(field[row-1,col], BlockState.Flash))
+                    if (field[row,col].State == BlockState.Hover)
+                        if (IsOfState(field[row-1,col], BlockState.Idle|BlockState.Flash))
                             field[row,col].DropAndLand();
 
                 }
@@ -526,7 +524,7 @@ namespace Tetatt.GamePlay
                         if (fieldHeight[col] == -1)//if we haven't already found one in the same column
                             fieldHeight[col] = row+1;//set height
 
-                    if (IsGarbage(field[row,col]) || !field[row,col].NeedPopCheck())
+                    if (IsGarbage(field[row,col]) || !field[row,col].NeedPopCheck)
                     {
                         if (field[row,col].State == BlockState.Pop2)//but we want to check if we need to 'pop' it
                         {
@@ -568,11 +566,11 @@ namespace Tetatt.GamePlay
                     {
                         for (int check = bottom; check <= top; check++)
                         {
-                            if (!field[check,col].IsPopped())
+                            if (!field[check,col].Popped)
                             {
                                 field[check,col].Chain = tmpChain;
                                 popper.AddBlock(field[check,col], (height - check)*width+col);
-                                field[check,col].SetPop();
+                                field[check,col].Popped = true;
                             }
                         }
                         bClearChain = false;//and make sure we don't clear the chain
@@ -603,18 +601,18 @@ namespace Tetatt.GamePlay
                     {
                         for (int check = left; check <= right; check++)
                         {
-                            if (!field[row,check].IsPopped())
+                            if (!field[row,check].Popped)
                             {
                                 field[row,check].Chain = tmpChain;
                                 popper.AddBlock(field[row,check], row*width + check);
-                                field[row,check].SetPop();
+                                field[row,check].Popped = true;
                             }
                         }
                         bClearChain = false;
                         bPop = true;
                     }
 
-                    field[row,col].PopChecked();
+                    field[row,col].NeedPopCheck = false;
                     if (bClearChain && field[row,col].State != BlockState.Hover)
                         field[row,col].Chain = null;
                 }
@@ -639,7 +637,7 @@ namespace Tetatt.GamePlay
                             // TODO: Do this in terms of the larger GarbageBlocks instead of the individual fields
                             if (!IsGarbage(field[row,col]) || field[row,col].State != BlockState.Idle)
                                 continue;
-                            if (field[row,col].IsPopped())
+                            if (field[row,col].Popped)
                                 continue;
 
                             GarbageBlock g = (GarbageBlock)field[row,col];
@@ -650,7 +648,7 @@ namespace Tetatt.GamePlay
                             if (col > 0)
                                 tmpChain = SamePopChain(g, field[row,col-1], tmpChain);
 
-                            if (!g.IsPopped()) // If it didn't pop, next!
+                            if (!g.Popped) // If it didn't pop, next!
                                 continue;
 
                             if (tmpChain != null)
@@ -748,7 +746,7 @@ namespace Tetatt.GamePlay
         }
         private bool IsOfState(Block b, BlockState s)
         {
-            return b != null && b.State == s;
+            return b != null && b.IsState(s);
         }
         public int GetHeight()
         {
@@ -756,30 +754,11 @@ namespace Tetatt.GamePlay
         }
         private bool IsHoverOrMove(Block b)
         {
-            if (b == null)
-                return false;
-            switch (b.State)
-            {
-                case BlockState.Hover:
-                case BlockState.Moving:
-                case BlockState.PostMove:
-                    return true;
-                default:
-                    return false;
-            }
+            return (b != null) && b.IsState(BlockState.Hover|BlockState.Moving|BlockState.PostMove);
         }
         private bool IsHoverOrIdle(Block b)
         {
-            if (b == null)
-                return false;
-            switch (b.State)
-            {
-                case BlockState.Hover:
-                case BlockState.Idle:
-                    return true;
-                default:
-                    return false;
-            }
+            return (b != null) && b.IsState(BlockState.Hover|BlockState.Idle);
         }
         private bool IsPopableWith(Block reference, Block candidate)
         {
@@ -789,7 +768,7 @@ namespace Tetatt.GamePlay
         Chain SamePopChain(GarbageBlock g, Block block, Chain chain)
         {
             if (block != null &&
-                block.IsPopped() &&
+                block.Popped &&
                 !g.IsOtherGarbageType(block))
             {
                 if (chain == null)
@@ -801,7 +780,7 @@ namespace Tetatt.GamePlay
 
         bool IsDropable(Block b)
         {
-            return IsBlock(b) && (b.State == BlockState.Idle || IsHoverOrMove(b));
+            return IsBlock(b) && b.IsState(BlockState.Hover|BlockState.Moving|BlockState.PostMove|BlockState.Idle);
         }
 
         public void AddGarbage(int num, GarbageType type)

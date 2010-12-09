@@ -16,9 +16,9 @@ namespace Tetatt.GamePlay
         protected int dropTimer;
         protected int stateDelay;
         protected BlockState nextState;
-        private bool needPopCheck;
+        public bool NeedPopCheck;
         private Chain chain;
-        private bool popped;
+        public bool Popped;
         protected StressState stress;
         private AnimFrame[] stressFrames;
         private AnimFrame[] flashFrames;
@@ -44,9 +44,9 @@ namespace Tetatt.GamePlay
             dropTimer = 0;
             stateDelay = -1;
             nextState = BlockState.Idle;
-            this.needPopCheck = needPopCheck;
+            this.NeedPopCheck = needPopCheck;
             this.Chain = chain;
-            popped = false;
+            this.Popped = false;
             stress = StressState.Normal;
 
             stressFrames = new AnimFrame[] {
@@ -76,7 +76,7 @@ namespace Tetatt.GamePlay
                 State = nextState;
             }
             anim.Update();
-            popped = false;
+            Popped = false;
         }
 
         public virtual void Drop()
@@ -99,31 +99,6 @@ namespace Tetatt.GamePlay
         {
             Drop();
             Land();
-        }
-
-	    public bool NeedPopCheck()
-        {
-            return needPopCheck;
-        }
-
-	    public void PopChecked()
-        {
-            needPopCheck = false;
-        }
-
-	    public void ForcePopCheck()
-        {
-            needPopCheck = true;
-        }
-
-	    public void SetPop()
-        {
-            popped = true;
-        }
-
-	    public bool IsPopped()
-        {
-            return popped;
         }
 
         public bool CheckDrop()
@@ -161,6 +136,11 @@ namespace Tetatt.GamePlay
         public BlockType Type
         {
             get { return type; }
+        }
+
+        public bool IsState(BlockState mask)
+        {
+            return (this.State & mask) != 0;
         }
 
         public BlockState State
@@ -216,7 +196,7 @@ namespace Tetatt.GamePlay
 			    else if(state == BlockState.Falling)
 				    anim = new Anim(AnimType.Once, stressFrames);
 			    stateDelay = -1;
-			    ForcePopCheck();
+			    NeedPopCheck = true;
 		        break;
 	        case BlockState.Falling:
 		        dropTimer = dropDelay;
@@ -224,7 +204,7 @@ namespace Tetatt.GamePlay
 		        break;
 	        case BlockState.Hover:
 		        nextState = BlockState.Falling;
-		        ForcePopCheck(); // needed for lateslip-technique
+		        NeedPopCheck = true; // needed for lateslip-technique
 		        break;
 	        case BlockState.Moving:
 		        anim = new Anim((int)type);

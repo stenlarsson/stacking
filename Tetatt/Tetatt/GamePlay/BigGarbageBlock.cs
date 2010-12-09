@@ -59,7 +59,7 @@ namespace Tetatt.GamePlay
         {
             foreach(Block block in blocks)
             {
-                block.SetPop();
+                block.Popped = true;
             	// Needed so adjacent garbageblocks triggered by this one gets the same chain.
                 block.Chain = chain;
             }
