@@ -138,9 +138,13 @@ namespace Tetatt.GamePlay
             get { return type; }
         }
 
-        public bool IsState(BlockState mask)
+        public bool IsState(params BlockState[] states)
         {
-            return (this.State & mask) != 0;
+            for (int i = 0; i < states.Length; i++) {
+                if (states[i] == state)
+                    return true;
+            }
+            return false;
         }
 
         public BlockState State
