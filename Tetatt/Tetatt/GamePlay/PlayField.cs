@@ -480,7 +480,7 @@ namespace Tetatt.GamePlay
                     }
 
                     if (field[row,col].State == BlockState.Hover)
-                        if (IsOfState(field[row-1,col], BlockState.Idle|BlockState.Flash))
+                        if (IsOfState(field[row-1,col], BlockState.Idle, BlockState.Flash))
                             field[row,col].DropAndLand();
 
                 }
@@ -748,9 +748,9 @@ namespace Tetatt.GamePlay
         {
             return b != null && b.Type != BlockType.Garbage && b.Type != BlockType.EvilGarbage;
         }
-        private bool IsOfState(Block b, BlockState s)
+        private bool IsOfState(Block b, params BlockState[] states)
         {
-            return b != null && b.IsState(s);
+            return b != null && b.IsState(states);
         }
         public int GetHeight()
         {
@@ -758,11 +758,11 @@ namespace Tetatt.GamePlay
         }
         private bool IsHoverOrMove(Block b)
         {
-            return (b != null) && b.IsState(BlockState.Hover|BlockState.Moving|BlockState.PostMove);
+            return (b != null) && b.IsState(BlockState.Hover, BlockState.Moving, BlockState.PostMove);
         }
         private bool IsHoverOrIdle(Block b)
         {
-            return (b != null) && b.IsState(BlockState.Hover|BlockState.Idle);
+            return (b != null) && b.IsState(BlockState.Hover, BlockState.Idle);
         }
         private bool IsPopableWith(Block reference, Block candidate)
         {
@@ -784,7 +784,7 @@ namespace Tetatt.GamePlay
 
         bool IsDropable(Block b)
         {
-            return IsBlock(b) && b.IsState(BlockState.Hover|BlockState.Moving|BlockState.PostMove|BlockState.Idle);
+            return IsBlock(b) && b.IsState(BlockState.Hover, BlockState.Moving, BlockState.PostMove, BlockState.Idle);
         }
 
         public void AddGarbage(int num, GarbageType type)
