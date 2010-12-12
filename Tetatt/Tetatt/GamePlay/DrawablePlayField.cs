@@ -2,10 +2,16 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tetatt.Graphics;
+
 namespace Tetatt.GamePlay
 {
     public class DrawablePlayField : PlayField
     {
+        private Vector2 offset;
+        public Vector2 Offset { get { return offset; } }
+
+        private SpriteBatch spriteBatch;
+
         public const int blockSize = 32;
 
         // TODO accessor
@@ -13,7 +19,31 @@ namespace Tetatt.GamePlay
         public static Texture2D background;
         public static Texture2D marker;
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 offset)
+        public DrawablePlayField(Game game, Vector2 offset)
+            : base(game)
+        {
+            this.offset = offset;
+        }
+
+        public override void Initialize()
+        {
+            Start();
+
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            background = Game.Content.Load<Texture2D>("playfield");
+            marker = Game.Content.Load<Texture2D>("marker");
+            blocksTileSet = new TileSet(
+                Game.Content.Load<Texture2D>("blocks"), blockSize);
+
+            base.LoadContent();
+        }
+
+        public override void Draw(GameTime gameTime)
         {
             // Draw frame and background
             spriteBatch.Begin();
@@ -35,7 +65,7 @@ namespace Tetatt.GamePlay
                 width * blockSize,
                 visibleHeight * blockSize);
 
-            offset.Y += (int)(scrollOffset * blockSize);
+            Vector2 blocksOffset = offset + new Vector2(0, (int)(scrollOffset * blockSize));
 
             // Draw blocks
             for (int row = 0; row < visibleHeight+1; row++)
@@ -46,7 +76,7 @@ namespace Tetatt.GamePlay
                     if (block != null)
                     {
                         int tile = block.Tile;
-                        Vector2 pos = PosToVector(new Pos(row, col)) + offset;
+                        Vector2 pos = PosToVector(new Pos(row, col)) + blocksOffset;
                         spriteBatch.Draw(
                             blocksTileSet.Texture,
                             new Rectangle(
@@ -66,9 +96,11 @@ namespace Tetatt.GamePlay
             spriteBatch.Begin();
             spriteBatch.Draw(
                 marker,
-                PosToVector(markerPos) + offset - new Vector2(4, 5),
+                PosToVector(markerPos) + blocksOffset - new Vector2(4, 5),
                 Color.White);
             spriteBatch.End();
+
+            base.Draw(gameTime);
         }
 
         public Vector2 PosToVector(Pos pos)

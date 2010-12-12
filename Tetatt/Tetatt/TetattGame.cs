@@ -21,14 +21,12 @@ namespace Tetatt
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D background;
         SoundEffect[] popEffect;
         SoundEffect chainEffect;
         SoundEffect fanfare1Effect;
         SoundEffect fanfare2Effect;
 
         DrawablePlayField playField;
-        Vector2 playFieldOffset;
 
         GamePadState oldGamePadState;
         KeyboardState oldKeyboardState;
@@ -47,12 +45,14 @@ namespace Tetatt
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 720;
 
-            playField = new DrawablePlayField();
+            Components.Add(new Background(this));
+
+            playField = new DrawablePlayField(this, new Vector2(96, 248));
             playField.PerformedCombo += playField_PerformedCombo;
             playField.PerformedChain += playField_PerformedChain;
             playField.Popped += playField_Popped;
+            Components.Add(playField);
 
-            playFieldOffset = new Vector2(96, 248);
         }
 
         /// <summary>
@@ -77,7 +77,6 @@ namespace Tetatt
 
             oldGamePadState = GamePad.GetState(PlayerIndex.One);
             oldKeyboardState = Keyboard.GetState();
-            playField.Start();
 
             music = normalMusic.CreateInstance();
             music.IsLooped = true;
@@ -94,13 +93,6 @@ namespace Tetatt
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            background = this.Content.Load<Texture2D>("background");
-            DrawablePlayField.background = this.Content.Load<Texture2D>("playfield");
-            DrawablePlayField.marker = this.Content.Load<Texture2D>("marker");
-            DrawablePlayField.blocksTileSet = new TileSet(
-                this.Content.Load<Texture2D>("blocks"), DrawablePlayField.blockSize);
-
         }
 
         /// <summary>
@@ -120,8 +112,6 @@ namespace Tetatt
         protected override void Update(GameTime gameTime)
         {
             UpdateInput();
-
-            playField.Update();
 
             if (playField.GetHeight() >= PlayField.stressHeight)
             {
@@ -204,18 +194,16 @@ namespace Tetatt
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            spriteBatch.Begin();
-            spriteBatch.Draw(background, new Vector2(0, 0), Color.White);
-            spriteBatch.End();
-            playField.Draw(spriteBatch, playFieldOffset);
             base.Draw(gameTime);
         }
 
         private void playField_PerformedCombo(object sender, ComboEventArgs ce)
         {
+            DrawablePlayField dpf = (DrawablePlayField)sender;
+
             EffCombo eff = new EffCombo(
                 this,
-                playField.PosToVector(ce.pos) + playFieldOffset,
+                playField.PosToVector(ce.pos) + dpf.Offset,
                 ce.isChain,
                 ce.count);
             Components.Add(eff);

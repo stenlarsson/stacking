@@ -113,6 +113,7 @@
     <Compile Include="GamePlay\PoppedEventArgs.cs" />
     <Compile Include="GamePlay\Pos.cs" />
     <Compile Include="GamePlay\RandomBlocks.cs" />
+    <Compile Include="Graphics\Background.cs" />
     <Compile Include="Graphics\EffCombo.cs" />
     <Compile Include="GamePlay\InputType.cs" />
     <Compile Include="GamePlay\PlayFieldState.cs" />
