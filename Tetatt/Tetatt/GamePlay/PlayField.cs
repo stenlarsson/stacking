@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Tetatt.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace Tetatt.GamePlay
 {
-    public class PlayField
+    public class PlayField : DrawableGameComponent
     {
         public const int width = 6;
         public const int height = 48;
@@ -54,7 +55,8 @@ namespace Tetatt.GamePlay
 
         private bool leftAlignGarbage;
 
-        public PlayField()
+        public PlayField(Game game)
+            : base(game)
         {
             field = new Block[height,width];
             fieldHeight = new int[width];
@@ -137,7 +139,7 @@ namespace Tetatt.GamePlay
             //effects->Add(new EffReady());
         }
 
-        public void Update()
+        public override void Update(GameTime gameTime)
         {
             StateCheck();
 
@@ -182,6 +184,8 @@ namespace Tetatt.GamePlay
                     }
                 }
             }
+        
+            base.Update(gameTime);
         }
 
         public void KeyInput(InputType input)
