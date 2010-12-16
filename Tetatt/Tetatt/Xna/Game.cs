@@ -90,6 +90,13 @@ namespace Microsoft.Xna.Framework
 		
 		protected virtual void Initialize()
 		{
+            foreach (GameComponent c in Components)
+            {
+                c.Initialize();
+            }
+            Components.ComponentAdded += delegate(object sender, GameComponentCollectionEventArgs e) {
+                e.GameComponent.Initialize();
+            };
 		}
 		
 		protected virtual void LoadContent()

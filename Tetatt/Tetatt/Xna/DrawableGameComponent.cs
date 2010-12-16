@@ -118,7 +118,6 @@ namespace Microsoft.Xna.Framework
 
         public DrawableGameComponent(Game game) : base(game)
         {
-            Initialize(); // TODO: This is a hack. Should (probably) be done when added to Components
         }
 
         public override void Initialize ()

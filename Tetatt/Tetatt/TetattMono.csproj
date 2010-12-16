@@ -83,6 +83,11 @@
     <Compile Include="GamePlay\RandomBlocks.cs" />
     <Compile Include="GamePlay\DrawablePlayField.cs" />
     <Compile Include="GamePlay\Pos.cs" />
+    <Compile Include="Graphics\Background.cs" />
+    <Compile Include="Xna\VertexBuffer.cs" />
+    <Compile Include="Xna\BasicEffect.cs" />
+    <Compile Include="Xna\Vector3.cs" />
+    <Compile Include="Xna\Matrix.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TetattContent\TetattContent.mdproj">
