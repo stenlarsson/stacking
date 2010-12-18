@@ -6,16 +6,16 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class EffectPassCollection : IEnumerable<EffectPass>
     {
-        private BasicEffect effect;
+        private EffectPass pass;
 
         internal EffectPassCollection(BasicEffect effect)
         {
-            this.effect = effect;
+            this.pass = new EffectPass(effect);
         }
 
         public IEnumerator<EffectPass> GetEnumerator()
         {
-            yield return new EffectPass(effect);
+            yield return pass;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -27,17 +27,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
     public sealed class EffectTechnique
     {
-        internal BasicEffect effect;
+        internal EffectPassCollection passes;
 
         internal EffectTechnique(BasicEffect effect)
         {
-            this.effect = effect;
+            this.passes = new EffectPassCollection(effect);
         }
-
 
         public EffectPassCollection Passes {
             get {
-                return new EffectPassCollection(effect);
+                return passes;
             }
         }
     }
@@ -74,26 +73,24 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Apply()
         {
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
             Matrix m = effect.Projection;
+            Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glLoadMatrixf(m.ToArray());
-            Gl.glLoadIdentity();
-            Gl.glOrtho(0, 1280, 720, 0, -1, 1);
 
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             m = effect.World;
             Gl.glLoadMatrixf(m.ToArray());
             m = effect.View;
             Gl.glMultMatrixf(m.ToArray());
-            Gl.glLoadIdentity();
 
-            /*
-            float[] a = new float[16];
-            Gl.glGetFloatv(Gl.GL_MODELVIEW_MATRIX, a);
-            Console.WriteLine("modelview {0}", String.Join(",", Array.ConvertAll(a, f => f.ToString())));
-            Gl.glGetFloatv(Gl.GL_PROJECTION_MATRIX, a);
-            Console.WriteLine("projection {0}", String.Join(",", Array.ConvertAll(a, f => f.ToString())));
-             */
+            if (effect.VertexColorEnabled)
+            {
+                 Gl.glEnableClientState(Gl.GL_COLOR_ARRAY);
+            }
+            else
+            {
+                 Gl.glDisableClientState(Gl.GL_COLOR_ARRAY);
+            }
         }
     }
 
