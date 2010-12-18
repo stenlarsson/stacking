@@ -67,22 +67,14 @@ namespace Microsoft.Xna.Framework.Graphics
             Gl.glGenBuffersARB(1, out this.buffer);
         }
 
-        internal object datta;
-        internal GCHandle handle;
-
         public void SetData<T>(T[] data) where T : struct
         {
-            datta = data;
-            handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            Console.WriteLine("Sizes {0} {1}", count * Marshal.SizeOf(type), Marshal.SizeOf(data[0]));
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER, buffer);
-            Gl.glBufferDataARB(Gl.GL_ARRAY_BUFFER, (IntPtr)(count * Marshal.SizeOf(type)), handle.AddrOfPinnedObject(), Gl.GL_STATIC_DRAW);
-
-            /*
-            float[] array = new float[24];
-            Gl.glGetBufferSubData(Gl.GL_ARRAY_BUFFER, IntPtr.Zero, new IntPtr(96), array);
-            Console.WriteLine("Ortho {0}", String.Join(";", Array.ConvertAll(array, f => f.ToString())));
-             */
+            int size = Marshal.SizeOf(type);
+            Gl.glBindBuffer(Gl.GL_ARRAY_BUFFER, buffer);
+            // FIXME: Don't use hard-coded values here...
+            Gl.glBufferData(Gl.GL_ARRAY_BUFFER, new IntPtr(count * size), data, Gl.GL_STATIC_DRAW);
+            Gl.glVertexPointer(3, Gl.GL_FLOAT, size, IntPtr.Zero);
+            Gl.glColorPointer(4, Gl.GL_UNSIGNED_BYTE, size, new IntPtr(3*sizeof(float)));
             Gl.glBindBuffer(Gl.GL_ARRAY_BUFFER, 0);
         }
     }

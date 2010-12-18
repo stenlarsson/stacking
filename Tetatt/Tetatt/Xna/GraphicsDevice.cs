@@ -8,10 +8,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public enum PrimitiveType
     {
-        TriangleList = Gl.GL_TRIANGLES,
-        TriangleStrip = Gl.GL_TRIANGLE_STRIP,
-        LineList = Gl.GL_LINES,
-        LineStrip = Gl.GL_LINE_STRIP
+        TriangleList,
+        TriangleStrip,
+        LineList,
+        LineStrip
     }
 
 	public class GraphicsDevice
@@ -58,61 +58,22 @@ namespace Microsoft.Xna.Framework.Graphics
 			Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
 		}
 
-        public static int counter = 0;
         public void SetVertexBuffer(VertexBuffer buffer)
         {
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER, buffer.buffer);
+            Gl.glBindBuffer(Gl.GL_ARRAY_BUFFER, buffer.buffer);
             Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-            //Gl.glEnableClientState(Gl.GL_COLOR_ARRAY);
-            Gl.glColorPointer(4, Gl.GL_UNSIGNED_BYTE, 16, 12);
-            Gl.glVertexPointer(3, Gl.GL_FLOAT, 16, buffer.datta);
-            Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
-            Gl.glColor3f(0,0,0);
-            Gl.glVertex3f(300,100,0);
-            Gl.glArrayElement(1);
-            Gl.glVertex3f(0,300,0);
-            Gl.glEnd();
-            Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
-            //Gl.glDisableClientState(Gl.GL_COLOR_ARRAY);
-            Gl.glBindBufferARB(Gl.GL_ARRAY_BUFFER, 0);
         }
+
+        private static readonly int[] glPrimitiveTypes = { Gl.GL_TRIANGLES, Gl.GL_TRIANGLE_STRIP, Gl.GL_LINES, Gl.GL_LINE_STRIP };
+        private static readonly Func<int,int>[] glPrimitiveTriangleCount = new Func<int,int>[4]{ c => 3*c, c => c+2, c => 2*c, c => c+1 };
 
         public void DrawPrimitives(PrimitiveType type, int first, int count)
         {
-#if false
-            Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
-            Gl.glColor3f(0.5f,0.5f,0.5f);
-            Gl.glVertex3f(0,0,0);
-            Gl.glColor3f(0.5f, 0.5f, 0.5f);
-            Gl.glVertex3f(1280,0,0);
-            Gl.glColor3f(0.0f, 0.0f, 0.0f);
-            Gl.glVertex3f(0,648,0);
-            Gl.glColor3f(0.0f, 0.0f, 0.0f);
-            Gl.glVertex3f(1280,640,0);
-            Gl.glColor3f(0.24f, 0.24f, 0.24f);
-            Gl.glVertex3f(0,720,0);
-            Gl.glColor3f(0.24f, 0.24f, 0.24f);
-            Gl.glVertex3f(1280,720,0);
-            Gl.glEnd();
-#endif
-            /*
-            // Gl.glEnableClientState(Gl.GL_COLOR_ARRAY);
-            // Gl.glColorPointer(4, Gl.GL_UNSIGNED_BYTE, 16, 12);
-            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
-            Gl.glVertexPointer(3, Gl.GL_FLOAT, 16, 0);
-            Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
-            Gl.glArrayElement(0);
-            Gl.glArrayElement(1);
-            Gl.glArrayElement(2);
-            Gl.glEnd();
-//            Gl.glDrawArrays(Gl.GL_TRIANGLE_STRIP, 0, 6);
-            Gl.glDisableClientState(Gl.GL_VERTEX_ARRAY);
-            Gl.glDisableClientState(Gl.GL_COLOR_ARRAY);
-            */
+            Gl.glDrawArrays(glPrimitiveTypes[(int)type], first, glPrimitiveTriangleCount[(int)type](count));
         }
 
-		public void Present()
-		{
+        public void Present()
+        {
             int error = Gl.glGetError();
 
             while (error != Gl.GL_NO_ERROR)
@@ -121,7 +82,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 error = Gl.glGetError();
             }
 
-			Sdl.SDL_GL_SwapBuffers();
-		}
-	}
+            Sdl.SDL_GL_SwapBuffers();
+        }
+    }
 }
