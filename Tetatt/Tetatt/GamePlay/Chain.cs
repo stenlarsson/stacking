@@ -7,6 +7,14 @@ namespace Tetatt.GamePlay
 {
     public class Chain
     {
+        private class DescendingComparer<T> : IComparer<T> where T : IComparable<T>
+        {
+            public int Compare(T x, T y)
+            {
+                return y.CompareTo(x);
+            }
+        }
+
         private SortedDictionary<int,Block> blocks;
         public int numBlocks {
             get {
@@ -22,7 +30,7 @@ namespace Tetatt.GamePlay
 
         public Chain()
         {
-            blocks = new SortedDictionary<int, Block>();
+            blocks = new SortedDictionary<int, Block>(new DescendingComparer<int>());
             length = 0;
             activeBlocks = 0;
             sentCombo = false;

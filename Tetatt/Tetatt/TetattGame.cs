@@ -203,7 +203,7 @@ namespace Tetatt
 
             EffCombo eff = new EffCombo(
                 this,
-                playField.PosToVector(ce.pos) + dpf.Offset,
+                dpf.PosToVector(ce.pos) + dpf.Offset,
                 ce.isChain,
                 ce.count);
             Components.Add(eff);
@@ -232,8 +232,13 @@ namespace Tetatt
 
         private void playField_Popped(object sender, PoppedEventArgs pe)
         {
+            DrawablePlayField dpf = (DrawablePlayField)sender;
+
             SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4) - 1];
             effect.Play(1, pe.chain.popCount / 10.0f, 0);
+
+            EffPop eff = new EffPop(this, dpf.PosToVector(pe.pos) + dpf.Offset);
+            Components.Add(eff);
 
             if (pe.chain.popCount < 10)
             {

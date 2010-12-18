@@ -57,8 +57,6 @@ namespace Tetatt.GamePlay
                     chain.AddGarbage(new GarbageInfo(evil - 2, GarbageType.Evil)); // -2 to specify number of garbage lines
                 }
 
-                bool offscreen = chain.TopMostBlockIndex / PlayField.width < (PlayField.firstVisibleRow - 3); // If the block is too much offscreen
-
                 if (chain.numBlocks > 3)
                 {
                     // A combo.
@@ -69,13 +67,10 @@ namespace Tetatt.GamePlay
                         bBonusStop = true;
                     pf.AddScore((chain.numBlocks - 1) * 10);
 
-                    if (!offscreen) // Only add effect if it's onscreen
-                    {
-                        pf.ActivatePerformedCombo(
-                            chain.TopMostBlockIndex,
-                            false,
-                            chain.numBlocks);
-                    }
+                    pf.ActivatePerformedCombo(
+                        chain.TopMostBlockIndex,
+                        false,
+                        chain.numBlocks);
 
                     if (chain.length > 1)
                     {
@@ -83,13 +78,10 @@ namespace Tetatt.GamePlay
                         pf.DelayScroll(chain.numBlocks * 10);
                         pf.AddScore(50 + (chain.length - 1) * 20 * chain.length);
 
-                        if (!offscreen)
-                        {
-                            pf.ActivatePerformedCombo(
-                                chain.TopMostBlockIndex - PlayField.width,
-                                true,
-                                chain.length);
-                        }
+                        pf.ActivatePerformedCombo(
+                            chain.TopMostBlockIndex - PlayField.width,
+                            true,
+                            chain.length);
                    }
                 }
                 else if (chain.length > 1)
@@ -98,13 +90,10 @@ namespace Tetatt.GamePlay
                     pf.DelayScroll(chain.numBlocks * 10);
                     pf.AddScore(50 + (chain.length - 1) * 20 * chain.length);
 
-                    if (!offscreen)
-                    {
-                        pf.ActivatePerformedCombo(
-                            chain.TopMostBlockIndex,
-                            true,
-                            chain.length);
-                    }
+                    pf.ActivatePerformedCombo(
+                        chain.TopMostBlockIndex,
+                        true,
+                        chain.length);
                 }
 
                 if (bBonusStop)
