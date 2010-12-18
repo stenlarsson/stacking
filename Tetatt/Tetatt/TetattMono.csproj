@@ -88,6 +88,7 @@
     <Compile Include="Xna\BasicEffect.cs" />
     <Compile Include="Xna\Vector3.cs" />
     <Compile Include="Xna\Matrix.cs" />
+    <Compile Include="Graphics\EffPop.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TetattContent\TetattContent.mdproj">
