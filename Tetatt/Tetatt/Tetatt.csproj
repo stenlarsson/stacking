@@ -114,7 +114,6 @@
     <Compile Include="GamePlay\Pos.cs" />
     <Compile Include="GamePlay\RandomBlocks.cs" />
     <Compile Include="Graphics\Background.cs" />
-    <Compile Include="Graphics\EffCombo.cs" />
     <Compile Include="GamePlay\InputType.cs" />
     <Compile Include="GamePlay\PlayFieldState.cs" />
     <Compile Include="Graphics\Anim.cs" />
@@ -132,6 +131,10 @@
     <Compile Include="GamePlay\PlayField.cs" />
     <Compile Include="GamePlay\Popper.cs" />
     <Compile Include="GamePlay\StressState.cs" />
+    <Compile Include="Graphics\EffCombo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Graphics\EffPop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="TetattGame.cs" />

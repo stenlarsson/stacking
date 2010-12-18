@@ -573,7 +573,7 @@ namespace Tetatt.GamePlay
                             if (!field[check,col].Popped)
                             {
                                 field[check,col].Chain = tmpChain;
-                                popper.AddBlock(field[check,col], (height - check)*width+col);
+                                popper.AddBlock(field[check,col], check*width+col);
                                 field[check,col].Popped = true;
                             }
                         }
@@ -795,7 +795,7 @@ namespace Tetatt.GamePlay
         public void ActivatePerformedCombo(int pos, bool isChain, int count)
         {
             ComboEventArgs eventArgs = new ComboEventArgs(
-                new Pos(height - pos / width, pos % width),
+                new Pos(pos / width, pos % width),
                 isChain,
                 count);
             PerformedCombo(this, eventArgs);
