@@ -48,10 +48,9 @@ namespace Tetatt
             Components.Add(new Background(this));
 
             playField = new DrawablePlayField(this, new Vector2(96, 248));
-            playField.PerformedCombo += playField_PerformedCombo;
-            playField.PerformedChain += playField_PerformedChain;
-            playField.Popped += playField_Popped;
-            playField.Swapped += playField_Swapped;
+            playField.PlayField.PerformedCombo += playField_PerformedCombo;
+            playField.PlayField.PerformedChain += playField_PerformedChain;
+            playField.PlayField.Popped += playField_Popped;
             Components.Add(playField);
 
         }
@@ -114,7 +113,7 @@ namespace Tetatt
         {
             UpdateInput();
 
-            if (playField.GetHeight() >= PlayField.stressHeight)
+            if (playField.PlayField.GetHeight() >= PlayField.stressHeight)
             {
                 if (!isStressMusic && musicChangeTimer <= 0)
                 {
@@ -155,35 +154,35 @@ namespace Tetatt
                 !oldGamePadState.IsButtonDown(Buttons.DPadLeft) ||
                 keyboardState.IsKeyDown(Keys.A) &&
                 !oldKeyboardState.IsKeyDown(Keys.A))
-                playField.KeyInput(InputType.Left);
+                playField.PlayField.KeyInput(InputType.Left);
 
             if (gamePadState.IsButtonDown(Buttons.DPadRight) &&
                 !oldGamePadState.IsButtonDown(Buttons.DPadRight) ||
                 keyboardState.IsKeyDown(Keys.D) &&
                 !oldKeyboardState.IsKeyDown(Keys.D))
-                playField.KeyInput(InputType.Right);
+                playField.PlayField.KeyInput(InputType.Right);
 
             if (gamePadState.IsButtonDown(Buttons.DPadUp) &&
                 !oldGamePadState.IsButtonDown(Buttons.DPadUp) ||
                 keyboardState.IsKeyDown(Keys.W) &&
                 !oldKeyboardState.IsKeyDown(Keys.W))
-                playField.KeyInput(InputType.Up);
+                playField.PlayField.KeyInput(InputType.Up);
 
             if (gamePadState.IsButtonDown(Buttons.DPadDown) &&
                 !oldGamePadState.IsButtonDown(Buttons.DPadDown) ||
                 keyboardState.IsKeyDown(Keys.S) &&
                 !oldKeyboardState.IsKeyDown(Keys.S))
-                playField.KeyInput(InputType.Down);
+                playField.PlayField.KeyInput(InputType.Down);
 
             if (gamePadState.IsButtonDown(Buttons.A) &&
                 !oldGamePadState.IsButtonDown(Buttons.A) ||
                 keyboardState.IsKeyDown(Keys.LeftControl) &&
                 !oldKeyboardState.IsKeyDown(Keys.LeftControl))
-                playField.KeyInput(InputType.Swap);
+                playField.PlayField.KeyInput(InputType.Swap);
 
             if (gamePadState.IsButtonDown(Buttons.RightShoulder) ||
                 keyboardState.IsKeyDown(Keys.LeftShift))
-                playField.KeyInput(InputType.Raise);
+                playField.PlayField.KeyInput(InputType.Raise);
 
             oldGamePadState = gamePadState;
             oldKeyboardState = keyboardState;
@@ -200,15 +199,6 @@ namespace Tetatt
 
         private void playField_PerformedCombo(object sender, ComboEventArgs ce)
         {
-            DrawablePlayField dpf = (DrawablePlayField)sender;
-
-            EffCombo eff = new EffCombo(
-                this,
-                dpf.PosToVector(ce.pos),
-                ce.isChain,
-                ce.count);
-            Components.Add(eff);
-
             if (ce.isChain)
             {
                 chainEffect.Play();
@@ -233,37 +223,12 @@ namespace Tetatt
 
         private void playField_Popped(object sender, PoppedEventArgs pe)
         {
-            DrawablePlayField dpf = (DrawablePlayField)sender;
-
             SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4) - 1];
             effect.Play(1, pe.chain.popCount / 10.0f, 0);
-
-            EffPop eff = new EffPop(this, dpf.PosToVector(pe.pos));
-            Components.Add(eff);
 
             if (pe.chain.popCount < 10)
             {
                 pe.chain.popCount++;
-            }
-        }
-
-        private void playField_Swapped(object sender, SwapEventArgs me)
-        {
-            DrawablePlayField dpf = (DrawablePlayField)sender;
-
-            if (me.left != null)
-            {
-                Vector2 pos = dpf.PosToVector(me.pos);
-                EffMoveBlock eff = new EffMoveBlock(this, me.left, pos, false);
-                Components.Add(eff);
-            }
-
-            if (me.right != null)
-            {
-                Vector2 pos = dpf.PosToVector(me.pos);
-                pos.X += DrawablePlayField.blockSize;
-                EffMoveBlock eff = new EffMoveBlock(this, me.right, pos, true);
-                Components.Add(eff);
             }
         }
     }
