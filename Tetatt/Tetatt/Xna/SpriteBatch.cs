@@ -85,9 +85,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			
 			Gl.glMatrixMode(Gl.GL_TEXTURE);
 			Gl.glLoadIdentity();
-			Gl.glScalef(1.0f/texture.Width, -1.0f/texture.Height, 1);
 			Gl.glTranslatef(0, 1, 0);
-			
+			Gl.glScalef(1.0f/texture.Width, -1.0f/texture.Height, 1);
+
 			Gl.glBindTexture(Gl.GL_TEXTURE_2D, texture.id);
 			Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
 			Gl.glTexCoord2d(src.Left, src.Top);
