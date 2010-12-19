@@ -47,7 +47,6 @@
     <Compile Include="GamePlay\GarbageHandler.cs" />
     <Compile Include="GamePlay\GarbageInfo.cs" />
     <Compile Include="GamePlay\GarbageType.cs" />
-    <Compile Include="GamePlay\InputType.cs" />
     <Compile Include="GamePlay\PlayField.cs" />
     <Compile Include="GamePlay\Popper.cs" />
     <Compile Include="GamePlay\StressState.cs" />
