@@ -38,8 +38,10 @@ namespace Microsoft.Xna.Framework.Graphics
             Color = color;
         }
 
+#pragma warning disable 0414
         Vector3 Position;
         Color Color;
+#pragma warning restore 0414
 
         VertexDeclaration IVertexType.VertexDeclaration {
             get {
