@@ -292,15 +292,12 @@ namespace Tetatt.GamePlay
             if (right != null)
             {
                 right.Move();
-                // TODO effects
-                //effects->Add(new EffMoveBlock(DIR_LEFT, right, RightOf(pos)));
             }
             if (left != null)
             {
                 left.Move();
-                // TODO effects
-                //effects->Add(new EffMoveBlock(DIR_RIGHT, left, pos));
             }
+            Swapped(this, new SwapEventArgs(left, right, markerPos));
             return true;
         }
 
@@ -811,5 +808,7 @@ namespace Tetatt.GamePlay
         public event EventHandler<ChainEventArgs> PerformedChain;
 
         public event EventHandler<PoppedEventArgs> Popped;
+
+        public event EventHandler<SwapEventArgs> Swapped;
     }
 }
