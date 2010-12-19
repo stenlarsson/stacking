@@ -340,8 +340,6 @@ namespace Tetatt.GamePlay
         {
             if (!tooHigh)
             {
-                scrolledRows++;
-
                 if (fastScroll)
                     scrollOffset -= 0.0625;
                 else
@@ -350,6 +348,7 @@ namespace Tetatt.GamePlay
 
                 if (scrollOffset <= -1.0)
                 {
+                    scrolledRows++;
                     for (int row = height - 1; row >= 1; row--)
                         for (int col = 0; col < width; col++)
                             field[row,col] = field[row-1,col];
