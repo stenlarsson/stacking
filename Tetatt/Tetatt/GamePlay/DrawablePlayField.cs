@@ -65,18 +65,16 @@ namespace Tetatt.GamePlay
                 width * blockSize,
                 visibleHeight * blockSize);
 
-            Vector2 blocksOffset = offset + new Vector2(0, (int)(scrollOffset * blockSize));
-
             // Draw blocks
             for (int row = 0; row < visibleHeight+1; row++)
             {
                 for (int col = 0; col < width; col++)
                 {
                     Block block = field[row,col];
-                    if (block != null)
+                    if (block != null && !block.IsState(BlockState.Moving))
                     {
                         int tile = block.Tile;
-                        Vector2 pos = PosToVector(new Pos(row, col)) + blocksOffset;
+                        Vector2 pos = PosToVector(new Pos(row, col));
                         spriteBatch.Draw(
                             blocksTileSet.Texture,
                             new Rectangle(
@@ -96,7 +94,7 @@ namespace Tetatt.GamePlay
             spriteBatch.Begin();
             spriteBatch.Draw(
                 marker,
-                PosToVector(markerPos) + blocksOffset - new Vector2(4, 5),
+                PosToVector(markerPos) - new Vector2(4, 5),
                 Color.White);
             spriteBatch.End();
 
@@ -106,8 +104,8 @@ namespace Tetatt.GamePlay
         public Vector2 PosToVector(Pos pos)
         {
             return new Vector2(
-                pos.Col * blockSize,
-                (visibleHeight - pos.Row) * blockSize);
+                pos.Col * blockSize + offset.X,
+                (visibleHeight - pos.Row) * blockSize + (int)(scrollOffset * blockSize) + offset.Y);
         }
 
     }

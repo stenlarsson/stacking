@@ -51,6 +51,7 @@ namespace Tetatt
             playField.PerformedCombo += playField_PerformedCombo;
             playField.PerformedChain += playField_PerformedChain;
             playField.Popped += playField_Popped;
+            playField.Swapped += playField_Swapped;
             Components.Add(playField);
 
         }
@@ -203,7 +204,7 @@ namespace Tetatt
 
             EffCombo eff = new EffCombo(
                 this,
-                dpf.PosToVector(ce.pos) + dpf.Offset,
+                dpf.PosToVector(ce.pos),
                 ce.isChain,
                 ce.count);
             Components.Add(eff);
@@ -237,12 +238,32 @@ namespace Tetatt
             SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4) - 1];
             effect.Play(1, pe.chain.popCount / 10.0f, 0);
 
-            EffPop eff = new EffPop(this, dpf.PosToVector(pe.pos) + dpf.Offset);
+            EffPop eff = new EffPop(this, dpf.PosToVector(pe.pos));
             Components.Add(eff);
 
             if (pe.chain.popCount < 10)
             {
                 pe.chain.popCount++;
+            }
+        }
+
+        private void playField_Swapped(object sender, SwapEventArgs me)
+        {
+            DrawablePlayField dpf = (DrawablePlayField)sender;
+
+            if (me.left != null)
+            {
+                Vector2 pos = dpf.PosToVector(me.pos);
+                EffMoveBlock eff = new EffMoveBlock(this, me.left, pos, false);
+                Components.Add(eff);
+            }
+
+            if (me.right != null)
+            {
+                Vector2 pos = dpf.PosToVector(me.pos);
+                pos.X += DrawablePlayField.blockSize;
+                EffMoveBlock eff = new EffMoveBlock(this, me.right, pos, true);
+                Components.Add(eff);
             }
         }
     }
