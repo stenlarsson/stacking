@@ -69,9 +69,9 @@ namespace Tetatt.GamePlay
 			    (Type == BlockType.Garbage ? BlockType.EvilGarbage : BlockType.Garbage);
 	    }
 
-        public void Pop(int num, int total, int nextGraphic)
+        public void Pop(int num, int total, int nextGraphic, int popStartOffset, int popTime, int flashTime)
         {
-            base.Pop(num, total);
+            base.Pop(num, total, popStartOffset, popTime, flashTime);
             this.nextGraphic = nextGraphic;
         }
 
@@ -93,9 +93,6 @@ namespace Tetatt.GamePlay
                 case BlockState.Flash:
                     anim = new Anim(AnimType.Looping, flashFrames);
                     nextState = BlockState.Pop;
-                    // TODO difficulty
-                    stateDelay = 40;
-                    //stateDelay = g_game->GetLevelData()->flashTime;
                     break;
                 case BlockState.Pop:
                     anim = new Anim((int)type + BigGarbageBlock.tileFlash1Offset);

@@ -67,11 +67,11 @@ namespace Tetatt.GamePlay
            sentCombo = true;
         }
 
-        public int PopAllAndCountEvil() {
+        public int PopAllAndCountEvil(int popStartOffset, int popTime, int flashTime) {
             int any = 0, evil = 0;
             foreach( KeyValuePair<int, Block> cur in blocks )
             {
-                cur.Value.Pop(any++, blocks.Count);
+                cur.Value.Pop(any++, blocks.Count, popStartOffset, popTime, flashTime);
                 if (cur.Value.Type == BlockType.Gray)
                     evil++;
             }

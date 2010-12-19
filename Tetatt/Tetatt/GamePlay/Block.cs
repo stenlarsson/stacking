@@ -115,12 +115,12 @@ namespace Tetatt.GamePlay
             return other.Type == type;
         }
 
-        public virtual void Pop(int num, int total)
+        public virtual void Pop(int num, int total, int popStartOffset, int popTime, int flashTime)
         {
 	        State = BlockState.Flash;
-            // TODO difficulty
-	        popOffset = 10 + 7 * num;
-	        dieOffset = 10 + 7 * total - popOffset - 1;
+            stateDelay = flashTime;
+	        popOffset = popStartOffset + popTime * num;
+	        dieOffset = popStartOffset + popTime * total - popOffset - 1;
         }
 
         public virtual void Move()
@@ -221,13 +221,8 @@ namespace Tetatt.GamePlay
 		        stateDelay = 1;
 		        break;
 	        case BlockState.Flash:
-		        {
-			        anim = new Anim(AnimType.Looping, flashFrames);
-			        nextState = BlockState.Pop;
-                    // TODO difficulty
-                    stateDelay = 40;
-			        //stateDelay = g_game->GetLevelData()->flashTime;
-		        }
+		        anim = new Anim(AnimType.Looping, flashFrames);
+		        nextState = BlockState.Pop;
 		        break;
 	        case BlockState.Pop:
 		        anim = new Anim((int)type + tileEyesOffset);

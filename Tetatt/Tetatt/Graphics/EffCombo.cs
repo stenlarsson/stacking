@@ -16,14 +16,12 @@ namespace Tetatt.Graphics
         private SpriteBatch spriteBatch;
         private float radius;
 
-        public EffCombo(Game game, Vector2 pos, bool isChain, int count)
+        public EffCombo(Game game, Vector2 pos, bool isChain, int count, int duration)
             : base(game)
         {
             this.pos = pos;
             tile = (isChain ? 52 : 38) + count;
-            // TODO difficulty
-            //g_game->GetLevelData()->effComboDuration
-            duration = 80;
+            this.duration = duration;
             radius = 70;
         }
 

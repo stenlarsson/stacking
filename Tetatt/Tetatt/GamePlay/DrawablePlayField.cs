@@ -25,7 +25,7 @@ namespace Tetatt.GamePlay
             : base(game)
         {
             this.offset = offset;
-            this.PlayField = new PlayField();
+            this.PlayField = new PlayField(4);
             this.PlayField.Popped += (_, e) =>
                 {
                     game.Components.Add(
@@ -34,7 +34,7 @@ namespace Tetatt.GamePlay
             this.PlayField.PerformedCombo += (_, e) =>
                 {
                     game.Components.Add(
-                        new EffCombo(game, PosToVector(e.pos), e.isChain, e.count));
+                        new EffCombo(game, PosToVector(e.pos), e.isChain, e.count, PlayField.GetLevelData().effComboDuration));
                 };
             this.PlayField.Swapped += (_, e) =>
                 {
