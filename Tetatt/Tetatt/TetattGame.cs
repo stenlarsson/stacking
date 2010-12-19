@@ -154,35 +154,35 @@ namespace Tetatt
                 !oldGamePadState.IsButtonDown(Buttons.DPadLeft) ||
                 keyboardState.IsKeyDown(Keys.A) &&
                 !oldKeyboardState.IsKeyDown(Keys.A))
-                playField.PlayField.KeyInput(InputType.Left);
+                playField.PlayField.MoveLeft();
 
             if (gamePadState.IsButtonDown(Buttons.DPadRight) &&
                 !oldGamePadState.IsButtonDown(Buttons.DPadRight) ||
                 keyboardState.IsKeyDown(Keys.D) &&
                 !oldKeyboardState.IsKeyDown(Keys.D))
-                playField.PlayField.KeyInput(InputType.Right);
+                playField.PlayField.MoveRight();
 
             if (gamePadState.IsButtonDown(Buttons.DPadUp) &&
                 !oldGamePadState.IsButtonDown(Buttons.DPadUp) ||
                 keyboardState.IsKeyDown(Keys.W) &&
                 !oldKeyboardState.IsKeyDown(Keys.W))
-                playField.PlayField.KeyInput(InputType.Up);
+                playField.PlayField.MoveUp();
 
             if (gamePadState.IsButtonDown(Buttons.DPadDown) &&
                 !oldGamePadState.IsButtonDown(Buttons.DPadDown) ||
                 keyboardState.IsKeyDown(Keys.S) &&
                 !oldKeyboardState.IsKeyDown(Keys.S))
-                playField.PlayField.KeyInput(InputType.Down);
+                playField.PlayField.MoveDown();
 
             if (gamePadState.IsButtonDown(Buttons.A) &&
                 !oldGamePadState.IsButtonDown(Buttons.A) ||
                 keyboardState.IsKeyDown(Keys.LeftControl) &&
                 !oldKeyboardState.IsKeyDown(Keys.LeftControl))
-                playField.PlayField.KeyInput(InputType.Swap);
+                playField.PlayField.Swap();
 
             if (gamePadState.IsButtonDown(Buttons.RightShoulder) ||
                 keyboardState.IsKeyDown(Keys.LeftShift))
-                playField.PlayField.KeyInput(InputType.Raise);
+                playField.PlayField.Raise();
 
             oldGamePadState = gamePadState;
             oldKeyboardState = keyboardState;

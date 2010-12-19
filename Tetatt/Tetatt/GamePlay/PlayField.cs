@@ -184,49 +184,49 @@ namespace Tetatt.GamePlay
             }
         }
 
-        public void KeyInput(InputType input)
+        public void MoveUp()
         {
-            switch (input)
-            {
-                case InputType.Up:
-                    swapTimer = 0;
-                    if (markerPos.Row < makerHeightLimit)
-                        markerPos.Row++;
-                    break;
+            swapTimer = 0;
+            if (markerPos.Row < makerHeightLimit)
+                markerPos.Row++;
+        }
 
-                case InputType.Left:
-                    swapTimer = 0;
-                    if (markerPos.Col > 0)
-                        markerPos.Col--;
-                    break;
+        public void MoveLeft()
+        {
+            swapTimer = 0;
+            if (markerPos.Col > 0)
+                markerPos.Col--;
+        }
 
-                case InputType.Right:
-                    swapTimer = 0;
-                    if (markerPos.Col < width-2)
-                        markerPos.Col++;
-                    break;
+        public void MoveRight()
+        {
+            swapTimer = 0;
+            if (markerPos.Col < width-2)
+                markerPos.Col++;
+        }
 
-                case InputType.Down:
-                    swapTimer = 0;
-                    if (markerPos.Row > 1)
-                        markerPos.Row--;
-                    break;
+        public void MoveDown()
+        {
+            swapTimer = 0;
+            if (markerPos.Row > 1)
+                markerPos.Row--;
+        }
 
-                case InputType.Swap:
-                    if (state != PlayFieldState.Play)
-                        break;
-                    if (!SwapBlocks())
-                        swapTimer = 20;
-                    else
-                        swapTimer = 0;
-                    break;
+        public void Swap()
+        {
+            if (state != PlayFieldState.Play)
+                return;
+            if (!SwapBlocks())
+                swapTimer = 20;
+            else
+                swapTimer = 0;
+        }
 
-                case InputType.Raise:
-                    fastScroll = true;
-                    if (scrollPause > 2)
-                        scrollPause = 0;
-                    break;
-            }
+        public void Raise()
+        {
+            fastScroll = true;
+            if (scrollPause > 2)
+                scrollPause = 0;
         }
 
         private void StateCheck()
