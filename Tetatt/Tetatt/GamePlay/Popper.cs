@@ -29,7 +29,7 @@ namespace Tetatt.GamePlay
 	        addToChain.AddBlock(block, blocknum);
         }
 
-        public void Pop()
+        public void Pop(int popStartOffset, int popTime, int flashTime)
         {
             int evil = 0;
 
@@ -38,7 +38,7 @@ namespace Tetatt.GamePlay
                 if (!chain.usedThisFrame)
                     continue;
 
-                evil += chain.PopAllAndCountEvil();
+                evil += chain.PopAllAndCountEvil(popStartOffset, popTime, flashTime);
 
                 // Check add evil garbage
                 if (evil > 0)

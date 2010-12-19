@@ -108,22 +108,22 @@ namespace Tetatt.GamePlay
 	        return (count + PlayField.width - 1) / PlayField.width;
         }
 
-        public void Pop(int delay, int total, Chain newchain)
+        public void Pop(int delay, int total, Chain newchain, int popStartOffset, int popTime, int flashTime)
         {
 	        // int required here since we're stopping on less then 0
             int firstRemoved = Math.Max(blocks.Count, PlayField.width) - PlayField.width;
 
             for(int i = blocks.Count - 1; i >= firstRemoved; i--)
-		        blocks[i].Pop(delay++, total, graphicsDisabled);
+		        blocks[i].Pop(delay++, total, graphicsDisabled, popStartOffset, popTime, flashTime);
 
 	        for(int i = firstRemoved - 1; i >= 0; i--)
 		        blocks[i].Pop(
 			        delay++, total,
-			        GetGraphic(i, GetLines(blocks.Count) - 1, PlayField.width));
+			        GetGraphic(i, GetLines(blocks.Count) - 1, PlayField.width),
+                    popStartOffset, popTime, flashTime);
 
 	        state = BlockState.Pop;
-            // TODO difficulty
-            popDelay = 10 + 7 * total + 40;
+            popDelay = popStartOffset + popTime * total + flashTime;
         }
 
         public void SetGraphic()

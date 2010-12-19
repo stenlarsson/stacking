@@ -109,7 +109,7 @@ namespace Tetatt.GamePlay
 		        popBlocks.AddLast(info);
         }
 
-        public void Pop()
+        public void Pop(int popStartOffset, int popTime, int flashTime)
         {
             int numBlocks = 0;
             foreach (GBInfo info in popBlocks)
@@ -118,7 +118,7 @@ namespace Tetatt.GamePlay
             int delay = 0;
             foreach (GBInfo info in popBlocks)
             {
-                info.block.Pop(delay, numBlocks, info.chain);
+                info.block.Pop(delay, numBlocks, info.chain, popStartOffset, popTime, flashTime);
                 delay += info.block.GetNum();
             }
 

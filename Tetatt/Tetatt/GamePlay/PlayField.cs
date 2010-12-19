@@ -21,6 +21,25 @@ namespace Tetatt.GamePlay
         public const int deathDuration = 52; // num frames in Die state
         public const int maxStopTime = 180;
         private const int bonusStopTime = 80;
+        // 2^(1/7200) // Speed doubles in two minutes
+        private const double scrollSpeedIncrease = 1.0000962750758921229716090257793;
+        private const double maxScrollSpeed = 2.0/32;
+
+        // next speedlevel == current speedlevel * 1.8
+        // Speed, Blocks, Flashtime, PopOffset, PopTime, Comboeffect Duration
+        private static LevelData[] levelData = new LevelData[]
+        {
+            new LevelData(0.005/32, 5, 48, 14, 9, 50),
+            new LevelData(0.009/32, 5, 46, 13, 8, 50),
+            new LevelData(0.016/32, 5, 44, 12, 8, 50),
+            new LevelData(0.029/32, 5, 42, 11, 7, 50),
+            new LevelData(0.052/32, 5, 40, 10, 7, 50),
+            new LevelData(0.094/32, 6, 38,  9, 6, 45),
+            new LevelData(0.170/32, 6, 36,  8, 6, 40),
+            new LevelData(0.306/32, 6, 34,  7, 5, 35),
+            new LevelData(0.551/32, 6, 32,  6, 4, 30),
+            new LevelData(0.992/32, 6, 30,  5, 3, 25)
+        };
 
         public Block[,] field;
         private int[] fieldHeight;
@@ -36,6 +55,7 @@ namespace Tetatt.GamePlay
 
         private bool fastScroll;
         public double scrollOffset;
+        private double scrollSpeed;
         private int scrollPause;
 
         private int swapTimer;
@@ -56,7 +76,7 @@ namespace Tetatt.GamePlay
 
         private bool gotStopBonus = false;
 
-        public PlayField()
+        public PlayField(int startLevel)
         {
             field = new Block[height,width];
             fieldHeight = new int[width];
@@ -68,6 +88,7 @@ namespace Tetatt.GamePlay
             fastScroll = false;
             scrollPause = 0;
             scrollOffset = 0;
+            scrollSpeed = levelData[startLevel].scrollSpeed;
 
             swapTimer = 0;
 
@@ -338,13 +359,14 @@ namespace Tetatt.GamePlay
 
         void ScrollField()
         {
+            if (scrollSpeed < maxScrollSpeed)
+            {
+                scrollSpeed *= scrollSpeedIncrease;
+            }
+
             if (!tooHigh)
             {
-                if (fastScroll)
-                    scrollOffset -= 0.0625;
-                else
-                    // TODO difficulty
-                    scrollOffset -= 0.001625;
+                scrollOffset -= (fastScroll) ? maxScrollSpeed : scrollSpeed;
 
                 if (scrollOffset <= -1.0)
                 {
@@ -630,7 +652,8 @@ namespace Tetatt.GamePlay
 
             if (bPop)//if something popped
             {
-                popper.Pop();//initiate popping
+                LevelData currLevel = GetLevelData();
+                popper.Pop(currLevel.popStartOffset, currLevel.popTime, currLevel.flashTime);//initiate popping
 
                 bool bDoOver = true;
                 bool bReverse = false;
@@ -671,7 +694,7 @@ namespace Tetatt.GamePlay
                         bReverse = true;
                 }
 
-                gh.Pop();
+                gh.Pop(currLevel.popStartOffset, currLevel.popTime, currLevel.flashTime);
             }
         }
 
@@ -835,6 +858,20 @@ namespace Tetatt.GamePlay
                 ActivatePerformedCombo(
                     chain.TopMostBlockIndex, true, chain.length);
             }
+        }
+
+        public LevelData GetLevelData()
+        {
+            int i = 0;
+            for (i = 0; i < levelData.Length - 1; i++)
+            {
+                if(levelData[i + 1].scrollSpeed > scrollSpeed)
+                {
+                    break;
+                }
+            }
+
+            return levelData[i];
         }
 
         public void ActivatePerformedCombo(int pos, bool isChain, int count)

@@ -90,6 +90,7 @@
     <Compile Include="Graphics\EffPop.cs" />
     <Compile Include="Graphics\EffMoveBlock.cs" />
     <Compile Include="GamePlay\SwapEventArgs.cs" />
+    <Compile Include="GamePlay\LevelData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TetattContent\TetattContent.mdproj">
