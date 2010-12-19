@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using Tetatt.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace Tetatt.GamePlay
 {
-    public class PlayField : DrawableGameComponent
+    public class PlayField
     {
         public const int width = 6;
         public const int height = 48;
@@ -23,9 +22,9 @@ namespace Tetatt.GamePlay
         public const int deathDuration = 52; // num frames in Die state
         public const int maxStopTime = 180;
 
-        protected Block[,] field;
+        public Block[,] field;
         private int[] fieldHeight;
-        protected Pos markerPos;
+        public Pos markerPos;
         private Popper popper;
         private int makerHeightLimit {
             get {
@@ -36,7 +35,7 @@ namespace Tetatt.GamePlay
 
 
         private bool fastScroll;
-        protected double scrollOffset;
+        public double scrollOffset;
         private int scrollPause;
 
         private int swapTimer;
@@ -55,8 +54,7 @@ namespace Tetatt.GamePlay
 
         private bool leftAlignGarbage;
 
-        public PlayField(Game game)
-            : base(game)
+        public PlayField()
         {
             field = new Block[height,width];
             fieldHeight = new int[width];
@@ -139,7 +137,7 @@ namespace Tetatt.GamePlay
             //effects->Add(new EffReady());
         }
 
-        public override void Update(GameTime gameTime)
+        public void Update()
         {
             StateCheck();
 
@@ -184,8 +182,6 @@ namespace Tetatt.GamePlay
                     }
                 }
             }
-        
-            base.Update(gameTime);
         }
 
         public void KeyInput(InputType input)
@@ -299,6 +295,18 @@ namespace Tetatt.GamePlay
             }
             Swapped(this, new SwapEventArgs(left, right, markerPos));
             return true;
+        }
+
+        public delegate void BlockAction(int row, int col, Block block);
+        public void EachVisibleBlock(BlockAction action)
+        {
+            for (int row = 0; row < PlayField.visibleHeight+1; row++)
+            {
+                for (int col = 0; col < PlayField.width; col++)
+                {
+                    action(row, col, field[row,col]);
+                }
+            }
         }
 
         private bool ShouldScroll()

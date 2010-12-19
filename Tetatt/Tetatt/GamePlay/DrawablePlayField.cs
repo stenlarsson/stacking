@@ -5,7 +5,7 @@ using Tetatt.Graphics;
 
 namespace Tetatt.GamePlay
 {
-    public class DrawablePlayField : PlayField
+    public class DrawablePlayField : DrawableGameComponent
     {
         private Vector2 offset;
         public Vector2 Offset { get { return offset; } }
@@ -19,15 +19,37 @@ namespace Tetatt.GamePlay
         public static Texture2D background;
         public static Texture2D marker;
 
+        public readonly PlayField PlayField;
+
         public DrawablePlayField(Game game, Vector2 offset)
             : base(game)
         {
             this.offset = offset;
+            this.PlayField = new PlayField();
+            this.PlayField.Popped += (_, e) =>
+                {
+                    game.Components.Add(
+                        new EffPop(game, PosToVector(e.pos)));
+                };
+            this.PlayField.PerformedCombo += (_, e) =>
+                {
+                    game.Components.Add(
+                        new EffCombo(game, PosToVector(e.pos), e.isChain, e.count));
+                };
+            this.PlayField.Swapped += (_, e) =>
+                {
+                    if (e.left != null)
+                        game.Components.Add(new EffMoveBlock(game, e.left, PosToVector(e.pos), false));
+
+                    if (e.right != null)
+                        game.Components.Add(new EffMoveBlock(game, e.right, PosToVector(e.pos)+new Vector2(blockSize, 0), true));
+                };
+
         }
 
         public override void Initialize()
         {
-            Start();
+            PlayField.Start();
 
             base.Initialize();
         }
@@ -41,6 +63,13 @@ namespace Tetatt.GamePlay
                 Game.Content.Load<Texture2D>("blocks"), blockSize);
 
             base.LoadContent();
+        }
+
+        public override void Update (GameTime time)
+        {
+            PlayField.Update();
+
+            base.Update (time);
         }
 
         public override void Draw(GameTime gameTime)
@@ -62,19 +91,16 @@ namespace Tetatt.GamePlay
             spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
                 (int)offset.X,
                 (int)offset.Y,
-                width * blockSize,
-                visibleHeight * blockSize);
+                PlayField.width * blockSize,
+                PlayField.visibleHeight * blockSize);
 
             // Draw blocks
-            for (int row = 0; row < visibleHeight+1; row++)
-            {
-                for (int col = 0; col < width; col++)
+            PlayField.EachVisibleBlock( (row, col, block) =>
                 {
-                    Block block = field[row,col];
-                    if (block != null && !block.IsState(BlockState.Moving))
+                    if (block != null)
                     {
                         int tile = block.Tile;
-                        Vector2 pos = PosToVector(new Pos(row, col));
+                        Vector2 pos = PosToVector(new Pos(row,col));
                         spriteBatch.Draw(
                             blocksTileSet.Texture,
                             new Rectangle(
@@ -85,8 +111,7 @@ namespace Tetatt.GamePlay
                             blocksTileSet.SourceRectangle(tile),
                             (row == 0) ? Color.DarkGray : Color.White);
                     }
-                }
-            }
+                } );
 
             spriteBatch.End();
 
@@ -94,7 +119,7 @@ namespace Tetatt.GamePlay
             spriteBatch.Begin();
             spriteBatch.Draw(
                 marker,
-                PosToVector(markerPos) - new Vector2(4, 5),
+                PosToVector(PlayField.markerPos) - new Vector2(4, 5),
                 Color.White);
             spriteBatch.End();
 
@@ -105,7 +130,7 @@ namespace Tetatt.GamePlay
         {
             return new Vector2(
                 pos.Col * blockSize + offset.X,
-                (visibleHeight - pos.Row) * blockSize + (int)(scrollOffset * blockSize) + offset.Y);
+                (PlayField.visibleHeight - pos.Row) * blockSize + (int)(PlayField.scrollOffset * blockSize) + offset.Y);
         }
 
     }
