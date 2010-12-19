@@ -132,14 +132,9 @@ namespace Tetatt.GamePlay
 	        wantToDrop = false;
         }
 
-        public Block CreateBlock()
-        {
-	        return new Block(typeAfterPop, BlockState.Falling, this.Chain, false);
-        }
-
         public override Block ReplaceBlock() {
             // Replace garbage with a real block
-            Block b = CreateBlock();
+            Block b = new Block(typeAfterPop, BlockState.Falling, this.Chain, false);
             gb.RemoveBlock();
             Chain = null;
             return b;
