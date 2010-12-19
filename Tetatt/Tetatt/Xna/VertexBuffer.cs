@@ -139,6 +139,15 @@ namespace Microsoft.Xna.Framework.Graphics
             Gl.glGenBuffers(1, out buffer);
         }
 
+        protected override void Dispose (bool disposing)
+        {
+            if (disposing && buffer != 0)
+            {
+                Gl.glDeleteBuffers(1, ref buffer);
+                buffer = 0;
+            }
+        }
+
         public void SetData<T>(T[] data) where T : struct
         {
             // TODO: Check that count/size agrees with the data array
