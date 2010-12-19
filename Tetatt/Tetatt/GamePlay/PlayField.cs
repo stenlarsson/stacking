@@ -26,7 +26,7 @@ namespace Tetatt.GamePlay
         private int[] fieldHeight;
         public Pos markerPos;
         private Popper popper;
-        private int makerHeightLimit {
+        private int markerHeightLimit {
             get {
                 return (GetHeight() >= visibleHeight ? visibleHeight : visibleHeight-1);
             }
@@ -187,7 +187,7 @@ namespace Tetatt.GamePlay
         public void MoveUp()
         {
             swapTimer = 0;
-            if (markerPos.Row < makerHeightLimit)
+            if (markerPos.Row < markerHeightLimit)
                 markerPos.Row++;
         }
 
@@ -355,7 +355,7 @@ namespace Tetatt.GamePlay
                             field[row,col] = field[row-1,col];
                     RandomizeRow(0);
 
-                    if (markerPos.Row < makerHeightLimit)
+                    if (markerPos.Row < markerHeightLimit)
                     {
                         markerPos.Row++;
                     }
