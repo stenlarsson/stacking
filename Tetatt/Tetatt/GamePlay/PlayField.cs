@@ -14,13 +14,13 @@ namespace Tetatt.GamePlay
         public const int startHeight = 8;
         public const int visibleHeight = 12;
         public const int stressHeight = 10;
-        public const int firstVisibleRow = (height - visibleHeight - 1);
         public readonly static Pos markerStart = new Pos(visibleHeight/2 - 1, width/2 - 1);
         public const double grayBlockChance = 0.10; // chance per block on a row of six
         public const int grayBlockDelay = 5; // number of rows to wait before they can appear
         public const int deathDelay = 50; // num frames before dying
         public const int deathDuration = 52; // num frames in Die state
         public const int maxStopTime = 180;
+        private const int bonusStopTime = 80;
 
         public Block[,] field;
         private int[] fieldHeight;
@@ -54,11 +54,15 @@ namespace Tetatt.GamePlay
 
         private bool leftAlignGarbage;
 
+        private bool gotStopBonus = false;
+
         public PlayField()
         {
             field = new Block[height,width];
             fieldHeight = new int[width];
-            popper = new Popper(this);
+            popper = new Popper();
+            popper.ChainStep += popper_ChainStep;
+            popper.ChainFinish += (_, ce) => PerformedChain(this, ce);
             markerPos = markerStart;
 
             fastScroll = false;
@@ -87,11 +91,6 @@ namespace Tetatt.GamePlay
         public void DelayScroll(int delay)
         {
             scrollPause = Math.Min(maxStopTime, scrollPause + delay);
-        }
-
-        public void AddScore(int score)
-        {
-            this.score += score;
         }
 
         private void RandomizeField()
@@ -162,6 +161,7 @@ namespace Tetatt.GamePlay
                     ScrollField();
                 ClearDeadBlocks();
                 DropBlocks();
+                gotStopBonus = false;
                 CheckForPops();
                 CheckHeight();
 
@@ -797,6 +797,47 @@ namespace Tetatt.GamePlay
             gh.AddGarbage(num, type);
         }
 
+        private void popper_ChainStep(object sender, ChainEventArgs ce)
+        {
+            Chain chain = ce.chain;
+            if (chain.numBlocks > 3)
+            {
+                // A combo.
+                DelayScroll(chain.numBlocks * 5);
+                if (!gotStopBonus && GetHeight() > stressHeight)
+                {
+                    // TODO: Add some nifty graphics, and perhaps not a static bonus?
+                    DelayScroll(bonusStopTime);
+                    gotStopBonus = true;
+                }
+                score += (chain.numBlocks - 1) * 10;
+
+                ActivatePerformedCombo(
+                    chain.TopMostBlockIndex, false, chain.numBlocks);
+
+                if (chain.length > 1)
+                {
+                    // A chain involving the combo.
+                    DelayScroll(chain.numBlocks * 10);
+                    score += 50 + (chain.length - 1) * 20 * chain.length;
+
+                    ActivatePerformedCombo(
+                        chain.TopMostBlockIndex - PlayField.width,
+                        true,
+                        chain.length);
+               }
+            }
+            else if (chain.length > 1)
+            {
+                // Just a chain, without a combo
+                DelayScroll(chain.numBlocks * 10);
+                score += 50 + (chain.length - 1) * 20 * chain.length;
+
+                ActivatePerformedCombo(
+                    chain.TopMostBlockIndex, true, chain.length);
+            }
+        }
+
         public void ActivatePerformedCombo(int pos, bool isChain, int count)
         {
             ComboEventArgs eventArgs = new ComboEventArgs(
@@ -807,12 +848,6 @@ namespace Tetatt.GamePlay
         }
         public event EventHandler<ComboEventArgs> PerformedCombo;
 
-        public void ActivatePerformedChain(Chain chain)
-        {
-            ChainEventArgs eventArgs = new ChainEventArgs(
-                chain);
-            PerformedChain(this, eventArgs);
-        }
         public event EventHandler<ChainEventArgs> PerformedChain;
 
         public event EventHandler<PoppedEventArgs> Popped;

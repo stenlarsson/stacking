@@ -207,15 +207,21 @@ namespace Tetatt
 
         private void playField_PerformedChain(object sender, ChainEventArgs ce)
         {
-            if (ce.chain.length < 4)
+            // TODO: Send to other player(s)...
+            foreach (GarbageInfo info in ce.chain.garbage)
             {
-                return;
+                this.playField.PlayField.AddGarbage(info.size, info.type);
             }
-            else if (ce.chain.length == 4)
+            if (ce.chain.length > 1)
+            {
+                this.playField.PlayField.AddGarbage(ce.chain.length - 1, GarbageType.Chain);
+            }
+
+            if (ce.chain.length == 4)
             {
                 fanfare1Effect.Play();
             }
-            else
+            else if (ce.chain.length > 4)
             {
                 fanfare2Effect.Play();
             }
