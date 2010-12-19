@@ -1,8 +1,9 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    [Serializable]
+    [Serializable,StructLayout(LayoutKind.Sequential, Pack=1)]
 	public struct Color
 	{
 		public Color(byte r, byte g, byte b, byte a = 255)
