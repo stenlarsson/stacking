@@ -18,6 +18,7 @@ namespace Tetatt.GamePlay
         public static TileSet blocksTileSet;
         public static Texture2D background;
         public static Texture2D marker;
+        public static SpriteFont font;
 
         public readonly PlayField PlayField;
 
@@ -61,6 +62,8 @@ namespace Tetatt.GamePlay
             marker = Game.Content.Load<Texture2D>("marker");
             blocksTileSet = new TileSet(
                 Game.Content.Load<Texture2D>("blocks"), blockSize);
+            font = Game.Content.Load<SpriteFont>("ingame_font");
+            font.Spacing = -5;
 
             base.LoadContent();
         }
@@ -74,12 +77,51 @@ namespace Tetatt.GamePlay
 
         public override void Draw(GameTime gameTime)
         {
-            // Draw frame and background
             spriteBatch.Begin();
+
+            // Draw frame and background
             spriteBatch.Draw(
                 background,
                 offset - new Vector2(16, 16), // Adjust for the frame
                 Color.White);
+
+            // Draw statistics
+            string score = PlayField.Score.ToString();
+            spriteBatch.DrawString(
+                font,
+                "Score",
+                new Vector2(0, -105) + offset,
+                Color.White);
+            spriteBatch.DrawString(
+                font,
+                score,
+                new Vector2(200 - font.MeasureString(score).X, -105) + offset,
+                Color.White);
+
+            string level = (PlayField.Level + 1).ToString();
+            spriteBatch.DrawString(
+                font,
+                "Level",
+                new Vector2(0, -75) + offset,
+                Color.White);
+            spriteBatch.DrawString(
+                font,
+                level,
+                new Vector2(200 - font.MeasureString(level).X, -75) + offset,
+                Color.White);
+
+            string time = String.Format("{0}:{1:00}", PlayField.Time / 60, PlayField.Time % 60);
+            spriteBatch.DrawString(
+                font,
+                "Time",
+                new Vector2(0, -45) + offset,
+                Color.White);
+            spriteBatch.DrawString(
+                font,
+                time,
+                new Vector2(200 - font.MeasureString(time).X, -45) + offset,
+                Color.White);
+
             spriteBatch.End();
 
             // Setup sprite clipping using scissor test
@@ -97,7 +139,7 @@ namespace Tetatt.GamePlay
             // Draw blocks
             PlayField.EachVisibleBlock( (row, col, block) =>
                 {
-                    if (block != null)
+                    if (block != null && !block.IsState(BlockState.Moving))
                     {
                         int tile = block.Tile;
                         Vector2 pos = PosToVector(new Pos(row,col));
