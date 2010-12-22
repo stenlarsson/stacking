@@ -115,6 +115,13 @@
       <ProcessorParameters_Quality>Medium</ProcessorParameters_Quality>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ingame_font.png">
+      <Name>ingame_font</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>FontTextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

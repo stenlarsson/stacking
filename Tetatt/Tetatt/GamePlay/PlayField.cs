@@ -55,7 +55,7 @@ namespace Tetatt.GamePlay
 
         private bool fastScroll;
         public double scrollOffset;
-        private double scrollSpeed;
+        public double scrollSpeed;
         private int scrollPause;
 
         private int swapTimer;
@@ -67,6 +67,7 @@ namespace Tetatt.GamePlay
         private int dieTimer;
 
         private int score;
+        public int Score { get { return score; } }
         private int timeTicks;
         private int scrolledRows;
 
@@ -75,6 +76,24 @@ namespace Tetatt.GamePlay
         private bool leftAlignGarbage;
 
         private bool gotStopBonus = false;
+
+        public int Level
+        {
+            get
+            {
+                int i = 0;
+                for (i = 0; i < levelData.Length - 1; i++)
+                {
+                    if (levelData[i + 1].scrollSpeed > scrollSpeed)
+                    {
+                        break;
+                    }
+                }
+                return i;
+            }
+        }
+
+        public int Time { get { return timeTicks / 60; } }
 
         public PlayField(int startLevel)
         {
@@ -332,6 +351,11 @@ namespace Tetatt.GamePlay
 
         private bool ShouldScroll()
         {
+            if (scrollSpeed < maxScrollSpeed)
+            {
+                scrollSpeed *= scrollSpeedIncrease;
+            }
+
             for (int row = 1; row < height; row++)
             {
                 for (int col = 0; col < width; col++)
@@ -359,11 +383,6 @@ namespace Tetatt.GamePlay
 
         void ScrollField()
         {
-            if (scrollSpeed < maxScrollSpeed)
-            {
-                scrollSpeed *= scrollSpeedIncrease;
-            }
-
             if (!tooHigh)
             {
                 scrollOffset -= (fastScroll) ? maxScrollSpeed : scrollSpeed;
@@ -862,16 +881,7 @@ namespace Tetatt.GamePlay
 
         public LevelData GetLevelData()
         {
-            int i = 0;
-            for (i = 0; i < levelData.Length - 1; i++)
-            {
-                if(levelData[i + 1].scrollSpeed > scrollSpeed)
-                {
-                    break;
-                }
-            }
-
-            return levelData[i];
+            return levelData[Level];
         }
 
         public void ActivatePerformedCombo(int pos, bool isChain, int count)
