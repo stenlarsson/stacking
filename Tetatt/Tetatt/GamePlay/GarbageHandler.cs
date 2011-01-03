@@ -35,6 +35,14 @@ namespace Tetatt.GamePlay
             popBlocks = new LinkedList<GBInfo>();
         }
 
+        public void Reset()
+        {
+            activeBlocks.Clear();
+            normalDrops.Clear();
+            chainDrops.Clear();
+            popBlocks.Clear();
+        }
+
         public void AddGarbage(int num, GarbageType type)
         {
 	        switch(type)

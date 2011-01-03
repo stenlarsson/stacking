@@ -60,6 +60,7 @@ namespace Tetatt.GamePlay
 
         private int swapTimer;
 
+        public PlayFieldState State { get { return state; } }
         private PlayFieldState state;
         private int stateDelay;
 
@@ -91,6 +92,11 @@ namespace Tetatt.GamePlay
                 }
                 return i;
             }
+
+            set
+            {
+                scrollSpeed = levelData[value].scrollSpeed;
+            }
         }
 
         public int Time { get { return timeTicks / 60; } }
@@ -102,16 +108,25 @@ namespace Tetatt.GamePlay
             popper = new Popper();
             popper.ChainStep += popper_ChainStep;
             popper.ChainFinish += (_, ce) => PerformedChain(this, ce);
+            Level = startLevel;
+
+            gh = new GarbageHandler();
+
+            state = PlayFieldState.Init;
+
+            Reset();
+        }
+
+        public void Reset()
+        {
             markerPos = markerStart;
 
             fastScroll = false;
             scrollPause = 0;
             scrollOffset = 0;
-            scrollSpeed = levelData[startLevel].scrollSpeed;
 
             swapTimer = 0;
 
-            state = PlayFieldState.Init;
             stateDelay = -1;
 
             tooHigh = false;
@@ -120,12 +135,17 @@ namespace Tetatt.GamePlay
             score = 0;
             timeTicks = 0;
             scrolledRows = 0;
-
-            gh = new GarbageHandler();
-
             leftAlignGarbage = false;
 
-            RandomizeField();
+            for (int row = 0; row < height; row++)
+            {
+                for (int col = 0; col < width; col++)
+                {
+                    field[row, col] = null;
+                }
+            }
+
+            gh.Reset();
         }
 
         public void DelayScroll(int delay)
@@ -171,9 +191,12 @@ namespace Tetatt.GamePlay
         {
             state = PlayFieldState.Start;
             stateDelay = 150;
-            // TODO effects
-            Debug.WriteLine("Start");
-            //effects->Add(new EffReady());
+            RandomizeField();
+        }
+
+        public void Stop()
+        {
+            state = PlayFieldState.Init;
         }
 
         public void Update()
@@ -205,7 +228,6 @@ namespace Tetatt.GamePlay
                 CheckForPops();
                 CheckHeight();
 
-                // TODO
                 timeTicks++;
             }
             else if (state == PlayFieldState.Die)
@@ -285,8 +307,7 @@ namespace Tetatt.GamePlay
             if (state == PlayFieldState.Die)
             {
                 state = PlayFieldState.Dead;
-                // TODO
-                //g_game->PlayerDied();
+                Died(this, new DiedEventArgs());
             }
         }
 
@@ -899,5 +920,7 @@ namespace Tetatt.GamePlay
         public event EventHandler<PoppedEventArgs> Popped;
 
         public event EventHandler<SwapEventArgs> Swapped;
+
+        public event EventHandler<DiedEventArgs> Died;
     }
 }

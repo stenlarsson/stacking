@@ -26,16 +26,18 @@ namespace Tetatt
         SoundEffect fanfare1Effect;
         SoundEffect fanfare2Effect;
 
-        DrawablePlayField playField;
-
-        GamePadState oldGamePadState;
-        KeyboardState oldKeyboardState;
+        DrawablePlayField playField1;
+        DrawablePlayField playField2;
 
         SoundEffect normalMusic;
         SoundEffect stressMusic;
         SoundEffectInstance music;
         int musicChangeTimer;
         bool isStressMusic;
+
+        InputState inputState;
+
+        bool isRunning;
 
         public TetattGame()
         {
@@ -47,12 +49,22 @@ namespace Tetatt
 
             Components.Add(new Background(this));
 
-            playField = new DrawablePlayField(this, new Vector2(96, 248));
-            playField.PlayField.PerformedCombo += playField_PerformedCombo;
-            playField.PlayField.PerformedChain += playField_PerformedChain;
-            playField.PlayField.Popped += playField_Popped;
-            Components.Add(playField);
+            playField1 = new DrawablePlayField(this, new Vector2(96, 248));
+            playField1.PlayField.PerformedCombo += playField_PerformedCombo;
+            playField1.PlayField.PerformedChain += playField_PerformedChain;
+            playField1.PlayField.Popped += playField_Popped;
+            playField1.PlayField.Died += playField_Died;
+            Components.Add(playField1);
 
+            playField2 = new DrawablePlayField(this, new Vector2(384, 248));
+            playField2.PlayField.PerformedCombo += playField_PerformedCombo;
+            playField2.PlayField.PerformedChain += playField_PerformedChain;
+            playField2.PlayField.Popped += playField_Popped;
+            playField2.PlayField.Died += playField_Died;
+            Components.Add(playField2);
+
+            inputState = new InputState();
+            isRunning = false;
         }
 
         /// <summary>
@@ -74,13 +86,6 @@ namespace Tetatt
 
             normalMusic = Content.Load<SoundEffect>("normal_music");
             stressMusic = Content.Load<SoundEffect>("stress_music");
-
-            oldGamePadState = GamePad.GetState(PlayerIndex.One);
-            oldKeyboardState = Keyboard.GetState();
-
-            music = normalMusic.CreateInstance();
-            music.IsLooped = true;
-            music.Play();
 
             base.Initialize();
         }
@@ -113,7 +118,8 @@ namespace Tetatt
         {
             UpdateInput();
 
-            if (playField.PlayField.GetHeight() >= PlayField.stressHeight)
+            if (playField1.PlayField.GetHeight() >= PlayField.stressHeight ||
+                playField2.PlayField.GetHeight() >= PlayField.stressHeight)
             {
                 if (!isStressMusic && musicChangeTimer <= 0)
                 {
@@ -142,50 +148,129 @@ namespace Tetatt
 
         private void UpdateInput()
         {
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
+            inputState.Update();
+
+            GamePadState gamePad1State = GamePad.GetState(PlayerIndex.One);
+            GamePadState gamePad2State = GamePad.GetState(PlayerIndex.Two);
             KeyboardState keyboardState = Keyboard.GetState();
 
             // Allows the game to exit
-            if (gamePadState.Buttons.Back == ButtonState.Pressed ||
-                keyboardState.IsKeyDown(Keys.Escape))
+            if (inputState.IsKeyDown(Keys.Escape))
                 this.Exit();
 
-            if (gamePadState.IsButtonDown(Buttons.DPadLeft) &&
-                !oldGamePadState.IsButtonDown(Buttons.DPadLeft) ||
-                keyboardState.IsKeyDown(Keys.A) &&
-                !oldKeyboardState.IsKeyDown(Keys.A))
-                playField.PlayField.MoveLeft();
+            if (isRunning)
+            {
+                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadLeft) ||
+                    inputState.IsKeyDownThisFrame(Keys.A))
+                {
+                    playField1.PlayField.MoveLeft();
+                }
 
-            if (gamePadState.IsButtonDown(Buttons.DPadRight) &&
-                !oldGamePadState.IsButtonDown(Buttons.DPadRight) ||
-                keyboardState.IsKeyDown(Keys.D) &&
-                !oldKeyboardState.IsKeyDown(Keys.D))
-                playField.PlayField.MoveRight();
+                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadRight) ||
+                    inputState.IsKeyDownThisFrame(Keys.D))
+                {
+                    playField1.PlayField.MoveRight();
+                }
 
-            if (gamePadState.IsButtonDown(Buttons.DPadUp) &&
-                !oldGamePadState.IsButtonDown(Buttons.DPadUp) ||
-                keyboardState.IsKeyDown(Keys.W) &&
-                !oldKeyboardState.IsKeyDown(Keys.W))
-                playField.PlayField.MoveUp();
+                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadUp) ||
+                    inputState.IsKeyDownThisFrame(Keys.W))
+                {
+                    playField1.PlayField.MoveUp();
+                }
 
-            if (gamePadState.IsButtonDown(Buttons.DPadDown) &&
-                !oldGamePadState.IsButtonDown(Buttons.DPadDown) ||
-                keyboardState.IsKeyDown(Keys.S) &&
-                !oldKeyboardState.IsKeyDown(Keys.S))
-                playField.PlayField.MoveDown();
+                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadDown) ||
+                    inputState.IsKeyDownThisFrame(Keys.S))
+                {
+                    playField1.PlayField.MoveDown();
+                }
 
-            if (gamePadState.IsButtonDown(Buttons.A) &&
-                !oldGamePadState.IsButtonDown(Buttons.A) ||
-                keyboardState.IsKeyDown(Keys.LeftControl) &&
-                !oldKeyboardState.IsKeyDown(Keys.LeftControl))
-                playField.PlayField.Swap();
+                if (inputState.IsButtonDownThisFrame(0, Buttons.A) ||
+                    inputState.IsKeyDownThisFrame(Keys.LeftControl))
+                {
+                    playField1.PlayField.Swap();
+                }
 
-            if (gamePadState.IsButtonDown(Buttons.RightShoulder) ||
-                keyboardState.IsKeyDown(Keys.LeftShift))
-                playField.PlayField.Raise();
+                if (inputState.IsButtonDown(0, Buttons.RightShoulder) ||
+                    inputState.IsKeyDown(Keys.LeftShift))
+                {
+                    playField1.PlayField.Raise();
+                }
 
-            oldGamePadState = gamePadState;
-            oldKeyboardState = keyboardState;
+
+                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadLeft) ||
+                    inputState.IsKeyDownThisFrame(Keys.Left))
+                {
+                    playField2.PlayField.MoveLeft();
+                }
+
+                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadRight) ||
+                    inputState.IsKeyDownThisFrame(Keys.Right))
+                {
+                    playField2.PlayField.MoveRight();
+                }
+
+                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadUp) ||
+                    inputState.IsKeyDownThisFrame(Keys.Up))
+                {
+                    playField2.PlayField.MoveUp();
+                }
+
+                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadDown) ||
+                    inputState.IsKeyDownThisFrame(Keys.Down))
+                {
+                    playField2.PlayField.MoveDown();
+                }
+
+                if (inputState.IsButtonDownThisFrame(1, Buttons.A) ||
+                    inputState.IsKeyDownThisFrame(Keys.RightControl))
+                {
+                    playField2.PlayField.Swap();
+                }
+
+                if (inputState.IsButtonDown(1, Buttons.RightShoulder) ||
+                    inputState.IsKeyDown(Keys.RightShift))
+                {
+                    playField2.PlayField.Raise();
+                }
+            }
+            else
+            {
+                if (inputState.IsKeyDown(Keys.Enter))
+                {
+                    isRunning = true;
+                    playField1.PlayField.Reset();
+                    playField2.PlayField.Reset();
+                    playField1.PlayField.Start();
+                    playField2.PlayField.Start();
+                    music = normalMusic.CreateInstance();
+                    music.IsLooped = true;
+                    music.Play();
+                }
+
+                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadUp) ||
+                    inputState.IsKeyDownThisFrame(Keys.W))
+                {
+                    playField1.PlayField.Level = Math.Min(playField1.PlayField.Level + 1, 9);
+                }
+
+                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadDown) ||
+                    inputState.IsKeyDownThisFrame(Keys.S))
+                {
+                    playField1.PlayField.Level = Math.Max(playField1.PlayField.Level - 1, 0);
+                }
+
+                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadUp) ||
+                    inputState.IsKeyDownThisFrame(Keys.Up))
+                {
+                    playField2.PlayField.Level = Math.Min(playField2.PlayField.Level + 1, 9);
+                }
+
+                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadDown) ||
+                    inputState.IsKeyDownThisFrame(Keys.Down))
+                {
+                    playField2.PlayField.Level = Math.Max(playField2.PlayField.Level - 1, 0);
+                }
+            }
         }
 
         /// <summary>
@@ -194,6 +279,7 @@ namespace Tetatt
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.Clear(Color.White);
             base.Draw(gameTime);
         }
 
@@ -207,14 +293,13 @@ namespace Tetatt
 
         private void playField_PerformedChain(object sender, ChainEventArgs ce)
         {
-            // TODO: Send to other player(s)...
             foreach (GarbageInfo info in ce.chain.garbage)
             {
-                this.playField.PlayField.AddGarbage(info.size, info.type);
+                OtherPlayField(sender).AddGarbage(info.size, info.type);
             }
             if (ce.chain.length > 1)
             {
-                this.playField.PlayField.AddGarbage(ce.chain.length - 1, GarbageType.Chain);
+                OtherPlayField(sender).AddGarbage(ce.chain.length - 1, GarbageType.Chain);
             }
 
             if (ce.chain.length == 4)
@@ -235,6 +320,25 @@ namespace Tetatt
             if (pe.chain.popCount < 10)
             {
                 pe.chain.popCount++;
+            }
+        }
+
+        private void playField_Died(object sender, DiedEventArgs e)
+        {
+            isRunning = false;
+            OtherPlayField(sender).Stop();
+            music.Stop();
+        }
+
+        private PlayField OtherPlayField(object playField)
+        {
+            if (playField == playField1.PlayField)
+            {
+                return playField2.PlayField;
+            }
+            else
+            {
+                return playField1.PlayField;
             }
         }
     }

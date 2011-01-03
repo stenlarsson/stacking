@@ -37,8 +37,7 @@ namespace Tetatt.GamePlay
                     game.Components.Add(
                         new EffCombo(game, PosToVector(e.pos), e.isChain, e.count, PlayField.GetLevelData().effComboDuration));
                 };
-            this.PlayField.Swapped += (_, e) =>
-                {
+            this.PlayField.Swapped += (_, e) => {
                     if (e.left != null)
                         game.Components.Add(new EffMoveBlock(game, e.left, PosToVector(e.pos), false));
 
@@ -50,8 +49,6 @@ namespace Tetatt.GamePlay
 
         public override void Initialize()
         {
-            PlayField.Start();
-
             base.Initialize();
         }
 
@@ -151,18 +148,21 @@ namespace Tetatt.GamePlay
                                 blockSize,
                                 blockSize),
                             blocksTileSet.SourceRectangle(tile),
-                            (row == 0) ? Color.DarkGray : Color.White);
+                            (row == 0 || PlayField.State == PlayFieldState.Dead) ? Color.DarkGray : Color.White);
                     }
                 } );
 
             spriteBatch.End();
 
-            // Draw frame and background
             spriteBatch.Begin();
-            spriteBatch.Draw(
-                marker,
-                PosToVector(PlayField.markerPos) - new Vector2(4, 5),
-                Color.White);
+            if (PlayField.State == PlayFieldState.Play || PlayField.State == PlayFieldState.Start)
+            {
+                // Draw marker
+                spriteBatch.Draw(
+                    marker,
+                    PosToVector(PlayField.markerPos) - new Vector2(4, 5),
+                    Color.White);
+            }
             spriteBatch.End();
 
             base.Draw(gameTime);
