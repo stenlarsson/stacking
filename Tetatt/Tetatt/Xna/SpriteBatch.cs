@@ -45,16 +45,9 @@ namespace Microsoft.Xna.Framework.Graphics
 			Gl.glPolygonMode(Gl.GL_FRONT, Gl.GL_FILL);
 			
 			Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
-			
+
 			if(rasterizerState != null && rasterizerState.ScissorTestEnable)
-			{
-				Rectangle srect = graphicsDevice.ScissorRectangle;
 				Gl.glEnable(Gl.GL_SCISSOR_TEST);
-				Gl.glScissor(srect.Left,
-				             height - srect.Bottom, // Yay for inverted OpenGL
-				             srect.Width,
-				             srect.Height);
-			}
 		}
 		
 		public void End ()
@@ -100,5 +93,15 @@ namespace Microsoft.Xna.Framework.Graphics
 			Gl.glVertex2i(dest.Right, dest.Bottom);
 			Gl.glEnd();
 		}
+
+        public void DrawString (SpriteFont font, string text, Vector2 position, Color color)
+        {
+            foreach (char c in text)
+            {
+                Draw(font.texture, position, font.chars[c], color);
+                position.X += font.chars[c].Width + font.Spacing;
+            }
+        }
+
 	}
 }
