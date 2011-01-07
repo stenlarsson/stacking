@@ -17,6 +17,7 @@ namespace Microsoft.Xna.Framework.Input {
 	}
 	public struct GamePadState {
 		public GamePadButtons Buttons { get { return new GamePadButtons(); } }
+        public bool IsButtonUp (Buttons button) { return true; }
 		public bool IsButtonDown (Buttons button) { return false; }
 	}
 	public class GamePad {
@@ -29,10 +30,20 @@ namespace Microsoft.Xna.Framework.Input {
 		S = Sdl.SDLK_s,
 		Escape = Sdl.SDLK_ESCAPE,
 		LeftControl = Sdl.SDLK_LCTRL,
-		LeftShift = Sdl.SDLK_LSHIFT
+		LeftShift = Sdl.SDLK_LSHIFT,
+        Left = Sdl.SDLK_LEFT,
+        Right = Sdl.SDLK_RIGHT,
+        Up = Sdl.SDLK_UP,
+        Down = Sdl.SDLK_DOWN,
+        RightControl = Sdl.SDLK_RCTRL,
+        RightShift = Sdl.SDLK_RSHIFT,
+        Enter = Sdl.SDLK_RETURN,
 	}
 	public struct KeyboardState {
 		internal byte[] keystate;
+        public bool IsKeyUp(Keys key) {
+            return keystate[(int)key] == 0;
+        }
 		public bool IsKeyDown(Keys key) {
 			return keystate[(int)key] != 0;
 		}

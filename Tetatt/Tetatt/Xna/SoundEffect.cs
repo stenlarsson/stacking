@@ -101,6 +101,13 @@ namespace Microsoft.Xna.Framework.Audio
             if (Al.alGetError() != Al.AL_NO_ERROR)
                 throw new Exception(Alut.alutGetErrorString(Al.alGetError()));
         }
+
+        public void Stop()
+        {
+            Al.alSourceStop(source);
+            if (Al.alGetError() != Al.AL_NO_ERROR)
+                throw new Exception(Alut.alutGetErrorString(Al.alGetError()));
+        }
     }
 
     public sealed class SoundEffect : IDisposable

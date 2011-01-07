@@ -22,7 +22,14 @@ namespace Microsoft.Xna.Framework.Graphics
 		public GraphicsProfile GraphicsProfile { get { return graphicsProfile; } }
 		private PresentationParameters presentationParameters;
 		public PresentationParameters PresentationParameters { get { return presentationParameters; } }
-		public Rectangle ScissorRectangle { get; set; }
+		public Rectangle ScissorRectangle {
+            set {
+                Gl.glScissor(value.Left,
+                             PresentationParameters.BackBufferHeight - value.Bottom, // Yay for inverted OpenGL
+                             value.Width,
+                             value.Height);
+            }
+        }
 		
 		public GraphicsDevice(GraphicsAdapter adapter,
 		                      GraphicsProfile graphicsProfile,

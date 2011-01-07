@@ -91,6 +91,9 @@
     <Compile Include="Graphics\EffMoveBlock.cs" />
     <Compile Include="GamePlay\SwapEventArgs.cs" />
     <Compile Include="GamePlay\LevelData.cs" />
+    <Compile Include="InputState.cs" />
+    <Compile Include="GamePlay\DiedEventArgs.cs" />
+    <Compile Include="Xna\SpriteFont.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TetattContent\TetattContent.mdproj">
@@ -100,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Core" />
     <Reference Include="Tao.DevIl, Version=1.6.8.3, Culture=neutral, PublicKeyToken=7ec4053013524957">
     </Reference>
