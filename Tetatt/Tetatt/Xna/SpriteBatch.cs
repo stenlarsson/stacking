@@ -1,5 +1,6 @@
 using System;
-using Tao.OpenGl;
+using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -26,36 +27,38 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			int width = graphicsDevice.PresentationParameters.BackBufferWidth;
 			int height = graphicsDevice.PresentationParameters.BackBufferHeight;
-			
-			Gl.glPushMatrix();
-			Gl.glLoadIdentity();
-			
-			Gl.glMatrixMode(Gl.GL_PROJECTION);
-			Gl.glPushMatrix();
-			Gl.glLoadIdentity();
-			Glu.gluOrtho2D(0, width, height, 0);
-			
-			Gl.glPushAttrib(Gl.GL_ALL_ATTRIB_BITS);
-			
-			Gl.glEnable(Gl.GL_TEXTURE_2D);
-			Gl.glEnable(Gl.GL_BLEND);
-			Gl.glDisable(Gl.GL_DEPTH_TEST);
-			Gl.glDisable(Gl.GL_LIGHTING);
-			Gl.glDisable(Gl.GL_FOG);
-			Gl.glPolygonMode(Gl.GL_FRONT, Gl.GL_FILL);
-			
-			Gl.glBlendFunc(Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA);
 
+            GL.PushMatrix();
+            GL.LoadIdentity();
+
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.PushMatrix();
+            GL.LoadIdentity();
+            Matrix4 mat = Matrix4.CreateOrthographicOffCenter(0, width, height, 0, -1, 1);
+            GL.LoadMatrix(ref mat);
+
+            GL.PushAttrib(AttribMask.AllAttribBits);
+
+            GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.Blend);
+            GL.Disable(EnableCap.DepthTest);
+            GL.Disable(EnableCap.Lighting);
+            GL.Disable(EnableCap.Fog);
+            GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
+
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+			
 			if(rasterizerState != null && rasterizerState.ScissorTestEnable)
-				Gl.glEnable(Gl.GL_SCISSOR_TEST);
+                GL.Enable(EnableCap.ScissorTest);
+
 		}
 		
 		public void End ()
 		{
-			Gl.glPopAttrib();
-			Gl.glPopMatrix();
-			Gl.glMatrixMode(Gl.GL_MODELVIEW);
-			Gl.glPopMatrix();
+            GL.PopAttrib();
+            GL.PopMatrix();
+            GL.MatrixMode(MatrixMode.Modelview);
+            GL.PopMatrix();
 		}
 		
 		public void Draw(Texture2D texture, Vector2 position, Color color)
@@ -71,27 +74,26 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
 		{
-			Gl.glColor4ub(color.R, color.G, color.B, color.A);
+            GL.Color4(color.R, color.G, color.B, color.A);
 			
 			Rectangle dest = destinationRectangle;
 			Rectangle src = sourceRectangle.HasValue ? (Rectangle)sourceRectangle : texture.Bounds;
-			
-			Gl.glMatrixMode(Gl.GL_TEXTURE);
-			Gl.glLoadIdentity();
-			Gl.glTranslatef(0, 1, 0);
-			Gl.glScalef(1.0f/texture.Width, -1.0f/texture.Height, 1);
 
-			Gl.glBindTexture(Gl.GL_TEXTURE_2D, texture.id);
-			Gl.glBegin(Gl.GL_TRIANGLE_STRIP);
-			Gl.glTexCoord2d(src.Left, src.Top);
-			Gl.glVertex2i(dest.Left, dest.Top);
-			Gl.glTexCoord2d(src.Left, src.Bottom);
-			Gl.glVertex2i(dest.Left, dest.Bottom);
-			Gl.glTexCoord2d(src.Right, src.Top);
-			Gl.glVertex2i(dest.Right, dest.Top);
-			Gl.glTexCoord2d(src.Right, src.Bottom);
-			Gl.glVertex2i(dest.Right, dest.Bottom);
-			Gl.glEnd();
+            GL.MatrixMode(MatrixMode.Texture);
+            GL.LoadIdentity();
+            GL.Scale(1.0f / texture.Width, 1.0f / texture.Height, 1);
+
+            GL.BindTexture(TextureTarget.Texture2D, texture.id);
+            GL.Begin(BeginMode.TriangleStrip);
+			GL.TexCoord2(src.Left, src.Top);
+			GL.Vertex2(dest.Left, dest.Top);
+			GL.TexCoord2(src.Left, src.Bottom);
+			GL.Vertex2(dest.Left, dest.Bottom);
+			GL.TexCoord2(src.Right, src.Top);
+			GL.Vertex2(dest.Right, dest.Top);
+			GL.TexCoord2(src.Right, src.Bottom);
+			GL.Vertex2(dest.Right, dest.Bottom);
+			GL.End();
 		}
 
         public void DrawString (SpriteFont font, string text, Vector2 position, Color color)

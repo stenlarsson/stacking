@@ -1,5 +1,5 @@
 using System;
-using Tao.Sdl;
+using OpenTK.Input;
 
 namespace Microsoft.Xna.Framework.Input {
 	[FlagsAttribute]
@@ -24,35 +24,38 @@ namespace Microsoft.Xna.Framework.Input {
 		public static GamePadState GetState(PlayerIndex index) { return new GamePadState(); }
 	}
 	public enum Keys {
-		A = Sdl.SDLK_a,
-		D = Sdl.SDLK_d,		
-		W = Sdl.SDLK_w,
-		S = Sdl.SDLK_s,
-		Escape = Sdl.SDLK_ESCAPE,
-		LeftControl = Sdl.SDLK_LCTRL,
-		LeftShift = Sdl.SDLK_LSHIFT,
-        Left = Sdl.SDLK_LEFT,
-        Right = Sdl.SDLK_RIGHT,
-        Up = Sdl.SDLK_UP,
-        Down = Sdl.SDLK_DOWN,
-        RightControl = Sdl.SDLK_RCTRL,
-        RightShift = Sdl.SDLK_RSHIFT,
-        Enter = Sdl.SDLK_RETURN,
+		A = Key.A,
+		D = Key.D,		
+		W = Key.W,
+		S = Key.S,
+        Escape = Key.Escape,
+        LeftControl = Key.ControlLeft,
+		LeftShift = Key.ShiftLeft,
+        Up = Key.Up,
+        Left = Key.Left,
+        Down = Key.Down,
+        Right = Key.Right,
+        RightControl = Key.ControlRight,
+        RightShift = Key.ShiftRight,
+		Enter = Key.Enter,
 	}
 	public struct KeyboardState {
-		internal byte[] keystate;
-        public bool IsKeyUp(Keys key) {
-            return keystate[(int)key] == 0;
+        internal bool[] keystate;
+        public bool IsKeyUp(Keys key)
+        {
+            return !IsKeyDown(key);
         }
-		public bool IsKeyDown(Keys key) {
-			return keystate[(int)key] != 0;
+		public bool IsKeyDown(Keys key)
+        {
+            return keystate[(int)key];
 		}
 	}
 	public class Keyboard {
+        internal static bool[] keys = new bool[Enum.GetValues(typeof(Key)).Length];
+
 		public static KeyboardState GetState() {
-			int dummy;
 			return new KeyboardState() {
-				keystate = (byte[])Sdl.SDL_GetKeyState(out dummy).Clone()
+                keystate = (bool[])keys.Clone()
 			};
 		}
 	}
