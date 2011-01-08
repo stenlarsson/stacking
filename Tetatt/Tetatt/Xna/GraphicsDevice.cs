@@ -1,8 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
-using Tao.Sdl;
-using Tao.OpenGl;
-using Tao.DevIl;
+using OpenTK.Graphics.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -24,10 +22,11 @@ namespace Microsoft.Xna.Framework.Graphics
 		public PresentationParameters PresentationParameters { get { return presentationParameters; } }
 		public Rectangle ScissorRectangle {
             set {
-                Gl.glScissor(value.Left,
-                             PresentationParameters.BackBufferHeight - value.Bottom, // Yay for inverted OpenGL
-                             value.Width,
-                             value.Height);
+                GL.Scissor(
+                    value.Left,
+                    PresentationParameters.BackBufferHeight - value.Bottom, // Yay for inverted OpenGL
+                    value.Width,
+                    value.Height);
             }
         }
 		
@@ -38,49 +37,39 @@ namespace Microsoft.Xna.Framework.Graphics
 			this.adapter = adapter;
 			this.graphicsProfile = graphicsProfile;
 			this.presentationParameters = presentationParameters;
-			
-			Sdl.SDL_GL_SetAttribute(Sdl.SDL_GL_DOUBLEBUFFER, 1);
-			
-			Sdl.SDL_SetVideoMode(presentationParameters.BackBufferWidth,
-			                     presentationParameters.BackBufferHeight,
-			                     0, // int bpp
-			                     Sdl.SDL_OPENGL);
-			Gl.glViewport(0,
-			              0,
-			              presentationParameters.BackBufferWidth,
-			              presentationParameters.BackBufferHeight);
-			
-			Ilut.ilutRenderer(Ilut.ILUT_OPENGL);
 
+            /*
 			Gl.glShadeModel(Gl.GL_SMOOTH);
 			Gl.glDisable(Gl.GL_LIGHTING);
 			Gl.glDepthFunc(Gl.GL_LEQUAL);
 			Gl.glDisable(Gl.GL_DEPTH_TEST);
 			Gl.glDisable(Gl.GL_CULL_FACE);
+            */
 		}
 
 		public static void Clear(Color color)
 		{
-			Gl.glClearColor(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
-			Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
+			GL.ClearColor(color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 		}
 
         public void SetVertexBuffer(VertexBuffer buffer)
         {
-            Gl.glBindBuffer(Gl.GL_ARRAY_BUFFER, buffer.buffer);
-            Gl.glEnableClientState(Gl.GL_VERTEX_ARRAY);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffer.buffer);
+            GL.EnableClientState(ArrayCap.VertexArray);
         }
 
-        private static readonly int[] glPrimitiveTypes = { Gl.GL_TRIANGLES, Gl.GL_TRIANGLE_STRIP, Gl.GL_LINES, Gl.GL_LINE_STRIP };
+        private static readonly BeginMode[] glPrimitiveTypes = { BeginMode.Triangles, BeginMode.TriangleStrip, BeginMode.Lines, BeginMode.LineStrip };
         private static readonly Func<int,int>[] glPrimitiveTriangleCount = new Func<int,int>[4]{ c => 3*c, c => c+2, c => 2*c, c => c+1 };
 
         public void DrawPrimitives(PrimitiveType type, int first, int count)
         {
-            Gl.glDrawArrays(glPrimitiveTypes[(int)type], first, glPrimitiveTriangleCount[(int)type](count));
+            GL.DrawArrays(glPrimitiveTypes[(int)type], first, glPrimitiveTriangleCount[(int)type](count));
         }
 
         public void Present()
         {
+        /*
             int error = Gl.glGetError();
 
             while (error != Gl.GL_NO_ERROR)
@@ -90,6 +79,7 @@ namespace Microsoft.Xna.Framework.Graphics
             }
 
             Sdl.SDL_GL_SwapBuffers();
+        */
         }
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Tao.OpenGl;
+using OpenTK.Graphics.OpenGL;
+using OpenTK;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class EffectPassCollection : IEnumerable<EffectPass>
@@ -74,22 +76,22 @@ namespace Microsoft.Xna.Framework.Graphics
         public void Apply()
         {
             Matrix m = effect.Projection;
-            Gl.glMatrixMode(Gl.GL_PROJECTION);
-            Gl.glLoadMatrixf(m.ToArray());
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadMatrix(ref m.m);
 
-            Gl.glMatrixMode(Gl.GL_MODELVIEW);
+            GL.MatrixMode(MatrixMode.Modelview);
             m = effect.World;
-            Gl.glLoadMatrixf(m.ToArray());
+            GL.LoadMatrix(ref m.m);
             m = effect.View;
-            Gl.glMultMatrixf(m.ToArray());
+            GL.MultMatrix(ref m.m);
 
             if (effect.VertexColorEnabled)
             {
-                 Gl.glEnableClientState(Gl.GL_COLOR_ARRAY);
+                GL.EnableClientState(ArrayCap.ColorArray);
             }
             else
             {
-                 Gl.glDisableClientState(Gl.GL_COLOR_ARRAY);
+                GL.DisableClientState(ArrayCap.ColorArray);
             }
         }
     }

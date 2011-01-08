@@ -1,7 +1,8 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Tao.OpenGl;
+using OpenTK.Graphics.OpenGL;
+
 namespace Microsoft.Xna.Framework.Graphics
 {
     public abstract class GraphicsResource : IDisposable
@@ -74,6 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public int UsageIndex { get; set; }
 
         public VertexElement(int offset, VertexElementFormat elementFormat, VertexElementUsage elementUsage, int usageIndex)
+            : this()
         {
             this.Offset = offset;
             this.ElementFormat = elementFormat;
@@ -138,14 +140,14 @@ namespace Microsoft.Xna.Framework.Graphics
             this.count = count;
             this.decl = decl;
 
-            Gl.glGenBuffers(1, out buffer);
+            GL.GenBuffers(1, out buffer);
         }
 
         protected override void Dispose (bool disposing)
         {
             if (disposing && buffer != 0)
             {
-                Gl.glDeleteBuffers(1, ref buffer);
+                GL.DeleteBuffers(1, ref buffer);
                 buffer = 0;
             }
         }
@@ -154,23 +156,23 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // TODO: Check that count/size agrees with the data array
             int size = decl.VertexStride;
-            Gl.glBindBuffer(Gl.GL_ARRAY_BUFFER, buffer);
-            Gl.glBufferData(Gl.GL_ARRAY_BUFFER, new IntPtr(count * size), data, Gl.GL_STATIC_DRAW);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+            GL.BufferData<T>(BufferTarget.ArrayBuffer, new IntPtr(count * size), data, BufferUsageHint.StaticDraw);
             foreach (VertexElement e in decl.GetVertexElements())
             {
                 switch(e.ElementFormat)
                 {
                 case VertexElementFormat.Color:
-                    Gl.glColorPointer(4, Gl.GL_UNSIGNED_BYTE, size, new IntPtr(e.Offset));
+                    GL.ColorPointer(4, ColorPointerType.UnsignedByte, size, new IntPtr(e.Offset));
                     break;
                 case VertexElementFormat.Vector3:
-                    Gl.glVertexPointer(3, Gl.GL_FLOAT, size, new IntPtr(e.Offset));
+                    GL.VertexPointer(3, VertexPointerType.Float, size, new IntPtr(e.Offset));
                     break;
                 default:
                     throw new NotImplementedException();
                 }
             }
-            Gl.glBindBuffer(Gl.GL_ARRAY_BUFFER, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
     }
 }
