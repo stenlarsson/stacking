@@ -13,6 +13,8 @@ using System.Linq;
 
 namespace Microsoft.Xna.Framework
 {
+    public class GameTime {}
+
 	public class Game : IDisposable
 	{
         private GameWindow gameWindow;
