@@ -27,22 +27,22 @@ namespace Tetatt.GamePlay
         {
             this.offset = offset;
             this.PlayField = new PlayField(4);
-            this.PlayField.Popped += (_, e) =>
+            this.PlayField.Popped += (_, pos, isGarbage, chain) =>
                 {
                     game.Components.Add(
-                        new EffPop(game, PosToVector(e.pos)));
+                        new EffPop(game, PosToVector(pos)));
                 };
-            this.PlayField.PerformedCombo += (_, e) =>
+            this.PlayField.PerformedCombo += (_, pos, isChain, count) =>
                 {
                     game.Components.Add(
-                        new EffCombo(game, PosToVector(e.pos), e.isChain, e.count, PlayField.GetLevelData().effComboDuration));
+                        new EffCombo(game, PosToVector(pos), isChain, count, PlayField.GetLevelData().effComboDuration));
                 };
-            this.PlayField.Swapped += (_, e) => {
-                    if (e.left != null)
-                        game.Components.Add(new EffMoveBlock(game, e.left, PosToVector(e.pos), false));
+            this.PlayField.Swapped += (_, left, right, pos) => {
+                    if (left != null)
+                        game.Components.Add(new EffMoveBlock(game, left, PosToVector(pos), false));
 
-                    if (e.right != null)
-                        game.Components.Add(new EffMoveBlock(game, e.right, PosToVector(e.pos)+new Vector2(blockSize, 0), true));
+                    if (right != null)
+                        game.Components.Add(new EffMoveBlock(game, right, PosToVector(pos)+new Vector2(blockSize, 0), true));
                 };
 
         }

@@ -53,7 +53,7 @@ namespace Tetatt.GamePlay
                     chain.AddGarbage(new GarbageInfo(chain.numBlocks - 1, GarbageType.Combo));
                 }
 
-                ChainStep(this, new ChainEventArgs(chain));
+                ChainStep(this, chain);
 
                 chain.EndFrame();
             }
@@ -67,13 +67,14 @@ namespace Tetatt.GamePlay
             {
                 if (!chain.IsActive() && (chain.sentCombo || chain.length > 1))
                 {
-                    ChainFinish(this, new ChainEventArgs(chain));
+                    ChainFinish(this, chain);
                 }
             }
 
             chains.RemoveAll(chain => !chain.IsActive());
         }
 
-        public event EventHandler<ChainEventArgs> ChainStep, ChainFinish;
+        public delegate void ChainHandler(Popper sender, Chain chain);
+        public event ChainHandler ChainStep, ChainFinish;
     }
 }
