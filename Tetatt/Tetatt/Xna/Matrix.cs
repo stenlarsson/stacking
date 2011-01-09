@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using OpenTK;
-using System.Runtime.InteropServices;
 
 namespace Microsoft.Xna.Framework
 {
@@ -15,10 +13,9 @@ namespace Microsoft.Xna.Framework
             this.m = m;
         }
 
-        public static Matrix Identity {
-            get {
-                return new Matrix(Matrix4.Identity);
-            }
+        public static Matrix Identity
+        {
+            get { return new Matrix(Matrix4.Identity); }
         }
 
         public bool Equals(Matrix other)

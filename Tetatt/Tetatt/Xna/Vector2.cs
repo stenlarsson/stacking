@@ -1,4 +1,5 @@
 using System;
+
 namespace Microsoft.Xna.Framework
 {
     public struct Vector2
@@ -20,6 +21,5 @@ namespace Microsoft.Xna.Framework
         {
             return new Vector2(a.X - b.X, a.Y - b.Y);
         }
-
     }
 }

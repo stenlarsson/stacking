@@ -3,21 +3,6 @@ using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework
 {
-    public class GameComponentCollectionEventArgs : EventArgs
-    {
-        private IGameComponent component;
-        public GameComponentCollectionEventArgs(IGameComponent component)
-        {
-            this.component = component;
-        }
-
-        public IGameComponent GameComponent {
-            get {
-                return component;
-            }
-        }
-    }
-
     public class GameComponentCollection : Collection<IGameComponent>
     {
         public event EventHandler<GameComponentCollectionEventArgs> ComponentAdded;
@@ -25,9 +10,8 @@ namespace Microsoft.Xna.Framework
 
         protected override void ClearItems()
         {
-            foreach (IGameComponent component in this) {
+            foreach (IGameComponent component in this)
                 OnComponentRemoved(component);
-            }
             base.ClearItems();
         }
 
