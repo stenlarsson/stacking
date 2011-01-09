@@ -117,6 +117,7 @@ namespace Microsoft.Xna.Framework
         public void Dispose()
         {
             gameWindow.Dispose();
+            audioContext.Dispose();
         }
 	}
 }
