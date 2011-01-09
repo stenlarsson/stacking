@@ -107,7 +107,7 @@ namespace Tetatt.GamePlay
             fieldHeight = new int[width];
             popper = new Popper();
             popper.ChainStep += popper_ChainStep;
-            popper.ChainFinish += (_, ce) => PerformedChain(this, ce);
+            popper.ChainFinish += (_, chain) => PerformedChain(this, chain);
             Level = startLevel;
 
             gh = new GarbageHandler();
@@ -307,7 +307,7 @@ namespace Tetatt.GamePlay
             if (state == PlayFieldState.Die)
             {
                 state = PlayFieldState.Dead;
-                Died(this, new DiedEventArgs());
+                Died(this);
             }
         }
 
@@ -354,7 +354,7 @@ namespace Tetatt.GamePlay
             {
                 left.Move();
             }
-            Swapped(this, new SwapEventArgs(left, right, markerPos));
+            Swapped(this, left, right, markerPos);
             return true;
         }
 
@@ -604,10 +604,11 @@ namespace Tetatt.GamePlay
                             }
 
                             if (row <= visibleHeight)
-                                Popped(this, new PoppedEventArgs(
+                                Popped(
+                                    this,
                                     new Pos(row, col),
                                     IsGarbage(field[row,col]),
-                                    field[row,col].Chain));
+                                    field[row,col].Chain);
                         }
                         continue;
                     }
@@ -859,9 +860,8 @@ namespace Tetatt.GamePlay
             gh.AddGarbage(num, type);
         }
 
-        private void popper_ChainStep(object sender, ChainEventArgs ce)
+        private void popper_ChainStep(Popper sender, Chain chain)
         {
-            Chain chain = ce.chain;
             if (chain.numBlocks > 3)
             {
                 // A combo.
@@ -907,20 +907,21 @@ namespace Tetatt.GamePlay
 
         public void ActivatePerformedCombo(int pos, bool isChain, int count)
         {
-            ComboEventArgs eventArgs = new ComboEventArgs(
-                new Pos(pos / width, pos % width),
-                isChain,
-                count);
-            PerformedCombo(this, eventArgs);
+            PerformedCombo(this, new Pos(pos / width, pos % width), isChain, count);
         }
-        public event EventHandler<ComboEventArgs> PerformedCombo;
+        public delegate void PerformedComboHandler(PlayField player, Pos pos, bool isChain, int count);
+        public event PerformedComboHandler PerformedCombo;
 
-        public event EventHandler<ChainEventArgs> PerformedChain;
+        public delegate void PerformedChainHandler(PlayField player, Chain chain);
+        public event PerformedChainHandler PerformedChain;
 
-        public event EventHandler<PoppedEventArgs> Popped;
+        public delegate void PoppedHandler(PlayField player, Pos pos, bool isGarabge, Chain chain);
+        public event PoppedHandler Popped;
 
-        public event EventHandler<SwapEventArgs> Swapped;
+        public delegate void SwappedHandler(PlayField player, Block left, Block right, Pos pos);
+        public event SwappedHandler Swapped;
 
-        public event EventHandler<DiedEventArgs> Died;
+        public delegate void DiedHandler(PlayField player);
+        public event DiedHandler Died;
     }
 }

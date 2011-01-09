@@ -281,54 +281,54 @@ namespace Tetatt
             base.Draw(gameTime);
         }
 
-        private void playField_PerformedCombo(object sender, ComboEventArgs ce)
+        private void playField_PerformedCombo(PlayField sender, Pos pos, bool isChain, int count)
         {
-            if (ce.isChain)
+            if (isChain)
             {
                 chainEffect.Play();
             }
         }
 
-        private void playField_PerformedChain(object sender, ChainEventArgs ce)
+        private void playField_PerformedChain(PlayField sender, Chain chain)
         {
-            foreach (GarbageInfo info in ce.chain.garbage)
+            foreach (GarbageInfo info in chain.garbage)
             {
                 OtherPlayField(sender).AddGarbage(info.size, info.type);
             }
-            if (ce.chain.length > 1)
+            if (chain.length > 1)
             {
-                OtherPlayField(sender).AddGarbage(ce.chain.length - 1, GarbageType.Chain);
+                OtherPlayField(sender).AddGarbage(chain.length - 1, GarbageType.Chain);
             }
 
-            if (ce.chain.length == 4)
+            if (chain.length == 4)
             {
                 fanfare1Effect.Play();
             }
-            else if (ce.chain.length > 4)
+            else if (chain.length > 4)
             {
                 fanfare2Effect.Play();
             }
         }
 
-        private void playField_Popped(object sender, PoppedEventArgs pe)
+        private void playField_Popped(PlayField sender, Pos pos, bool isGarabge, Chain chain)
         {
-            SoundEffect effect = popEffect[Math.Min(pe.chain.length, 4) - 1];
-            effect.Play(1, pe.chain.popCount / 10.0f, 0);
+            SoundEffect effect = popEffect[Math.Min(chain.length, 4) - 1];
+            effect.Play(1, chain.popCount / 10.0f, 0);
 
-            if (pe.chain.popCount < 10)
+            if (chain.popCount < 10)
             {
-                pe.chain.popCount++;
+                chain.popCount++;
             }
         }
 
-        private void playField_Died(object sender, DiedEventArgs e)
+        private void playField_Died(PlayField sender)
         {
             isRunning = false;
             OtherPlayField(sender).Stop();
             music.Stop();
         }
 
-        private PlayField OtherPlayField(object playField)
+        private PlayField OtherPlayField(PlayField playField)
         {
             if (playField == playField1.PlayField)
             {

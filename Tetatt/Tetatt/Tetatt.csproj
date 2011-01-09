@@ -107,15 +107,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GamePlay\ChainEventArgs.cs" />
-    <Compile Include="GamePlay\ComboEventArgs.cs" />
-    <Compile Include="GamePlay\DiedEventArgs.cs" />
     <Compile Include="GamePlay\DrawablePlayField.cs" />
     <Compile Include="GamePlay\LevelData.cs" />
-    <Compile Include="GamePlay\PoppedEventArgs.cs" />
     <Compile Include="GamePlay\Pos.cs" />
     <Compile Include="GamePlay\RandomBlocks.cs" />
-    <Compile Include="GamePlay\SwapEventArgs.cs" />
     <Compile Include="Graphics\Background.cs" />
     <Compile Include="GamePlay\PlayFieldState.cs" />
     <Compile Include="Graphics\Anim.cs" />

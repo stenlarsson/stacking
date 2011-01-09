@@ -95,12 +95,9 @@
     <Compile Include="Xna\SoundEffect.cs" />
     <Compile Include="Graphics\EffCombo.cs" />
     <Compile Include="GamePlay\PlayFieldState.cs" />
-    <Compile Include="GamePlay\ComboEventArgs.cs" />
     <Compile Include="Xna\DrawableGameComponent.cs" />
     <Compile Include="Xna\Vector2.cs" />
     <Compile Include="Xna\GameComponentCollection.cs" />
-    <Compile Include="GamePlay\ChainEventArgs.cs" />
-    <Compile Include="GamePlay\PoppedEventArgs.cs" />
     <Compile Include="Xna\MathHelper.cs" />
     <Compile Include="GamePlay\RandomBlocks.cs" />
     <Compile Include="GamePlay\DrawablePlayField.cs" />
@@ -112,10 +109,8 @@
     <Compile Include="Xna\Matrix.cs" />
     <Compile Include="Graphics\EffPop.cs" />
     <Compile Include="Graphics\EffMoveBlock.cs" />
-    <Compile Include="GamePlay\SwapEventArgs.cs" />
     <Compile Include="GamePlay\LevelData.cs" />
     <Compile Include="InputState.cs" />
-    <Compile Include="GamePlay\DiedEventArgs.cs" />
     <Compile Include="Xna\SpriteFont.cs" />
   </ItemGroup>
   <ItemGroup>
