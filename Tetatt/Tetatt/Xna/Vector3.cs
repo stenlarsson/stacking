@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+
 namespace Microsoft.Xna.Framework
 {
     [Serializable,StructLayout(LayoutKind.Sequential, Pack=1)]

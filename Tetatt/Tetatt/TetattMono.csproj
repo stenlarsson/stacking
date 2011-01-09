@@ -143,6 +143,12 @@
     <Compile Include="Xna\Graphics\VertexDeclaration.cs" />
     <Compile Include="Xna\Graphics\IVertexType.cs" />
     <Compile Include="Xna\Graphics\SpriteFont.cs" />
+    <Compile Include="Xna\IGameComponent.cs" />
+    <Compile Include="Xna\IDrawable.cs" />
+    <Compile Include="Xna\IUpdateable.cs" />
+    <Compile Include="Xna\GameComponent.cs" />
+    <Compile Include="Xna\GameTime.cs" />
+    <Compile Include="Xna\GameComponentCollectionEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

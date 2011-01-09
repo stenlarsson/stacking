@@ -13,27 +13,28 @@ using System.Linq;
 
 namespace Microsoft.Xna.Framework
 {
-    public class GameTime {}
-
-	public class Game : IDisposable
-	{
+    public class Game : IDisposable
+    {
         private GameWindow gameWindow;
-		private GraphicsDeviceManager graphicsDeviceManager;
+        private GraphicsDeviceManager graphicsDeviceManager;
         private AudioContext audioContext = new AudioContext();
-		
-		public GameComponentCollection Components { get; set; }
-		public GameServiceContainer Services { get; set; }
-		public ContentManager Content { get; set; }
-		public GraphicsDevice GraphicsDevice { get { return graphicsDeviceManager.GraphicsDevice; } }
-		
-		public Game()
-		{
-			graphicsDeviceManager = null;
-			
-			Components = new GameComponentCollection();
-			Services = new GameServiceContainer();
-			Content = new ContentManager(Services);
 
+        public GameComponentCollection Components { get; set; }
+        public GameServiceContainer Services { get; set; }
+        public ContentManager Content { get; set; }
+        public GraphicsDevice GraphicsDevice
+        {
+            get { return graphicsDeviceManager.GraphicsDevice; }
+        }
+
+        public Game()
+        {
+            graphicsDeviceManager = null;
+            
+            Components = new GameComponentCollection();
+            Services = new GameServiceContainer();
+            Content = new ContentManager(Services);
+            
             gameWindow = new GameWindow(1280, 720, GraphicsMode.Default, "Tetatt");
             gameWindow.VSync = VSyncMode.On;
             gameWindow.Keyboard.KeyDown += (s, e) => Input.Keyboard.keys[(int)e.Key] = true;
@@ -42,20 +43,19 @@ namespace Microsoft.Xna.Framework
             gameWindow.Resize += (s, e) => GL.Viewport(gameWindow.ClientRectangle);
             gameWindow.UpdateFrame += (s, e) => Update(new GameTime());
             gameWindow.RenderFrame += (s, e) => OnRenderFrame();
-
         }
 
-		public void Run()
-		{
+        public void Run()
+        {
             graphicsDeviceManager = (GraphicsDeviceManager)Services.GetService(typeof(GraphicsDeviceManager));
             gameWindow.Width = graphicsDeviceManager.PreferredBackBufferWidth;
             gameWindow.Height = graphicsDeviceManager.PreferredBackBufferHeight;
             graphicsDeviceManager.CreateDevice();
-			Initialize();
-			LoadContent();
-
+            Initialize();
+            LoadContent();
+            
             gameWindow.Run(60.0, 60.0);
-		}
+        }
 
         public void Exit()
         {
@@ -68,56 +68,56 @@ namespace Microsoft.Xna.Framework
         private void OnRenderFrame()
         {
             Draw(new GameTime());
-
+            
             ErrorCode error = GL.GetError();
             while (error != ErrorCode.NoError)
             {
                 Console.WriteLine("OpenGL error {0}", error);
                 error = GL.GetError();
             }
-
+            
             gameWindow.SwapBuffers();
         }
 
         protected virtual void Initialize()
-		{
+        {
             foreach (GameComponent c in Components)
             {
                 c.Initialize();
             }
-            Components.ComponentAdded += delegate(object sender, GameComponentCollectionEventArgs e) {
-                e.GameComponent.Initialize();
-            };
-		}
-		
-		protected virtual void LoadContent()
-		{
-		}
-		
-		protected virtual void UnloadContent()
-		{
-		}
-		
-		protected virtual void Update(GameTime gameTime)
-		{
-			// TODO: Store sorted/filtered collection and update only on changes...
-			foreach (IUpdateable c in Components.OfType<IUpdateable>().Where(c => c.Enabled).OrderBy(c => c.UpdateOrder)) {
-				c.Update(gameTime);
-			}
-		}
-		
-		protected virtual void Draw(GameTime gameTime)
-		{
-			// TODO: Store sorted/filtered collection and update only on changes...
-			foreach (IDrawable c in Components.OfType<IDrawable>().Where(c => c.Visible).OrderBy(c => c.DrawOrder)) {
-				c.Draw(gameTime);
-			}
-		}
+            Components.ComponentAdded += delegate(object sender, GameComponentCollectionEventArgs e) { e.GameComponent.Initialize(); };
+        }
+
+        protected virtual void LoadContent()
+        {
+        }
+
+        protected virtual void UnloadContent()
+        {
+        }
+
+        protected virtual void Update(GameTime gameTime)
+        {
+            // TODO: Store sorted/filtered collection and update only on changes...
+            foreach (IUpdateable c in Components.OfType<IUpdateable>().Where(c => c.Enabled).OrderBy(c => c.UpdateOrder))
+            {
+                c.Update(gameTime);
+            }
+        }
+
+        protected virtual void Draw(GameTime gameTime)
+        {
+            // TODO: Store sorted/filtered collection and update only on changes...
+            foreach (IDrawable c in Components.OfType<IDrawable>().Where(c => c.Visible).OrderBy(c => c.DrawOrder))
+            {
+                c.Draw(gameTime);
+            }
+        }
 
         public void Dispose()
         {
             gameWindow.Dispose();
             audioContext.Dispose();
         }
-	}
+    }
 }
