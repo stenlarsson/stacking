@@ -148,10 +148,6 @@ namespace Tetatt
         {
             inputState.Update();
 
-            GamePadState gamePad1State = GamePad.GetState(PlayerIndex.One);
-            GamePadState gamePad2State = GamePad.GetState(PlayerIndex.Two);
-            KeyboardState keyboardState = Keyboard.GetState();
-
             // Allows the game to exit
             if (inputState.IsKeyDown(Keys.Escape))
                 this.Exit();
