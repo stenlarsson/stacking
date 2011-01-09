@@ -4,6 +4,14 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
+    public enum SpriteSortMode { Deferred }
+    public class BlendState {}
+    public class SamplerState {}
+    public class DepthStencilState {}
+    public class RasterizerState {
+        public bool ScissorTestEnable { get; set; }
+    }
+
 	public class SpriteBatch {
 		private GraphicsDevice graphicsDevice;
 		

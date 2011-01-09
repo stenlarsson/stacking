@@ -79,7 +79,6 @@
     <Compile Include="Graphics\AnimType.cs" />
     <Compile Include="Graphics\TileSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XnaHack.cs" />
     <Compile Include="Xna\Game.cs" />
     <Compile Include="Xna\GraphicsDevice.cs" />
     <Compile Include="Xna\GraphicsDeviceManager.cs" />
