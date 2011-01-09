@@ -111,8 +111,15 @@
     <Compile Include="Xna\Graphics\SpriteBatch.cs" />
     <Compile Include="Xna\Graphics\Texture2D.cs" />
     <Compile Include="Xna\Graphics\VertexBuffer.cs" />
-    <Compile Include="Xna\Input\Input.cs" />
     <Compile Include="Xna\PlayerIndex.cs" />
+    <Compile Include="Xna\Input\Buttons.cs" />
+    <Compile Include="Xna\Input\ButtonState.cs" />
+    <Compile Include="Xna\Input\GamePadButtons.cs" />
+    <Compile Include="Xna\Input\GamePadState.cs" />
+    <Compile Include="Xna\Input\GamePad.cs" />
+    <Compile Include="Xna\Input\Keys.cs" />
+    <Compile Include="Xna\Input\KeyboardState.cs" />
+    <Compile Include="Xna\Input\Keyboard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
