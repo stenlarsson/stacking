@@ -80,19 +80,9 @@
     <Compile Include="Graphics\TileSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Xna\Game.cs" />
-    <Compile Include="Xna\GraphicsDevice.cs" />
     <Compile Include="Xna\GraphicsDeviceManager.cs" />
     <Compile Include="Xna\GameServiceContainer.cs" />
-    <Compile Include="Xna\GraphicsProfile.cs" />
-    <Compile Include="Xna\PresentationParameters.cs" />
-    <Compile Include="Xna\GraphicsAdapter.cs" />
     <Compile Include="Xna\Rectangle.cs" />
-    <Compile Include="Xna\Texture2D.cs" />
-    <Compile Include="Xna\ContentManager.cs" />
-    <Compile Include="Xna\SpriteBatch.cs" />
-    <Compile Include="Xna\Input.cs" />
-    <Compile Include="Xna\Color.cs" />
-    <Compile Include="Xna\SoundEffect.cs" />
     <Compile Include="Graphics\EffCombo.cs" />
     <Compile Include="GamePlay\PlayFieldState.cs" />
     <Compile Include="Xna\DrawableGameComponent.cs" />
@@ -103,8 +93,6 @@
     <Compile Include="GamePlay\DrawablePlayField.cs" />
     <Compile Include="GamePlay\Pos.cs" />
     <Compile Include="Graphics\Background.cs" />
-    <Compile Include="Xna\VertexBuffer.cs" />
-    <Compile Include="Xna\BasicEffect.cs" />
     <Compile Include="Xna\Vector3.cs" />
     <Compile Include="Xna\Matrix.cs" />
     <Compile Include="Graphics\EffPop.cs" />
@@ -112,6 +100,19 @@
     <Compile Include="GamePlay\LevelData.cs" />
     <Compile Include="InputState.cs" />
     <Compile Include="Xna\SpriteFont.cs" />
+    <Compile Include="Xna\Audio\SoundEffect.cs" />
+    <Compile Include="Xna\Content\ContentManager.cs" />
+    <Compile Include="Xna\Graphics\BasicEffect.cs" />
+    <Compile Include="Xna\Graphics\Color.cs" />
+    <Compile Include="Xna\Graphics\GraphicsAdapter.cs" />
+    <Compile Include="Xna\Graphics\GraphicsDevice.cs" />
+    <Compile Include="Xna\Graphics\GraphicsProfile.cs" />
+    <Compile Include="Xna\Graphics\PresentationParameters.cs" />
+    <Compile Include="Xna\Graphics\SpriteBatch.cs" />
+    <Compile Include="Xna\Graphics\Texture2D.cs" />
+    <Compile Include="Xna\Graphics\VertexBuffer.cs" />
+    <Compile Include="Xna\Input\Input.cs" />
+    <Compile Include="Xna\PlayerIndex.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
