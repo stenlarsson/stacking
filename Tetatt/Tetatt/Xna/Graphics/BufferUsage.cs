@@ -2,9 +2,10 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public enum GraphicsProfile
+    [Flags]
+    public enum BufferUsage
     {
-        HiDef,
-        Reach
+        None,
+        WriteOnly
     }
 }

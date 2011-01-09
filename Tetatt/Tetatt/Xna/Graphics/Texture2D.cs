@@ -5,16 +5,19 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-	public class Texture2D
-	{
-		internal int id;
-		
-		public int Width { get; set; }
-		public int Height { get; set; }
-		public Rectangle Bounds { get { return new Rectangle(0, 0, Width, Height); } }
-		
-		public Texture2D(string filename)
-		{
+    public class Texture2D
+    {
+        internal int id;
+
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public Rectangle Bounds
+        {
+            get { return new Rectangle(0, 0, Width, Height); }
+        }
+
+        public Texture2D(string filename)
+        {
             if (String.IsNullOrEmpty(filename))
                 throw new ArgumentException(filename);
 
@@ -48,7 +51,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-		}
-	}
+        }
+    }
 }
 
