@@ -20,7 +20,6 @@ namespace Microsoft.Xna.Framework.Input {
         public bool IsButtonUp (Buttons button) { return true; }
 		public bool IsButtonDown (Buttons button) { return false; }
 	}
-    public enum PlayerIndex { One, Two, Three, Four }
 	public class GamePad {
 		public static GamePadState GetState(PlayerIndex idex) { return new GamePadState(); }
 	}
