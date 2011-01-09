@@ -120,6 +120,29 @@
     <Compile Include="Xna\Input\Keys.cs" />
     <Compile Include="Xna\Input\KeyboardState.cs" />
     <Compile Include="Xna\Input\Keyboard.cs" />
+    <Compile Include="Xna\Audio\SoundState.cs" />
+    <Compile Include="Xna\Audio\SoundEffectInstance.cs" />
+    <Compile Include="Xna\Graphics\EffectPassCollection.cs" />
+    <Compile Include="Xna\Graphics\EffectTechnique.cs" />
+    <Compile Include="Xna\Graphics\Effect.cs" />
+    <Compile Include="Xna\Graphics\IEffectMatrices.cs" />
+    <Compile Include="Xna\Graphics\IEffectLights.cs" />
+    <Compile Include="Xna\Graphics\IEffectFog.cs" />
+    <Compile Include="Xna\Graphics\EffectPass.cs" />
+    <Compile Include="Xna\Graphics\PrimitiveType.cs" />
+    <Compile Include="Xna\Graphics\SpriteSortMode.cs" />
+    <Compile Include="Xna\Graphics\BlendState.cs" />
+    <Compile Include="Xna\Graphics\SamplerState.cs" />
+    <Compile Include="Xna\Graphics\DepthStencilState.cs" />
+    <Compile Include="Xna\Graphics\RasterizerState.cs" />
+    <Compile Include="Xna\Graphics\GraphicsResource.cs" />
+    <Compile Include="Xna\Graphics\VertexPositionColor.cs" />
+    <Compile Include="Xna\Graphics\BufferUsage.cs" />
+    <Compile Include="Xna\Graphics\VertexElement.cs" />
+    <Compile Include="Xna\Graphics\VertexElementUsage.cs" />
+    <Compile Include="Xna\Graphics\VertexElementFormat.cs" />
+    <Compile Include="Xna\Graphics\VertexDeclaration.cs" />
+    <Compile Include="Xna\Graphics\IVertexType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

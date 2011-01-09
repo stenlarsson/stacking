@@ -2,9 +2,7 @@ using System;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
-    public enum GraphicsProfile
+    public interface IEffectFog
     {
-        HiDef,
-        Reach
     }
 }
