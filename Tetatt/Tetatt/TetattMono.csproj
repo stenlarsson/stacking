@@ -99,7 +99,6 @@
     <Compile Include="Graphics\EffMoveBlock.cs" />
     <Compile Include="GamePlay\LevelData.cs" />
     <Compile Include="InputState.cs" />
-    <Compile Include="Xna\SpriteFont.cs" />
     <Compile Include="Xna\Audio\SoundEffect.cs" />
     <Compile Include="Xna\Content\ContentManager.cs" />
     <Compile Include="Xna\Graphics\BasicEffect.cs" />
@@ -143,6 +142,7 @@
     <Compile Include="Xna\Graphics\VertexElementFormat.cs" />
     <Compile Include="Xna\Graphics\VertexDeclaration.cs" />
     <Compile Include="Xna\Graphics\IVertexType.cs" />
+    <Compile Include="Xna\Graphics\SpriteFont.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
