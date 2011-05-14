@@ -33,8 +33,20 @@ namespace Tetatt
         bool isStressMusic;
 
         InputState inputState;
+        Keys[][] controllerMappings;
 
         bool isRunning;
+
+        PlayerInput[] input = new PlayerInput[] {
+            PlayerInput.Left, PlayerInput.Right, PlayerInput.Up, PlayerInput.Down, PlayerInput.Swap, PlayerInput.Raise
+        };
+        Buttons[] buttons = new Buttons[] {
+            Buttons.DPadLeft, Buttons.DPadRight, Buttons.DPadUp, Buttons.DPadDown, Buttons.A, Buttons.RightShoulder
+        };
+        Keys[][] keyMappings = new Keys[][] {
+            new Keys[]{Keys.A, Keys.D, Keys.W, Keys.S, Keys.LeftControl, Keys.LeftShift},
+            new Keys[]{Keys.Left, Keys.Right, Keys.Up, Keys.Down, Keys.RightControl, Keys.RightShift},
+        };
 
         public TetattGame()
         {
@@ -59,6 +71,7 @@ namespace Tetatt
             }
 
             inputState = new InputState();
+            controllerMappings = new Keys[][] { keyMappings[0], keyMappings[1], null, null };
             isRunning = false;
         }
 
@@ -137,77 +150,21 @@ namespace Tetatt
 
             if (isRunning)
             {
-                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadLeft) ||
-                    inputState.IsKeyDownThisFrame(Keys.A))
+                for (int i = 0; i < playFields.Length; i++)
                 {
-                    playFields[0].MoveLeft();
-                }
-
-                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadRight) ||
-                    inputState.IsKeyDownThisFrame(Keys.D))
-                {
-                    playFields[0].MoveRight();
-                }
-
-                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadUp) ||
-                    inputState.IsKeyDownThisFrame(Keys.W))
-                {
-                    playFields[0].MoveUp();
-                }
-
-                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadDown) ||
-                    inputState.IsKeyDownThisFrame(Keys.S))
-                {
-                    playFields[0].MoveDown();
-                }
-
-                if (inputState.IsButtonDownThisFrame(0, Buttons.A) ||
-                    inputState.IsKeyDownThisFrame(Keys.LeftControl))
-                {
-                    playFields[0].Swap();
-                }
-
-                if (inputState.IsButtonDown(0, Buttons.RightShoulder) ||
-                    inputState.IsKeyDown(Keys.LeftShift))
-                {
-                    playFields[0].Raise();
-                }
-
-
-                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadLeft) ||
-                    inputState.IsKeyDownThisFrame(Keys.Left))
-                {
-                    playFields[1].MoveLeft();
-                }
-
-                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadRight) ||
-                    inputState.IsKeyDownThisFrame(Keys.Right))
-                {
-                    playFields[1].MoveRight();
-                }
-
-                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadUp) ||
-                    inputState.IsKeyDownThisFrame(Keys.Up))
-                {
-                    playFields[1].MoveUp();
-                }
-
-                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadDown) ||
-                    inputState.IsKeyDownThisFrame(Keys.Down))
-                {
-                    playFields[1].MoveDown();
-                }
-
-                if (inputState.IsButtonDownThisFrame(1, Buttons.A) ||
-                    inputState.IsKeyDownThisFrame(Keys.RightControl))
-                {
-                    playFields[1].Swap();
-                }
-
-                if (inputState.IsButtonDown(1, Buttons.RightShoulder) ||
-                    inputState.IsKeyDown(Keys.RightShift))
-                {
-                    playFields[1].Raise();
+                    for (int j = 0; j < 5; j++)
+                    {
+                        if (inputState.IsButtonDownThisFrame(i, buttons[j]) ||
+                            (controllerMappings[i] != null && inputState.IsKeyDownThisFrame(controllerMappings[i][j])))
+                        {
+                            playFields[i].Input((PlayerInput)j);
+                        }
+                    }
+                    if (inputState.IsButtonDown(i, buttons[5]) ||
+                        (controllerMappings[i] != null && inputState.IsKeyDown(controllerMappings[i][5])))
+                    {
+                        playFields[i].Input(input[5]);
+                    }
                 }
             }
             else
@@ -225,28 +182,18 @@ namespace Tetatt
                     music.Play();
                 }
 
-                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadUp) ||
-                    inputState.IsKeyDownThisFrame(Keys.W))
+                for (int i = 0; i < playFields.Length; i++)
                 {
-                    playFields[0].Level = Math.Min(playFields[0].Level + 1, 9);
-                }
-
-                if (inputState.IsButtonDownThisFrame(0, Buttons.DPadDown) ||
-                    inputState.IsKeyDownThisFrame(Keys.S))
-                {
-                    playFields[0].Level = Math.Max(playFields[0].Level - 1, 0);
-                }
-
-                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadUp) ||
-                    inputState.IsKeyDownThisFrame(Keys.Up))
-                {
-                    playFields[1].Level = Math.Min(playFields[1].Level + 1, 9);
-                }
-
-                if (inputState.IsButtonDownThisFrame(1, Buttons.DPadDown) ||
-                    inputState.IsKeyDownThisFrame(Keys.Down))
-                {
-                    playFields[1].Level = Math.Max(playFields[1].Level - 1, 0);
+                    if (inputState.IsButtonDownThisFrame(i, buttons[2]) ||
+                        (controllerMappings[i] != null && inputState.IsKeyDownThisFrame(controllerMappings[i][2])))
+                    {
+                        playFields[i].Level = Math.Min(playFields[i].Level + 1, 9);
+                    }
+                    if (inputState.IsButtonDownThisFrame(i, buttons[3]) ||
+                        (controllerMappings[i] != null && inputState.IsKeyDownThisFrame(controllerMappings[i][3])))
+                    {
+                        playFields[i].Level = Math.Max(playFields[i].Level - 1, 0);
+                    }
                 }
             }
         }
