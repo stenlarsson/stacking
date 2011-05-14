@@ -48,6 +48,8 @@ namespace Tetatt.Graphics
 
         public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
+
             anim.Update();
 
             if (mov > 0 && (duration & 1) == 1)
@@ -59,10 +61,8 @@ namespace Tetatt.Graphics
             duration--;
             if (duration <= 0)
             {
-                Game.Components.Remove(this);
+                Dispose();
             }
-
-            base.Update(gameTime);
         }
 
         public override void Draw(GameTime gameTime)
