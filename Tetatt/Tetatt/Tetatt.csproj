@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="GamePlay\DrawablePlayField.cs" />
     <Compile Include="GamePlay\LevelData.cs" />
+    <Compile Include="GamePlay\PlayerInput.cs" />
     <Compile Include="GamePlay\Pos.cs" />
     <Compile Include="GamePlay\RandomBlocks.cs" />
     <Compile Include="Graphics\Background.cs" />
