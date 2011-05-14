@@ -24,8 +24,7 @@ namespace Tetatt
         SoundEffect fanfare1Effect;
         SoundEffect fanfare2Effect;
 
-        DrawablePlayField playField1;
-        DrawablePlayField playField2;
+        PlayField[] playFields;
 
         SoundEffect normalMusic;
         SoundEffect stressMusic;
@@ -47,19 +46,17 @@ namespace Tetatt
 
             Components.Add(new Background(this));
 
-            playField1 = new DrawablePlayField(this, new Vector2(96, 248));
-            playField1.PlayField.PerformedCombo += playField_PerformedCombo;
-            playField1.PlayField.PerformedChain += playField_PerformedChain;
-            playField1.PlayField.Popped += playField_Popped;
-            playField1.PlayField.Died += playField_Died;
-            Components.Add(playField1);
-
-            playField2 = new DrawablePlayField(this, new Vector2(384, 248));
-            playField2.PlayField.PerformedCombo += playField_PerformedCombo;
-            playField2.PlayField.PerformedChain += playField_PerformedChain;
-            playField2.PlayField.Popped += playField_Popped;
-            playField2.PlayField.Died += playField_Died;
-            Components.Add(playField2);
+            playFields = new PlayField[4];
+            for (int i = 0; i < 4; i++)
+            {
+                var dp = new DrawablePlayField(this, new Vector2(96 + 288 * i, 248));
+                playFields[i] = dp.PlayField;
+                playFields[i].PerformedCombo += playField_PerformedCombo;
+                playFields[i].PerformedChain += playField_PerformedChain;
+                playFields[i].Popped += playField_Popped;
+                playFields[i].Died += playField_Died;
+                Components.Add(dp);
+            }
 
             inputState = new InputState();
             isRunning = false;
@@ -116,29 +113,15 @@ namespace Tetatt
         {
             UpdateInput();
 
-            if (playField1.PlayField.GetHeight() >= PlayField.stressHeight ||
-                playField2.PlayField.GetHeight() >= PlayField.stressHeight)
+            bool anyStress = playFields.Any(p => p.GetHeight() >= PlayField.stressHeight);
+            if (anyStress != isStressMusic && --musicChangeTimer <= 0)
             {
-                if (!isStressMusic && musicChangeTimer <= 0)
-                {
-                    music.Dispose();
-                    music = stressMusic.CreateInstance();
-                    music.IsLooped = true;
-                    music.Play();
-                    isStressMusic = true;
-                }
+                music.Dispose();
+                music = (anyStress ? stressMusic : normalMusic).CreateInstance();
+                music.IsLooped = true;
+                music.Play();
+                isStressMusic = anyStress;
                 musicChangeTimer = 20;
-            }
-            else
-            {
-                if (isStressMusic && --musicChangeTimer <= 0)
-                {
-                    music.Dispose();
-                    music = normalMusic.CreateInstance();
-                    music.IsLooped = true;
-                    music.Play();
-                    isStressMusic = false;
-                }
             }
 
             base.Update(gameTime);
@@ -157,74 +140,74 @@ namespace Tetatt
                 if (inputState.IsButtonDownThisFrame(0, Buttons.DPadLeft) ||
                     inputState.IsKeyDownThisFrame(Keys.A))
                 {
-                    playField1.PlayField.MoveLeft();
+                    playFields[0].MoveLeft();
                 }
 
                 if (inputState.IsButtonDownThisFrame(0, Buttons.DPadRight) ||
                     inputState.IsKeyDownThisFrame(Keys.D))
                 {
-                    playField1.PlayField.MoveRight();
+                    playFields[0].MoveRight();
                 }
 
                 if (inputState.IsButtonDownThisFrame(0, Buttons.DPadUp) ||
                     inputState.IsKeyDownThisFrame(Keys.W))
                 {
-                    playField1.PlayField.MoveUp();
+                    playFields[0].MoveUp();
                 }
 
                 if (inputState.IsButtonDownThisFrame(0, Buttons.DPadDown) ||
                     inputState.IsKeyDownThisFrame(Keys.S))
                 {
-                    playField1.PlayField.MoveDown();
+                    playFields[0].MoveDown();
                 }
 
                 if (inputState.IsButtonDownThisFrame(0, Buttons.A) ||
                     inputState.IsKeyDownThisFrame(Keys.LeftControl))
                 {
-                    playField1.PlayField.Swap();
+                    playFields[0].Swap();
                 }
 
                 if (inputState.IsButtonDown(0, Buttons.RightShoulder) ||
                     inputState.IsKeyDown(Keys.LeftShift))
                 {
-                    playField1.PlayField.Raise();
+                    playFields[0].Raise();
                 }
 
 
                 if (inputState.IsButtonDownThisFrame(1, Buttons.DPadLeft) ||
                     inputState.IsKeyDownThisFrame(Keys.Left))
                 {
-                    playField2.PlayField.MoveLeft();
+                    playFields[1].MoveLeft();
                 }
 
                 if (inputState.IsButtonDownThisFrame(1, Buttons.DPadRight) ||
                     inputState.IsKeyDownThisFrame(Keys.Right))
                 {
-                    playField2.PlayField.MoveRight();
+                    playFields[1].MoveRight();
                 }
 
                 if (inputState.IsButtonDownThisFrame(1, Buttons.DPadUp) ||
                     inputState.IsKeyDownThisFrame(Keys.Up))
                 {
-                    playField2.PlayField.MoveUp();
+                    playFields[1].MoveUp();
                 }
 
                 if (inputState.IsButtonDownThisFrame(1, Buttons.DPadDown) ||
                     inputState.IsKeyDownThisFrame(Keys.Down))
                 {
-                    playField2.PlayField.MoveDown();
+                    playFields[1].MoveDown();
                 }
 
                 if (inputState.IsButtonDownThisFrame(1, Buttons.A) ||
                     inputState.IsKeyDownThisFrame(Keys.RightControl))
                 {
-                    playField2.PlayField.Swap();
+                    playFields[1].Swap();
                 }
 
                 if (inputState.IsButtonDown(1, Buttons.RightShoulder) ||
                     inputState.IsKeyDown(Keys.RightShift))
                 {
-                    playField2.PlayField.Raise();
+                    playFields[1].Raise();
                 }
             }
             else
@@ -232,10 +215,11 @@ namespace Tetatt
                 if (inputState.IsKeyDown(Keys.Enter))
                 {
                     isRunning = true;
-                    playField1.PlayField.Reset();
-                    playField2.PlayField.Reset();
-                    playField1.PlayField.Start();
-                    playField2.PlayField.Start();
+                    foreach (var p in playFields)
+                    {
+                        p.Reset();
+                        p.Start();
+                    }
                     music = normalMusic.CreateInstance();
                     music.IsLooped = true;
                     music.Play();
@@ -244,25 +228,25 @@ namespace Tetatt
                 if (inputState.IsButtonDownThisFrame(0, Buttons.DPadUp) ||
                     inputState.IsKeyDownThisFrame(Keys.W))
                 {
-                    playField1.PlayField.Level = Math.Min(playField1.PlayField.Level + 1, 9);
+                    playFields[0].Level = Math.Min(playFields[0].Level + 1, 9);
                 }
 
                 if (inputState.IsButtonDownThisFrame(0, Buttons.DPadDown) ||
                     inputState.IsKeyDownThisFrame(Keys.S))
                 {
-                    playField1.PlayField.Level = Math.Max(playField1.PlayField.Level - 1, 0);
+                    playFields[0].Level = Math.Max(playFields[0].Level - 1, 0);
                 }
 
                 if (inputState.IsButtonDownThisFrame(1, Buttons.DPadUp) ||
                     inputState.IsKeyDownThisFrame(Keys.Up))
                 {
-                    playField2.PlayField.Level = Math.Min(playField2.PlayField.Level + 1, 9);
+                    playFields[1].Level = Math.Min(playFields[1].Level + 1, 9);
                 }
 
                 if (inputState.IsButtonDownThisFrame(1, Buttons.DPadDown) ||
                     inputState.IsKeyDownThisFrame(Keys.Down))
                 {
-                    playField2.PlayField.Level = Math.Max(playField2.PlayField.Level - 1, 0);
+                    playFields[1].Level = Math.Max(playFields[1].Level - 1, 0);
                 }
             }
         }
@@ -289,11 +273,11 @@ namespace Tetatt
         {
             foreach (GarbageInfo info in chain.garbage)
             {
-                OtherPlayField(sender).AddGarbage(info.size, info.type);
+                GetGarbageTarget(sender).AddGarbage(info.size, info.type);
             }
             if (chain.length > 1)
             {
-                OtherPlayField(sender).AddGarbage(chain.length - 1, GarbageType.Chain);
+                GetGarbageTarget(sender).AddGarbage(chain.length - 1, GarbageType.Chain);
             }
 
             if (chain.length == 4)
@@ -319,21 +303,25 @@ namespace Tetatt
 
         private void playField_Died(PlayField sender)
         {
-            isRunning = false;
-            OtherPlayField(sender).Stop();
-            music.Stop();
+            int alive = playFields.Count(p => p.State == PlayFieldState.Play);
+            if (alive <= 1)
+            {
+                isRunning = false;
+                GetGarbageTarget(sender).Stop();
+                music.Stop();
+            }
         }
 
-        private PlayField OtherPlayField(PlayField playField)
+        private PlayField GetGarbageTarget(PlayField playField)
         {
-            if (playField == playField1.PlayField)
+            int index = Array.IndexOf(playFields, playField);
+            for (int i = 1; i < playFields.Length; i++)
             {
-                return playField2.PlayField;
+                var p = playFields[(index + i) % playFields.Length];
+                if (p.State == PlayFieldState.Play)
+                    return p;
             }
-            else
-            {
-                return playField1.PlayField;
-            }
+            return playField; // Should only happen when we are about to win...
         }
     }
 }
