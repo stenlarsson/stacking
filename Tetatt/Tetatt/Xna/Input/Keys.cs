@@ -18,6 +18,7 @@ namespace Microsoft.Xna.Framework.Input
         Right = Key.Right,
         RightControl = Key.ControlRight,
         RightShift = Key.ShiftRight,
-        Enter = Key.Enter
+        Enter = Key.Enter,
+        Space = Key.Space,
     }
 }

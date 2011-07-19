@@ -21,6 +21,12 @@ namespace Microsoft.Xna.Framework.Content
             this.serviceProvider = serviceProvider;
         }
 
+        public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
+        {
+            this.serviceProvider = serviceProvider;
+            this.RootDirectory = rootDirectory;
+        }
+
         public virtual T Load<T>(string assetName)
         {
             if (typeof(T) == typeof(Texture2D))
@@ -47,6 +53,10 @@ namespace Microsoft.Xna.Framework.Content
                 );
             }
             return default(T);
+        }
+
+        public void Unload()
+        {
         }
     }
 }

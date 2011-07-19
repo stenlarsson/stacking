@@ -75,6 +75,11 @@ namespace Microsoft.Xna.Framework.Graphics
             Draw(texture, new Rectangle((int)position.X, (int)position.Y, src.Width, src.Height), src, color);
         }
 
+        public void Draw(Texture2D texture, Rectangle destinationRectangle, Color color)
+        {
+            Draw(texture, destinationRectangle, null, color);
+        }
+
         public void Draw(Texture2D texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color)
         {
             GL.Color4(color.R, color.G, color.B, color.A);
@@ -99,14 +104,45 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.End();
         }
 
-        public void DrawString (SpriteFont font, string text, Vector2 position, Color color)
+        public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
         {
-            foreach (char c in text)
-            {
-                Draw(font.texture, position, font.chars[c], color);
-                position.X += font.chars[c].Width + font.Spacing;
-            }
+            DrawString(spriteFont, text, position, color, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
         }
 
+        public void DrawString(
+            SpriteFont spriteFont,
+            string text,
+            Vector2 position,
+            Color color,
+            float rotation,
+            Vector2 origin,
+            float scale,
+            SpriteEffects effects,
+            float layerDepth)
+        {
+            // TODO implement rotation
+
+            float x = position.X;
+            float y = position.Y;
+            foreach (char c in text)
+            {
+                if (c == '\n')
+                {
+                    x = position.X;
+                    y += spriteFont.LineSpacing * scale;
+                    continue;
+                }
+                Rectangle rect = spriteFont.chars[c];
+                Draw(spriteFont.texture,
+                    new Rectangle(
+                        (int)x,
+                        (int)y,
+                        (int)(rect.Width * scale),
+                        (int)(rect.Height * scale)),
+                    rect,
+                    color);
+                x += (rect.Width + spriteFont.Spacing) * scale;
+            }
+        }
     }
 }

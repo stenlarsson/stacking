@@ -21,5 +21,12 @@ namespace Microsoft.Xna.Framework
         {
             return new Vector2(a.X - b.X, a.Y - b.Y);
         }
+
+        public static Vector2 operator/(Vector2 a, float b)
+        {
+            return new Vector2(a.X / b, a.Y / b);
+        }
+
+        public static Vector2 Zero = new Vector2(0, 0);
     }
 }

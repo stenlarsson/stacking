@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -60,7 +60,22 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GamePlay\PlayerInput.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Screens\BackgroundScreen.cs" />
+    <Compile Include="Screens\GameplayScreen.cs" />
+    <Compile Include="Screens\GameScreen.cs" />
+    <Compile Include="Screens\InputState.cs" />
+    <Compile Include="Screens\LobbyScreen.cs" />
+    <Compile Include="Screens\MainMenuScreen.cs" />
+    <Compile Include="Screens\MenuEntry.cs" />
+    <Compile Include="Screens\MenuScreen.cs" />
+    <Compile Include="Screens\MessageBoxScreen.cs" />
+    <Compile Include="Screens\OptionsMenuScreen.cs" />
+    <Compile Include="Screens\PauseMenuScreen.cs" />
+    <Compile Include="Screens\Player.cs" />
+    <Compile Include="Screens\PlayerIndexEventArgs.cs" />
+    <Compile Include="Screens\ScreenManager.cs" />
     <Compile Include="TetattGame.cs" />
     <Compile Include="GamePlay\Block.cs" />
     <Compile Include="GamePlay\BlockState.cs" />
@@ -82,6 +97,13 @@
     <Compile Include="Xna\Game.cs" />
     <Compile Include="Xna\GraphicsDeviceManager.cs" />
     <Compile Include="Xna\GameServiceContainer.cs" />
+    <Compile Include="Xna\Graphics\SpriteEffects.cs" />
+    <Compile Include="Xna\Graphics\Viewport.cs" />
+    <Compile Include="Xna\Input\GamePadThumbSticks.cs" />
+    <Compile Include="Xna\Input\Touch\GestureSample.cs" />
+    <Compile Include="Xna\Input\Touch\GestureType.cs" />
+    <Compile Include="Xna\Input\Touch\TouchCollection.cs" />
+    <Compile Include="Xna\Input\Touch\TouchPanel.cs" />
     <Compile Include="Xna\Rectangle.cs" />
     <Compile Include="Graphics\EffCombo.cs" />
     <Compile Include="GamePlay\PlayFieldState.cs" />
@@ -90,15 +112,11 @@
     <Compile Include="Xna\GameComponentCollection.cs" />
     <Compile Include="Xna\MathHelper.cs" />
     <Compile Include="GamePlay\RandomBlocks.cs" />
-    <Compile Include="GamePlay\DrawablePlayField.cs" />
     <Compile Include="GamePlay\Pos.cs" />
-    <Compile Include="Graphics\Background.cs" />
     <Compile Include="Xna\Vector3.cs" />
     <Compile Include="Xna\Matrix.cs" />
     <Compile Include="Graphics\EffPop.cs" />
-    <Compile Include="Graphics\EffMoveBlock.cs" />
     <Compile Include="GamePlay\LevelData.cs" />
-    <Compile Include="InputState.cs" />
     <Compile Include="Xna\Audio\SoundEffect.cs" />
     <Compile Include="Xna\Content\ContentManager.cs" />
     <Compile Include="Xna\Graphics\BasicEffect.cs" />
@@ -152,6 +170,9 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.XML" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />

@@ -22,11 +22,12 @@ namespace Microsoft.Xna.Framework
         public GameComponentCollection Components { get; set; }
         public GameServiceContainer Services { get; set; }
         public ContentManager Content { get; set; }
+        public bool IsActive { get; set; }
         public GraphicsDevice GraphicsDevice
         {
             get { return graphicsDeviceManager.GraphicsDevice; }
         }
-
+ 
         public Game()
         {
             graphicsDeviceManager = null;
@@ -34,15 +35,16 @@ namespace Microsoft.Xna.Framework
             Components = new GameComponentCollection();
             Services = new GameServiceContainer();
             Content = new ContentManager(Services);
+            IsActive = true;
             
             gameWindow = new GameWindow(1280, 720, GraphicsMode.Default, "Tetatt");
             gameWindow.VSync = VSyncMode.On;
             gameWindow.Keyboard.KeyDown += (s, e) => Input.Keyboard.keys[(int)e.Key] = true;
             gameWindow.Keyboard.KeyUp += (s, e) => Input.Keyboard.keys[(int)e.Key] = false;
             gameWindow.Load += (s, e) => LoadContent();
-            gameWindow.Resize += (s, e) => GL.Viewport(gameWindow.ClientRectangle);
-            gameWindow.UpdateFrame += (s, e) => Update(new GameTime());
-            gameWindow.RenderFrame += (s, e) => OnRenderFrame();
+            gameWindow.Resize += (s, e) => GraphicsDevice.Viewport.Bounds = gameWindow.ClientRectangle;
+            gameWindow.UpdateFrame += OnUpdateFrame;
+            gameWindow.RenderFrame += OnRenderFrame;
         }
 
         public void Run()
@@ -62,12 +64,17 @@ namespace Microsoft.Xna.Framework
             gameWindow.Exit();
         }
 
-        /// <summary>
-        /// Called when it is time to render the next frame. Add your rendering code here.
-        /// </summary>
-        private void OnRenderFrame()
+        private void OnUpdateFrame(object sender, FrameEventArgs e)
         {
-            Draw(new GameTime());
+            GameTime gameTime = new GameTime(e.Time);
+            GameTime.totalGameTime += gameTime.ElapsedGameTime;
+            Update(gameTime);
+        }
+
+        private void OnRenderFrame(object sender, FrameEventArgs e)
+        {
+            GameTime gameTime = new GameTime(e.Time);
+            Draw(gameTime);
             
             ErrorCode error = GL.GetError();
             while (error != ErrorCode.NoError)
@@ -85,7 +92,8 @@ namespace Microsoft.Xna.Framework
             {
                 c.Initialize();
             }
-            Components.ComponentAdded += delegate(object sender, GameComponentCollectionEventArgs e) { e.GameComponent.Initialize(); };
+            Components.ComponentAdded += ComponentAdded;
+            Components.ComponentRemoved += ComponentRemoved;
         }
 
         protected virtual void LoadContent()
@@ -118,6 +126,27 @@ namespace Microsoft.Xna.Framework
         {
             gameWindow.Dispose();
             audioContext.Dispose();
+        }
+
+        public void ResetElapsedTime()
+        {
+            // TODO implement
+        }
+
+        private void ComponentAdded(object sender, GameComponentCollectionEventArgs e)
+        {
+            e.GameComponent.Initialize();
+            ((GameComponent)e.GameComponent).Disposed += ComponentDisposed;
+        }
+
+        private void ComponentRemoved(object sender, GameComponentCollectionEventArgs e)
+        {
+            ((GameComponent)e.GameComponent).Disposed -= ComponentDisposed;
+        }
+
+        private void ComponentDisposed(object sender, EventArgs e)
+        {
+            Components.Remove((GameComponent)sender);
         }
     }
 }

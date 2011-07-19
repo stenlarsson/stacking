@@ -14,6 +14,7 @@ namespace Microsoft.Xna.Framework.Graphics
                              VertexElementFormat elementFormat,
                              VertexElementUsage elementUsage,
                              int usageIndex)
+            : this()
         {
             this.Offset = offset;
             this.ElementFormat = elementFormat;
