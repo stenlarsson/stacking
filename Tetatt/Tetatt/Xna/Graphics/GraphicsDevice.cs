@@ -23,7 +23,14 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return presentationParameters; }
         }
 
-        public Rectangle ScissorRectangle {
+        private Viewport viewport;
+        public Viewport Viewport
+        {
+            get { return viewport; }
+        }
+
+        public Rectangle ScissorRectangle
+        {
             set {
                 GL.Scissor(
                     value.Left,
@@ -40,6 +47,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.adapter = adapter;
             this.graphicsProfile = graphicsProfile;
             this.presentationParameters = presentationParameters;
+            this.viewport = new Viewport();
         }
 
         public static void Clear(Color color)

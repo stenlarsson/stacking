@@ -33,5 +33,16 @@ namespace Microsoft.Xna.Framework
             Width = width;
             Height = height;
         }
+
+        // Implicit cast to System.Drawing.Rectangle
+        public static implicit operator System.Drawing.Rectangle(Rectangle r)
+        {
+            return new System.Drawing.Rectangle(r.X, r.Y, r.Width, r.Height);
+        }
+        // Implicit cast from System.Drawing.Rectangle
+        public static implicit operator Rectangle(System.Drawing.Rectangle r)
+        {
+            return new Rectangle(r.X, r.Y, r.Width, r.Height);
+        }
     }
 }

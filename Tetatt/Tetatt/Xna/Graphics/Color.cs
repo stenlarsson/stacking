@@ -20,11 +20,18 @@ namespace Microsoft.Xna.Framework.Graphics
         }
 
         public readonly byte R, G, B, A;
+
+        public static Color operator *(Color c, float d)
+        {
+            return new Color((byte)(c.R * d), (byte)(c.G * d), (byte)(c.B * d), (byte)(c.A * d));
+        }
         
         public static Color Black { get { return new Color(0,0,0,255); } }
         
         public static Color White { get { return new Color(255,255,255,255); } }
         
         public static Color DarkGray { get { return new Color(169,169,169,255); } }
+
+        public static Color Yellow { get { return new Color(255, 255, 0, 255); } }
     }
 }

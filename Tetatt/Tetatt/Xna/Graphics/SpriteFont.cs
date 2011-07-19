@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -12,18 +13,28 @@ namespace Microsoft.Xna.Framework.Graphics
             this.texture = texture;
             this.chars = chars;
             Spacing = 0.0f;
+            LineSpacing = chars.First().Value.Height;
         }
 
         public float Spacing { get; set; }
+        public int LineSpacing { get; set; }
         public Vector2 MeasureString(string text)
         {
-            int x = 0, y = 0;
+            int x = 0;
+            int y = chars.First().Value.Height;
+            int line = 0;
             foreach (char c in text)
             {
-                x += chars[c].Width;
-                y = Math.Max(y, chars[c].Height);
+                if (c == '\n')
+                {
+                    line = Math.Max(line, x);
+                    x = 0;
+                    y += LineSpacing;
+                    continue;
+                } 
+                x += chars[c].Width + (int)Spacing;
             }
-            return new Vector2(x + (text.Length - 1)*Spacing, y);
+            return new Vector2(Math.Max(line, x), y);
         }
     }
 }

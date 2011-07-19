@@ -11,5 +11,10 @@ namespace Microsoft.Xna.Framework.Input
         {
             return new KeyboardState { keystate = (bool[])keys.Clone() };
         }
+
+        public static KeyboardState GetState(PlayerIndex playerIndex)
+        {
+            return GetState();
+        }
     }
 }

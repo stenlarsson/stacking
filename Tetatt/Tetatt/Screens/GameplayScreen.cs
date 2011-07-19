@@ -9,7 +9,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tetatt.GamePlay;
 using Tetatt.Graphics;
-using Microsoft.Xna.Framework.Media;
 
 namespace Tetatt.Screens
 {
