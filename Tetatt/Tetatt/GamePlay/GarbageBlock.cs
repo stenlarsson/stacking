@@ -81,11 +81,11 @@ namespace Tetatt.GamePlay
             switch (newState)
             {
                 case BlockState.Idle:
-                    stateDelay = -1;
+                    StateDelay = -1;
                     break;
                 case BlockState.Falling:
                     dropTimer = dropDelay;
-                    stateDelay = -1;
+                    StateDelay = -1;
                     break;
                 case BlockState.Hover:
                     nextState = BlockState.Falling;
@@ -97,16 +97,16 @@ namespace Tetatt.GamePlay
                 case BlockState.Pop:
                     anim = new Anim((int)type + BigGarbageBlock.tileFlash1Offset);
                     nextState = BlockState.Pop2;
-                    stateDelay = popOffset;
+                    StateDelay = popOffset;
                     break;
                 case BlockState.Pop2:
                     nextState = BlockState.Pop3;
-                    stateDelay = 1;
+                    StateDelay = 1;
                     break;
                 case BlockState.Pop3:
                     anim = new Anim(nextGraphic == BigGarbageBlock.graphicsDisabled ? (int)typeAfterPop : nextGraphic);
                     nextState = BlockState.Dead;
-                    stateDelay = dieOffset;
+                    StateDelay = dieOffset;
                     break;
                 case BlockState.Dead:
                     if (nextGraphic != BigGarbageBlock.graphicsDisabled)
@@ -115,7 +115,7 @@ namespace Tetatt.GamePlay
                         state = BlockState.Falling;
                         dropTimer = dropDelay;
                     }
-                    stateDelay = -1;
+                    StateDelay = -1;
                     break;
                 default:
                     Debug.Fail(string.Format("Unexpected state {0}", state));

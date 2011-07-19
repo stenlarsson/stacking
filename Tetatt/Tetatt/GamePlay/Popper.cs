@@ -38,7 +38,7 @@ namespace Tetatt.GamePlay
                 if (!chain.usedThisFrame)
                     continue;
 
-                evil += chain.PopAllAndCountEvil(popStartOffset, popTime, flashTime);
+                evil = chain.PopAllAndCountEvil(popStartOffset, popTime, flashTime);
 
                 // Check add evil garbage
                 if (evil > 0)

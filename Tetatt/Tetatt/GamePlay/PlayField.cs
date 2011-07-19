@@ -348,13 +348,12 @@ namespace Tetatt.GamePlay
 
             if (right != null)
             {
-                right.Move();
+                right.Move(true);
             }
             if (left != null)
             {
-                left.Move();
+                left.Move(false);
             }
-            Swapped(this, left, right, markerPos);
             return true;
         }
 
@@ -384,7 +383,7 @@ namespace Tetatt.GamePlay
                     if (field[row,col] == null)
                         continue;
 
-                    if (field[row,col].State != BlockState.Idle)
+                    if ((field[row, col].State != BlockState.Idle) && (field[row, col].State != BlockState.Moving))
                     {
                         fastScroll = false;
                         return false;
@@ -917,9 +916,6 @@ namespace Tetatt.GamePlay
 
         public delegate void PoppedHandler(PlayField player, Pos pos, bool isGarabge, Chain chain);
         public event PoppedHandler Popped;
-
-        public delegate void SwappedHandler(PlayField player, Block left, Block right, Pos pos);
-        public event SwappedHandler Swapped;
 
         public delegate void DiedHandler(PlayField player);
         public event DiedHandler Died;
