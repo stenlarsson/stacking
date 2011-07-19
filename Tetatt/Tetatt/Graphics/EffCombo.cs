@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Tetatt.GamePlay;
+using Tetatt.Screens;
 
 namespace Tetatt.Graphics
 {
@@ -16,19 +14,14 @@ namespace Tetatt.Graphics
         private SpriteBatch spriteBatch;
         private float radius;
 
-        public EffCombo(Game game, Vector2 pos, bool isChain, int count, int duration)
-            : base(game)
+        public EffCombo(ScreenManager screenManager, Vector2 pos, bool isChain, int count, int duration)
+            : base(screenManager.Game)
         {
+            this.spriteBatch = screenManager.SpriteBatch;
             this.pos = pos;
-            tile = (isChain ? 52 : 38) + count;
+            tile = (isChain ? 51 : 38) + count;
             this.duration = duration;
             radius = 70;
-        }
-
-        protected override void LoadContent()
-        {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
@@ -49,24 +42,24 @@ namespace Tetatt.Graphics
         {
             spriteBatch.Begin();
             spriteBatch.Draw(
-                DrawablePlayField.blocksTileSet.Texture,
+                GameplayScreen.blocksTileSet.Texture,
                 pos,
-                DrawablePlayField.blocksTileSet.SourceRectangle(tile),
+                GameplayScreen.blocksTileSet.SourceRectangle(tile),
                 Color.White);
             spriteBatch.End();
 
             spriteBatch.Begin();
-            float r = radius + DrawablePlayField.blockSize;
+            float r = radius + GameplayScreen.blockSize;
             int t = Math.Abs(duration - 80);
             for (int i = 0; i < 6; i++)
             {
                 float theta = (t + 60 * i) * (MathHelper.Pi / 180) * 7;
                 spriteBatch.Draw(
-                    DrawablePlayField.blocksTileSet.Texture,
+                    GameplayScreen.blocksTileSet.Texture,
                     new Vector2(
                         (r * (float)Math.Cos(theta) + pos.X),
                         (r * (float)Math.Sin(theta) + pos.Y)),
-                    DrawablePlayField.blocksTileSet.SourceRectangle(91),
+                    GameplayScreen.blocksTileSet.SourceRectangle(91),
                     Color.White);
             }
             spriteBatch.End();

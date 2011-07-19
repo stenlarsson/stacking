@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 using Tetatt.GamePlay;
+using Tetatt.Screens;
 
 namespace Tetatt.Graphics
 {
@@ -30,20 +27,15 @@ namespace Tetatt.Graphics
         private SpriteBatch spriteBatch;
         private Anim anim;
 
-        public EffPop(Game game, Vector2 pos)
-            : base(game)
+        public EffPop(ScreenManager screenManager, Vector2 pos)
+            : base(screenManager.Game)
         {
+            this.spriteBatch = screenManager.SpriteBatch;
             this.pos = pos;
             duration = 9*3+1;
-            offset = DrawablePlayField.blockSize / 2;
+            offset = GameplayScreen.blockSize / 2;
             mov = 3;
             anim = new Anim(AnimType.Once, frames);
-        }
-
-        protected override void LoadContent()
-        {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            base.LoadContent();
         }
 
         public override void Update(GameTime gameTime)
@@ -69,24 +61,24 @@ namespace Tetatt.Graphics
         {
             spriteBatch.Begin();
             spriteBatch.Draw(
-                DrawablePlayField.blocksTileSet.Texture,
+                GameplayScreen.blocksTileSet.Texture,
                 pos + new Vector2(-offset, -offset),
-                DrawablePlayField.blocksTileSet.SourceRectangle(anim.GetFrame()),
+                GameplayScreen.blocksTileSet.SourceRectangle(anim.GetFrame()),
                 Color.White);
             spriteBatch.Draw(
-                DrawablePlayField.blocksTileSet.Texture,
+                GameplayScreen.blocksTileSet.Texture,
                 pos + new Vector2(offset, -offset),
-                DrawablePlayField.blocksTileSet.SourceRectangle(anim.GetFrame()),
+                GameplayScreen.blocksTileSet.SourceRectangle(anim.GetFrame()),
                 Color.White);
             spriteBatch.Draw(
-                DrawablePlayField.blocksTileSet.Texture,
+                GameplayScreen.blocksTileSet.Texture,
                 pos + new Vector2(-offset, offset),
-                DrawablePlayField.blocksTileSet.SourceRectangle(anim.GetFrame()),
+                GameplayScreen.blocksTileSet.SourceRectangle(anim.GetFrame()),
                 Color.White);
             spriteBatch.Draw(
-                DrawablePlayField.blocksTileSet.Texture,
+                GameplayScreen.blocksTileSet.Texture,
                 pos + new Vector2(offset, offset),
-                DrawablePlayField.blocksTileSet.SourceRectangle(anim.GetFrame()),
+                GameplayScreen.blocksTileSet.SourceRectangle(anim.GetFrame()),
                 Color.White);
             spriteBatch.End();
 

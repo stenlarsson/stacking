@@ -14,7 +14,7 @@ namespace Tetatt.GamePlay
         protected int popOffset;
         protected int dieOffset;
         protected int dropTimer;
-        protected int stateDelay;
+        public int StateDelay;
         protected BlockState nextState;
         public bool NeedPopCheck;
         private Chain chain;
@@ -22,6 +22,7 @@ namespace Tetatt.GamePlay
         protected StressState stress;
         private AnimFrame[] stressFrames;
         private AnimFrame[] flashFrames;
+        public bool Right;
 
         protected const int dropDelay =  0;
         protected const int flashDelay = 40;
@@ -42,7 +43,7 @@ namespace Tetatt.GamePlay
             popOffset = 0;
             dieOffset = 0;
             dropTimer = 0;
-            stateDelay = -1;
+            StateDelay = -1;
             nextState = BlockState.Idle;
             this.NeedPopCheck = needPopCheck;
             this.Chain = chain;
@@ -67,12 +68,12 @@ namespace Tetatt.GamePlay
             if (dropTimer > 0)
                 dropTimer--;
 
-            if (stateDelay > 0)
-                stateDelay--;
+            if (StateDelay > 0)
+                StateDelay--;
 
-            if (stateDelay == 0)
+            if (StateDelay == 0)
             {
-                stateDelay = -1;
+                StateDelay = -1;
                 State = nextState;
             }
             anim.Update();
@@ -91,7 +92,7 @@ namespace Tetatt.GamePlay
 
         public virtual void Hover(int delay)
         {
-	        stateDelay = delay;
+	        StateDelay = delay;
             State = BlockState.Hover;
         }
 
@@ -118,14 +119,15 @@ namespace Tetatt.GamePlay
         public virtual void Pop(int num, int total, int popStartOffset, int popTime, int flashTime)
         {
 	        State = BlockState.Flash;
-            stateDelay = flashTime;
+            StateDelay = flashTime;
 	        popOffset = popStartOffset + popTime * num;
 	        dieOffset = popStartOffset + popTime * total - popOffset - 1;
         }
 
-        public virtual void Move()
+        public virtual void Move(bool right)
         {
 	        State = BlockState.Moving;
+            Right = right;
         }
 
         public int Tile
@@ -199,12 +201,12 @@ namespace Tetatt.GamePlay
 				    anim = new Anim(AnimType.Looping, stressFrames);
 			    else if(state == BlockState.Falling)
 				    anim = new Anim(AnimType.Once, stressFrames);
-			    stateDelay = -1;
+			    StateDelay = -1;
 			    NeedPopCheck = true;
 		        break;
 	        case BlockState.Falling:
 		        dropTimer = dropDelay;
-		        stateDelay = -1;
+		        StateDelay = -1;
 		        break;
 	        case BlockState.Hover:
 		        nextState = BlockState.Falling;
@@ -213,12 +215,12 @@ namespace Tetatt.GamePlay
 	        case BlockState.Moving:
 		        anim = new Anim((int)type);
 		        nextState = BlockState.PostMove;
-		        stateDelay = 5;
+		        StateDelay = 5;
 		        break;
 	        case BlockState.PostMove:
 		        anim = new Anim((int)type);
 		        nextState = BlockState.Idle;
-		        stateDelay = 1;
+		        StateDelay = 1;
 		        break;
 	        case BlockState.Flash:
 		        anim = new Anim(AnimType.Looping, flashFrames);
@@ -227,19 +229,19 @@ namespace Tetatt.GamePlay
 	        case BlockState.Pop:
 		        anim = new Anim((int)type + tileEyesOffset);
 		        nextState = BlockState.Pop2;
-		        stateDelay = popOffset;
+		        StateDelay = popOffset;
 		        break;
             case BlockState.Pop2:
                 nextState = BlockState.Pop3;
-		        stateDelay = 1;
+		        StateDelay = 1;
 		        break;
             case BlockState.Pop3:
 		        anim = new Anim(tileBlank);
 		        nextState = BlockState.Dead;
-		        stateDelay = dieOffset;
+		        StateDelay = dieOffset;
 		        break;
 	        case BlockState.Dead:
-		        stateDelay = -1;
+		        StateDelay = -1;
 		        break;
 	        }
         }
