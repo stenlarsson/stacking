@@ -41,7 +41,7 @@ namespace Microsoft.Xna.Framework.Content
             else if (typeof(T)==typeof(SpriteFont))
             {
                 return (T)(object)new SpriteFont(
-                    new Texture2D(string.Format("../../../TetattContent/{0}.png", assetName)),
+                    new Texture2D(string.Format("../../../TetattContent/{0}.png", assetName), System.Drawing.Color.Magenta),
                     XDocument.Load(string.Format("../../../TetattContent/{0}.xml", assetName)).Root.Elements("character").ToDictionary(
                         e => (char)int.Parse(e.Attribute("key").Value),
                         e => new Rectangle(

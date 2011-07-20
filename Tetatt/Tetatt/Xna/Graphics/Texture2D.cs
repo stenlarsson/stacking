@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return new Rectangle(0, 0, Width, Height); }
         }
 
-        public Texture2D(string filename)
+        internal Texture2D(string filename, System.Drawing.Color? transparent = null)
         {
             if (String.IsNullOrEmpty(filename))
                 throw new ArgumentException(filename);
@@ -25,6 +25,10 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.BindTexture(TextureTarget.Texture2D, id);
 
             Bitmap bmp = new Bitmap(filename);
+
+            if (transparent.HasValue)
+                bmp.MakeTransparent(transparent.Value);
+
             BitmapData bmp_data = bmp.LockBits(
                 new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
                 ImageLockMode.ReadOnly,
