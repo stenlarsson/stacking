@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework
             gameWindow.Keyboard.KeyDown += (s, e) => Input.Keyboard.keys[(int)e.Key] = true;
             gameWindow.Keyboard.KeyUp += (s, e) => Input.Keyboard.keys[(int)e.Key] = false;
             gameWindow.Load += (s, e) => LoadContent();
-            gameWindow.Resize += (s, e) => GraphicsDevice.Viewport.Bounds = gameWindow.ClientRectangle;
+            gameWindow.Resize += (s, e) => GraphicsDevice.Viewport.windowRectangle = gameWindow.ClientRectangle;
             gameWindow.UpdateFrame += OnUpdateFrame;
             gameWindow.RenderFrame += OnRenderFrame;
         }

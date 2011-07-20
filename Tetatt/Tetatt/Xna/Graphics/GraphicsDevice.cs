@@ -32,11 +32,14 @@ namespace Microsoft.Xna.Framework.Graphics
         public Rectangle ScissorRectangle
         {
             set {
+                // TODO: This should probably use the actual viewport, and not the window viewport
+                var w = Viewport.windowRectangle;
+                var s = Viewport.windowScale;
                 GL.Scissor(
-                    value.Left,
-                    PresentationParameters.BackBufferHeight - value.Bottom, // Yay for inverted OpenGL
-                    value.Width,
-                    value.Height);
+                    (int)(w.X + s * value.Left),
+                    (int)(w.Height + w.Y - s * value.Bottom), // Yay for inverted OpenGL
+                    (int)(s * value.Width),
+                    (int)(s * value.Height));
             }
         }
 
@@ -47,7 +50,7 @@ namespace Microsoft.Xna.Framework.Graphics
             this.adapter = adapter;
             this.graphicsProfile = graphicsProfile;
             this.presentationParameters = presentationParameters;
-            this.viewport = new Viewport();
+            this.viewport = new Viewport(presentationParameters);
         }
 
         public static void Clear(Color color)
