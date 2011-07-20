@@ -122,8 +122,8 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             // TODO implement rotation
 
-            float x = position.X;
-            float y = position.Y;
+            float x = position.X - scale * origin.X;
+            float y = position.Y - scale * origin.Y;
             foreach (char c in text)
             {
                 if (c == '\n')
