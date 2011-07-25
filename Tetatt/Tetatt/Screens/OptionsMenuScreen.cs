@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework;
 #endregion
 
 namespace Tetatt.Screens
-{
+{/*
     /// <summary>
     /// The options screen is brought up over the top of the main menu
     /// screen, and gives the user a chance to configure the game
@@ -145,5 +145,5 @@ namespace Tetatt.Screens
 
 
         #endregion
-    }
+    }*/
 }

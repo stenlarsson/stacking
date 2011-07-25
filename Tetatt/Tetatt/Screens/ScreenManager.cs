@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
+using Microsoft.Xna.Framework.GamerServices;
 #endregion
 
 namespace Tetatt.Screens
@@ -41,6 +42,8 @@ namespace Tetatt.Screens
         bool isInitialized;
 
         bool traceEnabled;
+
+        public SignedInGamer invited;
 
         #endregion
 
@@ -184,6 +187,8 @@ namespace Tetatt.Screens
                     {
                         screen.HandleInput(input);
 
+                        screen.UpdatePresence();
+
                         otherScreenHasFocus = true;
                     }
 
@@ -226,6 +231,18 @@ namespace Tetatt.Screens
 
                 screen.Draw(gameTime);
             }
+        }
+
+        /// <summary>
+        /// Draw an empty rectangle of the given size and color.
+        /// </summary>
+        /// <param name="rectangle">The destination rectangle.</param>
+        /// <param name="color">The color of the rectangle.</param>
+        public void DrawRectangle(Rectangle rectangle, Color color)
+        {
+            SpriteBatch.Begin();
+            SpriteBatch.Draw(blankTexture, rectangle, color);
+            SpriteBatch.End();
         }
 
 
@@ -278,6 +295,20 @@ namespace Tetatt.Screens
             if (screens.Count > 0)
             {
                 TouchPanel.EnabledGestures = screens[screens.Count - 1].EnabledGestures;
+            }
+        }
+
+        /// <summary>
+        /// Remove all screens except the BackgroundScreen and MainMenuScreen.
+        /// </summary>
+        public void ReturnToMainMenu()
+        {
+            foreach (var screen in GetScreens())
+            {
+                if (!(screen is BackgroundScreen || screen is MainMenuScreen))
+                {
+                    screen.ExitScreen();
+                }
             }
         }
 

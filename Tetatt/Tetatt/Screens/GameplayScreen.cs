@@ -9,27 +9,36 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tetatt.GamePlay;
 using Tetatt.Graphics;
+using Microsoft.Xna.Framework.Net;
+using Microsoft.Xna.Framework.GamerServices;
+using Tetatt.Networking;
 
 namespace Tetatt.Screens
 {
     /// <summary>
-    /// This screen implements the actual game logic. It is just a
-    /// placeholder to get the idea across: you'll probably want to
-    /// put some more interesting gameplay in here!
+    /// This screen implements the actual game logic.
     /// </summary>
     class GameplayScreen : GameScreen
     {
-        ContentManager content;
+        public const int SendFieldStateDelay = 5;
 
         public const int blockSize = 32;
 
-        public readonly List<Player> Players;
+        public static Vector2[] Offsets = new Vector2[] {
+            new Vector2(96, 248),
+            new Vector2(384, 248),
+            new Vector2(672, 248),
+            new Vector2(960, 248),
+        };
 
         // TODO accessor
         public static TileSet blocksTileSet;
         public static Texture2D background;
         public static Texture2D marker;
         public static SpriteFont font;
+        Texture2D hasVoiceTexture;
+        Texture2D isTalkingTexture;
+        Texture2D voiceMutedTexture;
 
         SoundEffect[] popEffect;
         SoundEffect chainEffect;
@@ -44,22 +53,36 @@ namespace Tetatt.Screens
 
         float pauseAlpha;
 
-        private bool isRunning;
+        /// <summary>
+        /// The network session for this game.
+        /// </summary>
+        private NetworkSession networkSession;
+
+        /// <summary>
+        /// The packet writer used to send data from this screen.
+        /// </summary>
+        private PacketWriter packetWriter = new PacketWriter();
+
+        /// <summary>
+        /// The packet reader used to receive data to this screen..
+        /// </summary>
+        private PacketReader packetReader = new PacketReader();
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public GameplayScreen()
+        public GameplayScreen(NetworkSession networkSession)
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
-            // Create list of players and add the player who started the game
-            Players = new List<Player>();
-            if (ControllingPlayer.HasValue)
-                CreatePlayer(ControllingPlayer.Value);
+            this.networkSession = networkSession;
 
-            isRunning = false;
+            // set the networking events
+            networkSession.GamerJoined += GamerJoined;
+            networkSession.GamerLeft += GamerLeft;
+            networkSession.GameStarted += GameStarted;
+            networkSession.GameEnded += GameEnded;
         }
 
         /// <summary>
@@ -67,8 +90,7 @@ namespace Tetatt.Screens
         /// </summary>
         public override void LoadContent()
         {
-            if (content == null)
-                content = new ContentManager(ScreenManager.Game.Services, "Content");
+            ContentManager content = ScreenManager.Game.Content;
 
             // Load graphics
             background = content.Load<Texture2D>("playfield");
@@ -77,6 +99,10 @@ namespace Tetatt.Screens
                 content.Load<Texture2D>("blocks"), blockSize);
             font = content.Load<SpriteFont>("ingame_font");
             font.Spacing = -5;
+
+            hasVoiceTexture = content.Load<Texture2D>("chat_able");
+            isTalkingTexture = content.Load<Texture2D>("chat_talking");
+            voiceMutedTexture = content.Load<Texture2D>("chat_mute");
 
             // Load sound effects
             popEffect = new SoundEffect[4];
@@ -91,20 +117,6 @@ namespace Tetatt.Screens
             // Load music
             normalMusic = content.Load<SoundEffect>("normal_music");
             stressMusic = content.Load<SoundEffect>("stress_music");
-            
-            // Once the load has finished, we use ResetElapsedTime to tell the game's
-            // timing mechanism that we have just finished a very long frame, and that
-            // it should not try to catch up.
-            ScreenManager.Game.ResetElapsedTime();
-        }
-
-
-        /// <summary>
-        /// Unload graphics content used by the game.
-        /// </summary>
-        public override void UnloadContent()
-        {
-            content.Unload();
         }
 
         /// <summary>
@@ -117,9 +129,76 @@ namespace Tetatt.Screens
         {
             base.Update(gameTime, otherScreenHasFocus, false);
 
-            if (!isRunning && !IsExiting && !coveredByOtherScreen)
+            if (IsExiting)
             {
-                ScreenManager.AddScreen(new LobbyScreen(this), null);
+                return;
+            }
+
+            ProcessPackets();
+
+            if (networkSession.SessionState != NetworkSessionState.Playing)
+            {
+                // Show lobby screen if we're not playing and not already showing it
+                if (!coveredByOtherScreen)
+                {
+                    ScreenManager.AddScreen(new LobbyScreen(this, networkSession), null);
+                }
+
+                // Check is game should start
+                if (networkSession.IsHost &&
+                    networkSession.IsEveryoneReady &&
+                    networkSession.AllGamers.Count > 1)
+                {
+                    foreach (var gamer in networkSession.LocalGamers)
+                    {
+                        gamer.IsReady = false;
+                    }
+                    networkSession.StartGame();
+                }
+            }
+            else
+            {
+                if (networkSession.IsHost)
+                {
+                    CheckEndOfGame();
+                }
+
+                // Send updates of play fields
+                foreach (var gamer in networkSession.LocalGamers)
+                {
+                    Player data = (Player)gamer.Tag;
+                    if (data.SendFieldStateTimer == 0)
+                    {
+                        SendFieldData(gamer);
+                        data.SendFieldStateTimer = SendFieldStateDelay;
+                    }
+                    else
+                    {
+                        data.SendFieldStateTimer--;
+                    }
+                }
+
+                // Switch to stressful music if anyone reaches a certain height, or back if
+                // everyone is below again. Use a delay to avoid changing too often.
+                bool anyStress = false;
+                foreach (var gamer in networkSession.AllGamers)
+                {
+                    Player data = (Player)gamer.Tag;
+                    if (data.PlayField.GetHeight() >= PlayField.stressHeight)
+                    {
+                        anyStress = true;
+                        break;
+                    }
+                }
+                if (anyStress != isStressMusic && --musicChangeTimer <= 0)
+                {
+                    music.Dispose();
+                    music = (anyStress ? stressMusic : normalMusic).CreateInstance();
+                    music.IsLooped = true;
+                    music.Play();
+                    isStressMusic = anyStress;
+                    musicChangeTimer = 20;
+                }
             }
 
             // Gradually fade in or out depending on whether we are covered by the pause screen.
@@ -128,26 +207,14 @@ namespace Tetatt.Screens
             else
                 pauseAlpha = Math.Max(pauseAlpha - 1f / 32, 0);
 
-            // Update playfields if not paused
-            if (IsActive)
+            // Update playfields if not paused. Cannot pause in network mode.
+            if (IsActive || networkSession.SessionType != NetworkSessionType.Local)
             {
-                foreach (Player player in Players)
+                foreach (var gamer in networkSession.LocalGamers)
                 {
-                    player.PlayField.Update();
+                    Player data = (Player)gamer.Tag;
+                    data.PlayField.Update();
                 }
-            }
-
-            // Switch between to stressful music if anyone reaches a certain height, or back if
-            // everyone is below again. Use a delay to avoid changing too often.
-            bool anyStress = Players.Any(p => p.PlayField.GetHeight() >= PlayField.stressHeight);
-            if (anyStress != isStressMusic && --musicChangeTimer <= 0)
-            {
-                music.Dispose();
-                music = (anyStress ? stressMusic : normalMusic).CreateInstance();
-                music.IsLooped = true;
-                music.Play();
-                isStressMusic = anyStress;
-                musicChangeTimer = 20;
             }
         }
 
@@ -164,17 +231,18 @@ namespace Tetatt.Screens
             PlayerIndex playerIndex;
 
             // Check if anyone paused the game
-            if (input.IsNewKeyPress(Keys.Escape, null, out playerIndex) ||
-                input.IsNewButtonPress(Buttons.Back, null, out playerIndex))
+            if (input.IsPauseGame(null, out playerIndex))
             {
-                ScreenManager.AddScreen(new PauseMenuScreen(), playerIndex);
+                ShowPauseScreen(playerIndex);
                 return;
             }
 
             // Check input for each player
-            foreach (Player player in Players)
+            foreach (var gamer in networkSession.LocalGamers)
             {
-                int playerInt = (int)player.Index;
+                Player data = (Player)gamer.Tag;
+                playerIndex = gamer.SignedInGamer.PlayerIndex;
+                int playerInt = (int)playerIndex;
 
                 KeyboardState keyboardState = input.CurrentKeyboardStates[playerInt];
                 GamePadState gamePadState = input.CurrentGamePadStates[playerInt];
@@ -185,19 +253,62 @@ namespace Tetatt.Screens
                 // no gamepad at all!
                 if (!gamePadState.IsConnected && input.GamePadWasConnected[playerInt])
                 {
-                    ScreenManager.AddScreen(new PauseMenuScreen(), player.Index);
+                    ShowPauseScreen(playerIndex);
                     return;
                 }
 
-                PlayerInput? playerInput = input.GetPlayerInput(player.Index);
+                PlayerInput? playerInput = input.GetPlayerInput(playerIndex);
                 if (playerInput.HasValue)
                 {
-                    player.PlayField.Input(playerInput.Value);
+                    data.PlayField.Input(playerInput.Value);
                 }
             }
         }
 
+        /// <summary>
+        /// Exit this screen.
+        /// </summary>
+        public override void ExitScreen()
+        {
+            if (!IsExiting)
+            {
+                networkSession.GamerJoined -= GamerJoined;
+                networkSession.GamerLeft -= GamerLeft;
+                networkSession.GameStarted -= GameStarted;
+                networkSession.GameEnded -= GameEnded;
+            }
+            if (music != null)
+            {
+                music.Dispose();
+            }
+            base.ExitScreen();
+        }
 
+        /// <summary>
+        /// Screen-specific update to gamer rich presence.
+        /// </summary>
+        public override void UpdatePresence()
+        {
+            if (!IsExiting && (networkSession != null))
+            {
+                foreach (LocalNetworkGamer localGamer in networkSession.LocalGamers)
+                {
+                    SignedInGamer signedInGamer = localGamer.SignedInGamer;
+                    if (signedInGamer.IsSignedInToLive)
+                    {
+                        if (networkSession.SessionType == NetworkSessionType.PlayerMatch)
+                        {
+                            signedInGamer.Presence.PresenceMode = GamerPresenceMode.OnlineVersus;
+                        }
+                        else
+                        {
+                            signedInGamer.Presence.PresenceMode = GamerPresenceMode.LocalVersus;
+                        }
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// Draws the gameplay screen.
         /// </summary>
@@ -205,40 +316,75 @@ namespace Tetatt.Screens
         {
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
 
-            foreach (Player player in Players)
+            foreach (var gamer in networkSession.AllGamers)
             {
+                Player data = (Player)gamer.Tag;
+                Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
+
                 spriteBatch.Begin();
 
                 // Draw frame and background
                 spriteBatch.Draw(
                     background,
-                    player.Offset - new Vector2(16, 16), // Adjust for the frame
-                    Color.White);
+                    offset - new Vector2(16, 16), // Adjust for the frame
+                    Color.White * TransitionAlpha);
 
-                // Draw statistics
-                string score = player.PlayField.Score.ToString();
+                // Draw gamertag and picture
                 spriteBatch.DrawString(
                     font,
-                    "Score",
-                    new Vector2(0, -75) + player.Offset,
-                    Color.White);
+                    gamer.Gamertag,
+                    new Vector2(0, -200) + offset,
+                    Color.White * TransitionAlpha);
+                if (data.GamerPicture != null)
+                {
+                    spriteBatch.Draw(
+                        data.GamerPicture,
+                        new Vector2(32, -170) + offset,
+                        Color.White * TransitionAlpha);
+                }
+
+                // Draw the "is muted", "is talking", or "has voice" icon.
+                Vector2 iconPosition = new Vector2(0, -170) + offset;
+                if (gamer.IsMutedByLocalUser)
+                {
+                    spriteBatch.Draw(voiceMutedTexture, iconPosition,
+                                     Color.White * TransitionAlpha);
+                }
+                else if (gamer.IsTalking)
+                {
+                    spriteBatch.Draw(isTalkingTexture, iconPosition,
+                                     Color.White * TransitionAlpha);
+                }
+                else if (gamer.HasVoice)
+                {
+                    spriteBatch.Draw(hasVoiceTexture, iconPosition,
+                                     Color.White * TransitionAlpha);
+                }
+
+                // Draw statistics
+                string score = data.PlayField.Score.ToString();
+                spriteBatch.DrawString(
+                    font,
+                    Resources.Score,
+                    new Vector2(0, -75) + offset,
+                    Color.White * TransitionAlpha);
                 spriteBatch.DrawString(
                     font,
                     score,
-                    new Vector2(200 - font.MeasureString(score).X, -75) + player.Offset,
-                    Color.White);
+                    new Vector2(200 - font.MeasureString(score).X, -75) + offset,
+                    Color.White * TransitionAlpha);
 
-                string time = String.Format("{0}:{1:00}", player.PlayField.Time / 60, player.PlayField.Time % 60);
+                string time = String.Format("{0}:{1:00}", data.PlayField.Time / 60, data.PlayField.Time % 60);
                 spriteBatch.DrawString(
                     font,
-                    "Time",
-                    new Vector2(0, -45) + player.Offset,
-                    Color.White);
+                    Resources.Time,
+                    new Vector2(0, -45) + offset,
+                    Color.White * TransitionAlpha);
                 spriteBatch.DrawString(
                     font,
                     time,
-                    new Vector2(200 - font.MeasureString(time).X, -45) + player.Offset,
-                    Color.White);
+                    new Vector2(200 - font.MeasureString(time).X, -45) + offset,
+                    Color.White * TransitionAlpha);
 
                 spriteBatch.End();
 
@@ -249,18 +395,18 @@ namespace Tetatt.Screens
                         ScissorTestEnable = true
                     });
                 spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
-                    (int)player.Offset.X,
-                    (int)player.Offset.Y,
+                    (int)offset.X,
+                    (int)offset.Y,
                     PlayField.width * blockSize,
                     PlayField.visibleHeight * blockSize);
 
                 // Draw blocks
-                player.PlayField.EachVisibleBlock((row, col, block) =>
+                data.PlayField.EachVisibleBlock((row, col, block) =>
                 {
                     if (block != null)
                     {
                         int tile = block.Tile;
-                        Vector2 pos = PosToVector(new Pos(row, col), player);
+                        Vector2 pos = PosToVector(new Pos(row, col), data) + offset;
                         if(block.IsState(BlockState.Moving))
                             pos.X += (block.Right ? 1 : -1) * blockSize * block.StateDelay / 5;
 
@@ -272,90 +418,70 @@ namespace Tetatt.Screens
                                 blockSize,
                                 blockSize),
                             blocksTileSet.SourceRectangle(tile),
-                            (row == 0 || player.PlayField.State == PlayFieldState.Dead) ? Color.DarkGray : Color.White);
+                            ((row == 0 || data.PlayField.State == PlayFieldState.Dead) ? Color.DarkGray : Color.White) * TransitionAlpha);
                     }
                 });
 
                 spriteBatch.End();
 
                 spriteBatch.Begin();
-                if (player.PlayField.State == PlayFieldState.Play || player.PlayField.State == PlayFieldState.Start)
+                if (data.PlayField.State == PlayFieldState.Play || data.PlayField.State == PlayFieldState.Start)
                 {
                     // Draw marker
                     spriteBatch.Draw(
                         marker,
-                        PosToVector(player.PlayField.markerPos, player) - new Vector2(4, 5),
-                        Color.White);
+                        PosToVector(data.PlayField.markerPos, data) + offset - new Vector2(4, 5),
+                        Color.White * TransitionAlpha);
                 }
+
+                if (data.PlayField.State == PlayFieldState.Start)
+                {
+                    string countdown = ((data.PlayField.StateDelay / 60) + 1).ToString();
+                    Vector2 size = font.MeasureString(countdown);
+                    spriteBatch.DrawString(
+                        font,
+                        countdown,
+                        new Vector2(96, 96) - size / 2 + offset,
+                        Color.White * TransitionAlpha);
+                }
+
                 spriteBatch.End();
             }
 
             base.Draw(gameTime);
 
-            // If the game is transitioning on or off, fade it out to black.
-            if (TransitionPosition > 0 || pauseAlpha > 0)
+            // If the game is covered by pause screen, fade it out to black.
+            if (pauseAlpha > 0)
             {
-                float alpha = MathHelper.Lerp(1f - TransitionAlpha, 1f, pauseAlpha / 2);
-
-                ScreenManager.FadeBackBufferToBlack(alpha);
+                ScreenManager.FadeBackBufferToBlack(pauseAlpha / 2);
             }
         }
 
-        public Vector2 PosToVector(Pos pos, Player player)
+        public Vector2 PosToVector(Pos pos, Player data)
         {
             return new Vector2(
-                pos.Col * blockSize + player.Offset.X,
-                (PlayField.visibleHeight - pos.Row) * blockSize + (int)(player.PlayField.scrollOffset * blockSize) + player.Offset.Y);
+                pos.Col * blockSize,
+                (PlayField.visibleHeight - pos.Row) * blockSize + (int)(data.PlayField.scrollOffset * blockSize));
         }
-
 
         /// <summary>
-        /// Create Player and PlayField and add to Players
+        /// Show message box asking if player wants to exit
         /// </summary>
-        /// <param name="playerIndex">Controller of new player</param>
-        public void CreatePlayer(PlayerIndex playerIndex)
+        public void ShowPauseScreen(PlayerIndex playerIndex)
         {
-            Player player = new Player(playerIndex);
-            player.Offset = Player.Offsets[Players.Count];
-
-            player.PlayField = new PlayField(player.StartLevel);
-            player.PlayField.PerformedCombo += playField_PerformedCombo;
-            player.PlayField.PerformedChain += playField_PerformedChain;
-            player.PlayField.Popped += playField_Popped;
-            player.PlayField.Died += playField_Died;
-
-            Players.Add(player);
-        }
-
-        public void StartGame()
-        {
-            foreach (var p in Players)
-            {
-                p.PlayField.Reset();
-                p.PlayField.Level = p.StartLevel;
-                p.PlayField.Start();
-            }
-            music = normalMusic.CreateInstance();
-            music.IsLooped = true;
-            music.Play();
-            isRunning = true;
-        }
-
-        public void StopGame()
-        {
-            foreach (var p in Players)
-            {
-                p.PlayField.Stop();
-            }
-            music.Stop();
-            isRunning = false;
+            NetworkSessionComponent.LeaveSession(ScreenManager, playerIndex);
         }
         
-        private void playField_PerformedCombo(PlayField sender, Pos pos, bool isChain, int count)
+        /// <summary>
+        /// Called when a playfield performed a combo or a step in a chain 
+        /// </summary>
+        private void PerformedCombo(PlayField sender, Pos pos, bool isChain, int count)
         {
-            Player player = GetPlayer(sender);
+            LocalNetworkGamer gamer = GetPlayer(sender);
+            Player data = (Player)gamer.Tag;
+            Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
             ScreenManager.Game.Components.Add(
-                new EffCombo(ScreenManager, PosToVector(pos, player),
+                new EffCombo(ScreenManager, PosToVector(pos, data) + offset,
                     isChain, count,
                     sender.GetLevelData().effComboDuration));
 
@@ -365,16 +491,19 @@ namespace Tetatt.Screens
             }
         }
 
-        private void playField_PerformedChain(PlayField sender, Chain chain)
+        /// <summary>
+        /// Called when a chain is completed
+        /// </summary>
+        private void PerformedChain(PlayField sender, Chain chain)
         {
-            Player player = GetPlayer(sender);
+            LocalNetworkGamer gamer = GetPlayer(sender);
             foreach (GarbageInfo info in chain.garbage)
             {
-                GetGarbageTarget(player).PlayField.AddGarbage(info.size, info.type);
+                SendGarbage(gamer, info.size, info.type);
             }
             if (chain.length > 1)
             {
-                GetGarbageTarget(player).PlayField.AddGarbage(chain.length - 1, GarbageType.Chain);
+                SendGarbage(gamer, chain.length - 1, GarbageType.Chain);
             }
 
             if (chain.length == 4)
@@ -387,11 +516,17 @@ namespace Tetatt.Screens
             }
         }
 
-        private void playField_Popped(PlayField sender, Pos pos, bool isGarabge, Chain chain)
+        /// <summary>
+        /// Called when a block is popped
+        /// </summary>
+        private void Popped(PlayField sender, Pos pos, bool isGarabge, Chain chain)
         {
-            Player player = GetPlayer(sender);
+            LocalNetworkGamer gamer = GetPlayer(sender);
+            Player data = (Player)gamer.Tag;
+            Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
+
             ScreenManager.Game.Components.Add(
-                new EffPop(ScreenManager, PosToVector(pos, player)));
+                new EffPop(ScreenManager, PosToVector(pos, data) + offset));
 
             SoundEffect effect = popEffect[Math.Min(chain.length, 4) - 1];
             effect.Play(1, chain.popCount / 10.0f, 0);
@@ -402,33 +537,295 @@ namespace Tetatt.Screens
             }
         }
 
-        private void playField_Died(PlayField sender)
+        /// <summary>
+        /// Called when a playfield dies
+        /// </summary>
+        private void Died(PlayField sender)
         {
-            Player player = GetPlayer(sender);
-            var alive = Players.FindAll(p => p.PlayField.State == PlayFieldState.Play);
-            if (alive.Count <= 1)
+            SendPlayerDied(GetPlayer(sender));
+        }
+
+        /// <summary>
+        /// Returns a LocalNetworkGamer corresponding to a playfield, or null if not local.
+        /// </summary>
+        private LocalNetworkGamer GetPlayer(PlayField playField)
+        {
+            foreach (var gamer in networkSession.LocalGamers)
             {
-                StopGame();
-                if (alive.Count == 1)
-                    alive[0].Wins++;
+                Player data = (Player)gamer.Tag;
+                if (data.PlayField == playField)
+                {
+                    return gamer;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Check end of game. Should only be called if we are the host.
+        /// </summary>
+        private void CheckEndOfGame()
+        {
+            NetworkGamer winner = null;
+            int aliveCount = 0;
+            foreach (var gamer in networkSession.AllGamers)
+            {
+                Player data = (Player)gamer.Tag;
+                if (data.PlayField.State != PlayFieldState.Dead)
+                {
+                    winner = gamer;
+                    aliveCount++;
+                }
+            }
+
+            if (aliveCount <= 1)
+            {
+                networkSession.EndGame();
+
+                if (aliveCount == 1)
+                {
+                    Player data = (Player)winner.Tag;
+                    data.Wins++;
+                    SendPlayerData(winner);
+                    data.PlayField.State = PlayFieldState.Dead;
+                }
             }
         }
 
-        private Player GetPlayer(PlayField playField)
+        /// <summary>
+        /// Called when network game is started.
+        /// </summary>
+        private void GameStarted(object sender, GameStartedEventArgs e)
         {
-            return Players.First(p => p.PlayField == playField);
+            // Remove lobby screen
+            foreach (var screen in ScreenManager.GetScreens())
+            {
+                if (screen is LobbyScreen)
+                    screen.ExitScreen();
+            }
+
+            foreach (var gamer in networkSession.AllGamers)
+            {
+                Player data = (Player)gamer.Tag;
+                data.PlayField.Reset();
+                data.PlayField.Level = data.StartLevel;
+                data.PlayField.Start();
+
+                if (!gamer.IsLocal)
+                {
+                    data.PlayField.State = PlayFieldState.Play;
+                }
+            }
+
+            music = normalMusic.CreateInstance();
+            music.IsLooped = true;
+            music.Play();
         }
 
-        private Player GetGarbageTarget(Player player)
+        /// <summary>
+        /// Called when network game ended.
+        /// </summary>
+        private void GameEnded(object sender, GameEndedEventArgs e)
         {
-            int index = Players.IndexOf(player);
-            for (int i = 1; i < Players.Count; i++)
+            foreach (var gamer in networkSession.LocalGamers)
             {
-                var p = Players[(index + i) % Players.Count];
-                if (p.PlayField.State == PlayFieldState.Play)
-                    return p;
+                Player data = (Player)gamer.Tag;
+                data.PlayField.Stop();
+
+                if (!gamer.IsLocal)
+                {
+                    gamer.IsReady = true;
+                }
             }
-            return player; // Should only happen when we are about to win...
+
+            if (music != null)
+            {
+                music.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Called when gamer joined network game.
+        /// </summary>
+        private void GamerJoined(object sender, GamerJoinedEventArgs e)
+        {
+            Player data = new Player();
+            data.PlayField = new PlayField(Player.DefaultLevel);
+            data.PlayField.PerformedCombo += PerformedCombo;
+            data.PlayField.PerformedChain += PerformedChain;
+            data.PlayField.Popped += Popped;
+            data.PlayField.Died += Died;
+
+            e.Gamer.Tag = data;
+
+            e.Gamer.BeginGetProfile(GetProfile, e.Gamer);
+        }
+
+        /// <summary>
+        /// Called when getting a profile asychronously is finished.
+        /// </summary>
+        private void GetProfile(IAsyncResult r)
+        {
+            try
+            {
+                NetworkGamer gamer = (NetworkGamer)r.AsyncState;
+                GamerProfile profile = gamer.EndGetProfile(r);
+                ((Player)gamer.Tag).GamerPicture = Texture2D.FromStream(
+                    ScreenManager.GraphicsDevice, profile.GetGamerPicture());
+            }
+            catch (GamerPrivilegeException)
+            {
+                // Not a Live profile. Can happen if playing against a local profile
+                // over System Link.
+            }
+            catch (InvalidOperationException)
+            {
+                // Not sure what the difference is to GamerPrivilegeException... Seems
+                // to happen when a local gamer is signed in with a local profile.
+            }
+        }
+
+        /// <summary>
+        /// Called when network player left.
+        /// </summary>
+        private void GamerLeft(object sender, GamerLeftEventArgs e)
+        {
+            Player data = (Player)e.Gamer.Tag;
+            data.PlayField.PerformedCombo -= PerformedCombo;
+            data.PlayField.PerformedChain -= PerformedChain;
+            data.PlayField.Popped -= Popped;
+            data.PlayField.Died -= Died;
+        }
+
+        /// <summary>
+        /// Process incoming packets on the local gamer.
+        /// </summary>
+        private void ProcessPackets()
+        {
+            foreach (var receiver in networkSession.LocalGamers)
+            {
+                Player receiverData = (Player)receiver.Tag;
+                while (receiver.IsDataAvailable)
+                {
+                    NetworkGamer sender;
+                    receiver.ReceiveData(packetReader, out sender);
+                    Player senderData = (Player)sender.Tag;
+
+                    PacketTypes packetType = (PacketTypes)packetReader.ReadByte();
+                    switch (packetType)
+                    {
+                        case PacketTypes.PlayerData:
+                            NetworkGamer gamer = networkSession.FindGamerById(packetReader.ReadByte());
+                            Player data = (Player)gamer.Tag;
+                            data.Wins = packetReader.ReadByte();
+                            data.StartLevel = packetReader.ReadByte();
+                            break;
+
+                        case PacketTypes.PlayerDied:
+                            senderData.PlayField.State = PlayFieldState.Dead;
+                            break;
+
+                        case PacketTypes.FieldData:
+                            if (!sender.IsLocal)
+                            {
+                                senderData.PlayField.scrollOffset = ((int)packetReader.ReadByte() - blockSize) / (double)blockSize;
+                                for (int i = 2; i < packetReader.Length; i += 3)
+                                {
+                                    int row = packetReader.ReadByte();
+                                    int col = packetReader.ReadByte();
+                                    int tile = packetReader.ReadByte();
+                                    Block block = (tile != 255) ? new Block(
+                                        BlockType.Blue, BlockState.Idle, null, true, new Anim(tile)) : null;
+                                    senderData.PlayField.field[row, col] = block;
+                                }
+                            }
+                            break;
+
+                        case PacketTypes.Garbage:
+                            int size = packetReader.ReadByte();
+                            GarbageType type = (GarbageType)packetReader.ReadByte();
+                            receiverData.PlayField.AddGarbage(size, type);
+                            break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Send player data to all players
+        /// </summary>
+        /// <param name="player">Player to send</param>
+        public void SendPlayerData(NetworkGamer gamer)
+        {
+            Player data = (Player)gamer.Tag;
+            packetWriter.Write((byte)PacketTypes.PlayerData);
+            packetWriter.Write((byte)gamer.Id);
+            packetWriter.Write((byte)data.Wins);
+            packetWriter.Write((byte)data.StartLevel);
+            networkSession.LocalGamers[0].SendData(
+                packetWriter,
+                SendDataOptions.ReliableInOrder);
+        }
+
+        /// <summary>
+        /// Sends that a player died to all players.
+        /// </summary>
+        /// <param name="player">Player to send</param>
+        public void SendPlayerDied(LocalNetworkGamer gamer)
+        {
+            if (networkSession != null)
+            {
+                packetWriter.Write((byte)PacketTypes.PlayerDied);
+                gamer.SendData(packetWriter, SendDataOptions.ReliableInOrder);
+            }
+        }
+
+        /// <summary>
+        /// Determine target and send garbage to this player, possibly
+        /// over the network.
+        /// </summary>
+        public void SendGarbage(LocalNetworkGamer sender, int size, GarbageType type)
+        {
+            // Determine receiver
+            NetworkGamer receiver = sender;
+            int index = networkSession.AllGamers.IndexOf(sender);
+            for (int i = 1; i < networkSession.AllGamers.Count; i++)
+            {
+                var gamer = networkSession.AllGamers[(index + i) % networkSession.AllGamers.Count];
+                Player data = (Player)gamer.Tag;
+                if (data.PlayField.State == PlayFieldState.Play)
+                    receiver = gamer;
+            }
+
+            // Send packet
+            packetWriter.Write((byte)PacketTypes.Garbage);
+            packetWriter.Write((byte)size);
+            packetWriter.Write((byte)type);
+            sender.SendData(packetWriter, SendDataOptions.ReliableInOrder, receiver);
+        }
+
+        /// <summary>
+        /// Send delta of field state.
+        /// </summary>
+        public void SendFieldData(LocalNetworkGamer gamer)
+        {
+            Player data = (Player)gamer.Tag;
+            packetWriter.Write((byte)PacketTypes.FieldData);
+            packetWriter.Write((byte)(data.PlayField.scrollOffset * blockSize + blockSize));
+
+            data.PlayField.EachVisibleBlock((row, col, block) =>
+                {
+                    int tile = (block != null) ? block.Tile : 255;
+                    if (tile != data.LastFieldState[row, col])
+                    {
+                        packetWriter.Write((byte)row);
+                        packetWriter.Write((byte)col);
+                        packetWriter.Write((byte)tile);
+                        data.LastFieldState[row, col] = tile;
+                    }
+                }
+            );
+            gamer.SendData(packetWriter, SendDataOptions.InOrder);
         }
     }
 }

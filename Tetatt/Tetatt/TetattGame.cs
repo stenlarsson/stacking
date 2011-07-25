@@ -1,6 +1,10 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Tetatt.Screens;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Net;
+using System.Reflection;
+using Tetatt.Networking;
 
 namespace Tetatt
 {
@@ -11,6 +15,32 @@ namespace Tetatt
     {
         GraphicsDeviceManager graphics;
         ScreenManager screenManager;
+
+        // By preloading any assets used by UI rendering, we avoid framerate glitches
+        // when they suddenly need to be loaded in the middle of a menu transition.
+        static readonly string[] preloadAssets =
+        {
+            "blank",
+            "blocks",
+            "cat",
+            "chat_able",
+            "chat_mute",
+            "chat_ready",
+            "chat_talking",
+            "fanfare1",
+            "fanfare2",
+            "gradient",
+            "ingame_font",
+            "marker",
+            "normal_music",
+            "playfield",
+            "pop1",
+            "pop2",
+            "pop3",
+            "pop4",
+            "normal_music",
+            "stress_music",
+        };
 
         public TetattGame()
         {
@@ -24,10 +54,32 @@ namespace Tetatt
             screenManager = new ScreenManager(this);
 
             Components.Add(screenManager);
+            Components.Add(new MessageDisplayComponent(this));
+            Components.Add(new GamerServicesComponent(this));
 
-            // Activate the first screens.
+            // load the initial screens
             screenManager.AddScreen(new BackgroundScreen(), null);
-            screenManager.AddScreen(new MainMenuScreen(), null); 
+            screenManager.AddScreen(new MainMenuScreen(), null);
+
+            // Listen for invite notification events.
+            NetworkSession.InviteAccepted += (sender, e)
+                => NetworkSessionComponent.InviteAccepted(screenManager, e);
+
+            // To test the trial mode behavior while developing your game,
+            // uncomment this line:
+
+            // Guide.SimulateTrialMode = true;
+        }
+
+        /// <summary>
+        /// Loads graphics content.
+        /// </summary>
+        protected override void LoadContent()
+        {
+            foreach (string asset in preloadAssets)
+            {
+                Content.Load<object>(asset);
+            }
         }
 
         /// <summary>
