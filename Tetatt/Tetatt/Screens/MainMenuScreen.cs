@@ -9,6 +9,9 @@
 
 #region Using Statements
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Net;
+using Tetatt.Networking;
+using Microsoft.Xna.Framework.GamerServices;
 using System.Collections.Generic;
 #endregion
 
@@ -26,21 +29,24 @@ namespace Tetatt.Screens
         /// Constructor fills in the menu contents.
         /// </summary>
         public MainMenuScreen()
-            : base("Tetatt")
+            : base(Resources.MainMenu)
         {
             // Create our menu entries.
-            MenuEntry playGameMenuEntry = new MenuEntry("Play Game");
-            MenuEntry optionsMenuEntry = new MenuEntry("Options");
-            MenuEntry exitMenuEntry = new MenuEntry("Exit");
+            MenuEntry localMenuEntry = new MenuEntry(Resources.Local);
+            MenuEntry liveMenuEntry = new MenuEntry(Resources.PlayerMatch);
+            MenuEntry systemLinkMenuEntry = new MenuEntry(Resources.SystemLink);
+            MenuEntry exitMenuEntry = new MenuEntry(Resources.Exit);
 
             // Hook up menu event handlers.
-            playGameMenuEntry.Selected += PlayGameMenuEntrySelected;
-            optionsMenuEntry.Selected += OptionsMenuEntrySelected;
+            localMenuEntry.Selected += LocalMenuEntrySelected;
+            liveMenuEntry.Selected += LiveMenuEntrySelected;
+            systemLinkMenuEntry.Selected += SystemLinkMenuEntrySelected;
             exitMenuEntry.Selected += OnCancel;
 
             // Add entries to the menu.
-            MenuEntries.Add(playGameMenuEntry);
-            MenuEntries.Add(optionsMenuEntry);
+            MenuEntries.Add(localMenuEntry);
+            MenuEntries.Add(liveMenuEntry);
+            MenuEntries.Add(systemLinkMenuEntry);
             MenuEntries.Add(exitMenuEntry);
         }
 
@@ -51,20 +57,52 @@ namespace Tetatt.Screens
 
 
         /// <summary>
-        /// Event handler for when the Play Game menu entry is selected.
+        /// Event handler for when the Local menu entry is selected.
         /// </summary>
-        void PlayGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        void LocalMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            ScreenManager.AddScreen(new GameplayScreen(), e.PlayerIndex);
+            CreateOrFindSession(NetworkSessionType.Local, e.PlayerIndex);
         }
 
 
         /// <summary>
-        /// Event handler for when the Options menu entry is selected.
+        /// Event handler for when the Live menu entry is selected.
         /// </summary>
-        void OptionsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        void LiveMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            ScreenManager.AddScreen(new OptionsMenuScreen(), e.PlayerIndex);
+            CreateOrFindSession(NetworkSessionType.PlayerMatch, e.PlayerIndex);
+        }
+
+
+        /// <summary>
+        /// Event handler for when the System Link menu entry is selected.
+        /// </summary>
+        void SystemLinkMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        {
+            CreateOrFindSession(NetworkSessionType.SystemLink, e.PlayerIndex);
+        }
+
+
+        /// <summary>
+        /// Helper method shared by the Live and System Link menu event handlers.
+        /// </summary>
+        void CreateOrFindSession(NetworkSessionType sessionType,
+                                 PlayerIndex playerIndex)
+        {
+            // First, we need to make sure a suitable gamer profile is signed in.
+            ProfileSignInScreen profileSignIn = new ProfileSignInScreen(sessionType);
+
+            // Hook up an event so once the ProfileSignInScreen is happy,
+            // it will activate the CreateOrFindSessionScreen.
+            profileSignIn.ProfileSignedIn += delegate
+            {
+                GameScreen createOrFind = new CreateOrFindSessionScreen(sessionType);
+
+                ScreenManager.AddScreen(createOrFind, playerIndex);
+            };
+
+            // Activate the ProfileSignInScreen.
+            ScreenManager.AddScreen(profileSignIn, playerIndex);
         }
 
 
@@ -73,9 +111,8 @@ namespace Tetatt.Screens
         /// </summary>
         protected override void OnCancel(PlayerIndex playerIndex)
         {
-            const string message = "Are you sure you want to exit this sample?";
-
-            MessageBoxScreen confirmExitMessageBox = new MessageBoxScreen(message);
+            MessageBoxScreen confirmExitMessageBox =
+                                    new MessageBoxScreen(Resources.ConfirmExitGame);
 
             confirmExitMessageBox.Accepted += ConfirmExitMessageBoxAccepted;
 

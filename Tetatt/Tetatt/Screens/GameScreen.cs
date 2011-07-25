@@ -319,6 +319,10 @@ namespace Tetatt.Screens
         /// </summary>
         public virtual void HandleInput(InputState input) { }
 
+        /// <summary>
+        /// Screen-specific update to gamer rich presence.
+        /// </summary>
+        public virtual void UpdatePresence() { }
 
         /// <summary>
         /// This is called when the screen should draw itself.
@@ -336,7 +340,7 @@ namespace Tetatt.Screens
         /// instantly kills the screen, this method respects the transition timings
         /// and will give the screen a chance to gradually transition off.
         /// </summary>
-        public void ExitScreen()
+        public virtual void ExitScreen()
         {
             if (TransitionOffTime == TimeSpan.Zero)
             {

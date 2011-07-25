@@ -60,9 +60,16 @@ namespace Tetatt.GamePlay
 
         private int swapTimer;
 
-        public PlayFieldState State { get { return state; } }
+        public PlayFieldState State {
+            get { return state; }
+            set { state = value; }
+        }
         private PlayFieldState state;
         private int stateDelay;
+        public int StateDelay
+        {
+            get { return stateDelay; }
+        }
 
         private bool tooHigh;
         private int dieTimer;

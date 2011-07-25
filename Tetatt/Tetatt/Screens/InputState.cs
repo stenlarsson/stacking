@@ -89,19 +89,19 @@ namespace Tetatt.Screens
                 new Dictionary<Keys, PlayerInput>(),
             };
 
-            keyMappings[0].Add(Keys.W, PlayerInput.Up);
-            keyMappings[0].Add(Keys.S, PlayerInput.Down);
-            keyMappings[0].Add(Keys.A, PlayerInput.Left);
-            keyMappings[0].Add(Keys.D, PlayerInput.Right);
-            keyMappings[0].Add(Keys.LeftControl, PlayerInput.Swap);
-            keyMappings[0].Add(Keys.LeftShift, PlayerInput.Raise);
+            keyMappings[0].Add(Keys.Up, PlayerInput.Up);
+            keyMappings[0].Add(Keys.Down, PlayerInput.Down);
+            keyMappings[0].Add(Keys.Left, PlayerInput.Left);
+            keyMappings[0].Add(Keys.Right, PlayerInput.Right);
+            keyMappings[0].Add(Keys.RightControl, PlayerInput.Swap);
+            keyMappings[0].Add(Keys.RightShift, PlayerInput.Raise);
 
-            keyMappings[1].Add(Keys.Up, PlayerInput.Up);
-            keyMappings[1].Add(Keys.Down, PlayerInput.Down);
-            keyMappings[1].Add(Keys.Left, PlayerInput.Left);
-            keyMappings[1].Add(Keys.Right, PlayerInput.Right);
-            keyMappings[1].Add(Keys.RightControl, PlayerInput.Swap);
-            keyMappings[1].Add(Keys.RightShift, PlayerInput.Raise);
+            keyMappings[1].Add(Keys.W, PlayerInput.Up);
+            keyMappings[1].Add(Keys.S, PlayerInput.Down);
+            keyMappings[1].Add(Keys.A, PlayerInput.Left);
+            keyMappings[1].Add(Keys.D, PlayerInput.Right);
+            keyMappings[1].Add(Keys.LeftControl, PlayerInput.Swap);
+            keyMappings[1].Add(Keys.LeftShift, PlayerInput.Raise);
 
             // Note: We don't have any mappings for player three and four
 
@@ -213,10 +213,21 @@ namespace Tetatt.Screens
         public bool IsMenuSelect(PlayerIndex? controllingPlayer,
                                  out PlayerIndex playerIndex)
         {
-            return IsNewKeyPress(Keys.Space, controllingPlayer, out playerIndex) ||
-                   IsNewKeyPress(Keys.Enter, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.A, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
+            if (IsNewKeyPress(Keys.RightControl, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.One;
+                return true;
+            }
+            else if (IsNewKeyPress(Keys.LeftControl, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.Two;
+                return true;
+            }
+            else
+            {
+                return IsNewButtonPress(Buttons.A, controllingPlayer, out playerIndex) ||
+                       IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
+            }
         }
 
 
@@ -238,42 +249,63 @@ namespace Tetatt.Screens
         /// <summary>
         /// Checks for a "menu up" input action.
         /// The controllingPlayer parameter specifies which player to read
-        /// input for. If this is null, it will accept input from any player.
+        /// input for. If this is null, it will accept input from any player. When the action
+        /// is detected, the output playerIndex reports which player pressed it.
         /// </summary>
-        public bool IsMenuUp(PlayerIndex? controllingPlayer)
+        public bool IsMenuUp(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            PlayerIndex playerIndex;
-
-            return IsNewKeyPress(Keys.Up, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.DPadUp, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.LeftThumbstickUp, controllingPlayer, out playerIndex);
+            if (IsNewKeyPress(Keys.Up, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.One;
+                return true;
+            }
+            else if (IsNewKeyPress(Keys.W, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.Two;
+                return true;
+            }
+            else
+            {
+                return IsNewButtonPress(Buttons.DPadUp, controllingPlayer, out playerIndex) ||
+                       IsNewButtonPress(Buttons.LeftThumbstickUp, controllingPlayer, out playerIndex);
+            }
         }
 
 
         /// <summary>
         /// Checks for a "menu down" input action.
         /// The controllingPlayer parameter specifies which player to read
-        /// input for. If this is null, it will accept input from any player.
+        /// input for. If this is null, it will accept input from any player. When the action
+        /// is detected, the output playerIndex reports which player pressed it.
         /// </summary>
-        public bool IsMenuDown(PlayerIndex? controllingPlayer)
+        public bool IsMenuDown(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            PlayerIndex playerIndex;
-
-            return IsNewKeyPress(Keys.Down, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.DPadDown, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.LeftThumbstickDown, controllingPlayer, out playerIndex);
+            if (IsNewKeyPress(Keys.Down, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.One;
+                return true;
+            }
+            else if (IsNewKeyPress(Keys.S, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.Two;
+                return true;
+            }
+            else
+            {
+                return IsNewButtonPress(Buttons.DPadDown, controllingPlayer, out playerIndex) ||
+                       IsNewButtonPress(Buttons.LeftThumbstickDown, controllingPlayer, out playerIndex);
+            }
         }
 
 
         /// <summary>
         /// Checks for a "pause the game" input action.
         /// The controllingPlayer parameter specifies which player to read
-        /// input for. If this is null, it will accept input from any player.
+        /// input for. If this is null, it will accept input from any player. When the action
+        /// is detected, the output playerIndex reports which player pressed it.
         /// </summary>
-        public bool IsPauseGame(PlayerIndex? controllingPlayer)
+        public bool IsPauseGame(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            PlayerIndex playerIndex;
-
             return IsNewKeyPress(Keys.Escape, controllingPlayer, out playerIndex) ||
                    IsNewButtonPress(Buttons.Back, controllingPlayer, out playerIndex) ||
                    IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
@@ -281,7 +313,8 @@ namespace Tetatt.Screens
 
         /// <summary>
         /// Returns the gameplay input for specified player. Handles key repeat and button mappings.
-        /// Must be called exactly once each frame for each player.
+        /// Must be called exactly once each frame for each player. This is separate method because
+        /// we don't want key repeat for the menus.
         /// </summary>
         public PlayerInput? GetPlayerInput(PlayerIndex player)
         {
@@ -293,7 +326,9 @@ namespace Tetatt.Screens
             GamePadState gamePadState = CurrentGamePadStates[playerInt];
 
             // Instead of using LeftThumbstickUp etc we check which axis is largest
-            // to avoid diagonals
+            // to avoid diagonals. We also use a very big dead zone to handle the
+            // stick swinging in the other direction when released, but with this
+            // dead zone diagonals is not really a problem...
             Buttons? thumbstick = null;
             Vector2 left = gamePadState.ThumbSticks.Left;
             if (Math.Abs(left.X) > Math.Abs(left.Y))

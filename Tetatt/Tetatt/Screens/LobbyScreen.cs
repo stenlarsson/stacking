@@ -6,17 +6,24 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Tetatt.GamePlay;
+using Microsoft.Xna.Framework.Net;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Tetatt.Screens
 {
     class LobbyScreen : GameScreen
     {
         private GameplayScreen gameplayScreen;
+        private NetworkSession networkSession;
 
-        public LobbyScreen(GameplayScreen gameplayScreen)
+        public LobbyScreen(GameplayScreen gameplayScreen, NetworkSession networkSession)
         {
-            TransitionOffTime = TimeSpan.Zero;
             this.gameplayScreen = gameplayScreen;
+            this.networkSession = networkSession;
+
+            // set the transition time
+            TransitionOnTime = TimeSpan.FromSeconds(1.0);
+            TransitionOffTime = TimeSpan.Zero;
         }
 
         /// <summary>
@@ -28,47 +35,92 @@ namespace Tetatt.Screens
             if (input == null)
                 throw new ArgumentNullException("input");
 
-            // Check if anyone paused the game
             PlayerIndex playerIndex;
-            if (input.IsNewKeyPress(Keys.Escape, null, out playerIndex) ||
-                input.IsNewButtonPress(Buttons.Back, null, out playerIndex))
+
+            // Check if anyone paused the game
+            if (input.IsPauseGame(null, out playerIndex))
             {
-                ScreenManager.AddScreen(new PauseMenuScreen(), playerIndex);
+                gameplayScreen.ShowPauseScreen(playerIndex);
                 return;
             }
 
-            for (int i = 0; i < InputState.MaxInputs; i++)
+            // Check if anyone wants to start the game
+            if (input.IsMenuSelect(null, out playerIndex))
             {
-                playerIndex = (PlayerIndex)i;
-                PlayerInput? playerInput = input.GetPlayerInput(playerIndex);
-                int listIndex = gameplayScreen.Players.FindIndex(p => p.Index == playerIndex);
-
-                if (listIndex != -1)
+                LocalNetworkGamer gamer = FindGamer(playerIndex);
+                if (gamer == null)
                 {
-                    Player player = gameplayScreen.Players[listIndex];
-
-                    switch(playerInput)
-                    {
-                        case PlayerInput.Swap:
-                            gameplayScreen.StartGame();
-                            ScreenManager.RemoveScreen(this);
-                            break;
-                        case PlayerInput.Up:
-                            player.StartLevel = Math.Min(player.StartLevel + 1, 8);
-                            break;
-                        case PlayerInput.Down:
-                            player.StartLevel = Math.Max(player.StartLevel - 1, 0);
-                            break;
-                    }
+                    AddLocalPlayer(playerIndex);
                 }
                 else
                 {
-                    if (playerInput == PlayerInput.Swap)
-                    {
-                        gameplayScreen.CreatePlayer(playerIndex);
-                    }
+                    gamer.IsReady = !gamer.IsReady;
                 }
             }
+
+            // Check if anyone want to start with a higher level
+            if (input.IsMenuUp(null, out playerIndex))
+            {
+                LocalNetworkGamer gamer = FindGamer(playerIndex);
+                if (gamer != null)
+                {
+                    Player data = (Player)gamer.Tag;
+                    data.StartLevel = (byte)Math.Min(data.StartLevel + 1, 8);
+                    gameplayScreen.SendPlayerData(gamer);
+                }
+            }
+
+            // Check if anyone want to start with a lower level
+            if (input.IsMenuDown(null, out playerIndex))
+            {
+                LocalNetworkGamer gamer = FindGamer(playerIndex);
+                if (gamer != null)
+                {
+                    Player data = (Player)gamer.Tag;
+                    data.StartLevel = (byte)Math.Max(data.StartLevel - 1, 0);
+                    gameplayScreen.SendPlayerData(gamer);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Find gamer by player index
+        /// </summary>
+        private LocalNetworkGamer FindGamer(PlayerIndex playerIndex)
+        {
+            foreach (var gamer in networkSession.LocalGamers)
+            {
+                if (gamer.SignedInGamer.PlayerIndex == playerIndex)
+                {
+                    return gamer;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Add local player to the current game.
+        /// </summary>
+        public void AddLocalPlayer(PlayerIndex playerIndex)
+        {
+            if (networkSession.AllGamers.Count == networkSession.MaxGamers)
+            {
+                // Game full
+                return;
+            }
+
+            // Join network game. Requires signed-in gamer.
+            SignedInGamer gamer;
+            gamer = Gamer.SignedInGamers[playerIndex];
+            if (gamer == null)
+            {
+                // Show only online-profiles if playing over Live
+                Guide.ShowSignIn(4, networkSession.SessionType == NetworkSessionType.PlayerMatch);
+                return;
+            }
+
+            // TODO any exceptions possible?
+            networkSession.AddLocalGamer(gamer);
         }
 
         /// <summary>
@@ -80,39 +132,50 @@ namespace Tetatt.Screens
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
             spriteBatch.Begin();
 
-            foreach (var player in gameplayScreen.Players)
+            foreach (var gamer in networkSession.AllGamers)
             {
-                string wins = player.Wins.ToString();
+                Player data = (Player)gamer.Tag;
+                Vector2 offset = GameplayScreen.Offsets[networkSession.AllGamers.IndexOf(gamer)];
+
+                string wins = data.Wins.ToString();
                 spriteBatch.DrawString(
                     font,
-                    "Wins",
-                    new Vector2(16, 16) + player.Offset,
+                    Resources.Wins,
+                    new Vector2(16, 16) + offset,
                     Color.White);
                 spriteBatch.DrawString(
                     font,
                     wins,
-                    new Vector2(168 - font.MeasureString(wins).X, 16) + player.Offset,
+                    new Vector2(168 - font.MeasureString(wins).X, 16) + offset,
                     Color.White);
-                
-                string level = (player.StartLevel + 1).ToString();
+
+                string level = (data.StartLevel + 1).ToString();
                 spriteBatch.DrawString(
                     font,
-                    "Level",
-                    new Vector2(16, 45) + player.Offset,
+                    Resources.Level,
+                    new Vector2(16, 16 + font.LineSpacing) + offset,
                     Color.White);
                 spriteBatch.DrawString(
                     font,
                     level,
-                    new Vector2(168 - font.MeasureString(level).X, 45) + player.Offset,
+                    new Vector2(168 - font.MeasureString(level).X, 16 + font.LineSpacing) + offset,
+                    Color.White);
+
+                string ready = gamer.IsReady ? Resources.IsReady : Resources.IsNotReady;
+                spriteBatch.DrawString(
+                    font,
+                    ready,
+                    new Vector2(16, 16 + font.LineSpacing * 2) + offset,
                     Color.White);
             }
 
-            for (int i = gameplayScreen.Players.Count; i < 4; i++)
+            for (int i = networkSession.AllGamers.Count; i < 4; i++)
             {
+                Vector2 offset = GameplayScreen.Offsets[i];
                 spriteBatch.DrawString(
                     font,
-                    "Press A\nto join",
-                    new Vector2(16, 16) + Player.Offsets[i],
+                    Resources.JoinInstruction,
+                    new Vector2(16, 16) + offset,
                     Color.White);
             }
             spriteBatch.End();
