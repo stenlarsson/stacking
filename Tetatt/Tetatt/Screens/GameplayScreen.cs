@@ -20,7 +20,11 @@ namespace Tetatt.Screens
     /// </summary>
     class GameplayScreen : GameScreen
     {
-        public const int SendFieldStateDelay = 5;
+        /// <summary>
+        /// Number of frames between sending input to other players.
+        /// This is multiplied by number of players to reduce the bandwidth.
+        /// </summary>
+        public const int SendInputDelay = 5;
 
         public const int blockSize = 32;
 
@@ -163,21 +167,6 @@ namespace Tetatt.Screens
                     CheckEndOfGame();
                 }
 
-                // Send updates of play fields
-                foreach (var gamer in networkSession.LocalGamers)
-                {
-                    Player data = (Player)gamer.Tag;
-                    if (data.SendFieldStateTimer == 0)
-                    {
-                        SendFieldData(gamer);
-                        data.SendFieldStateTimer = SendFieldStateDelay;
-                    }
-                    else
-                    {
-                        data.SendFieldStateTimer--;
-                    }
-                }
-
                 // Switch to stressful music if anyone reaches a certain height, or back if
                 // everyone is below again. Use a delay to avoid changing too often.
                 bool anyStress = false;
@@ -207,13 +196,113 @@ namespace Tetatt.Screens
             else
                 pauseAlpha = Math.Max(pauseAlpha - 1f / 32, 0);
 
+            // Send input
+            foreach (var gamer in networkSession.LocalGamers)
+            {
+                Player data = (Player)gamer.Tag;
+                if (data.SendInputTimer == 0)
+                {
+                    SendInput(gamer);
+                    data.SendInputTimer = SendInputDelay * networkSession.AllGamers.Count;
+                }
+                else
+                {
+                    data.SendInputTimer--;
+                }
+            }
+
             // Update playfields if not paused. Cannot pause in network mode.
             if (IsActive || networkSession.SessionType != NetworkSessionType.Local)
             {
-                foreach (var gamer in networkSession.LocalGamers)
+                UpdatePlayfields();
+            }
+        }
+
+        /// <summary>
+        /// Update all playfields. Remote playfields will only be updated if there is any input.
+        /// </summary>
+        private void UpdatePlayfields()
+        {
+            foreach (var gamer in networkSession.LocalGamers)
+            {
+                Player data = (Player)gamer.Tag;
+
+                if (data.GarbageQueue.Count > 0)
                 {
-                    Player data = (Player)gamer.Tag;
+                    // Inform other players then add everything to the playfield.
+                    SendGarbage(gamer);
+                    foreach (var garbage in data.GarbageQueue)
+                    {
+                        data.PlayField.AddGarbage(garbage.Item2, garbage.Item3);
+                    }
+                    data.GarbageQueue.Clear();
+                }
+
+                // Always update local fields
+                data.PlayField.Update();
+            }
+
+            foreach (var gamer in networkSession.RemoteGamers)
+            {
+                Player data = (Player)gamer.Tag;
+
+                if (data.PlayField.State != PlayFieldState.Play)
+                {
+                    // If not playing we can update freely without desyncing.
+                    // PlayField.Time should not change.
                     data.PlayField.Update();
+                    continue;
+                }
+
+                while (data.GarbageQueue.Count > 0)
+                {
+                    // Check if we should add the garbage this frame
+                    var garbage = data.GarbageQueue.Peek();
+                    if (garbage.Item1 <= data.PlayField.Time)
+                    {
+                        data.PlayField.AddGarbage(garbage.Item2, garbage.Item3);
+                        data.GarbageQueue.Dequeue();
+                    }
+                    else
+                    {
+                        // This (and any other) garbage must later
+                        break;
+                    }
+                }
+
+                // Only update remote fields if we know the input,
+                // otherwise we risk getting out of sync
+                int updates = 0;
+                while (data.InputQueue.Count > 0)
+                {
+                    // Try to catch up if multiple input on queue by running
+                    // two updates
+                    if (updates == 2 || updates == 1 && data.InputQueue.Count <= 1)
+                    {
+                        break;
+                    }
+                    data.PlayField.Update();
+                    updates++;
+
+                    // If the input was made on this particular frame,
+                    // send it to the playfield.
+                    // Note that input happens after Update(), because ScreenManager
+                    // calls Update() before HandleInput().
+                    while (data.InputQueue.Count > 0)
+                    {
+                        var input = data.InputQueue.Peek();
+                        //System.Diagnostics.Debug.Assert(input.Item1 >= data.PlayField.Time);
+                        if (input.Item1 <= data.PlayField.Time)
+                        {
+                            data.PlayField.Input(input.Item2);
+                            data.InputQueue.Dequeue();
+                        }
+                        else
+                        {
+                            // This (and any other) input must later
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -257,10 +346,11 @@ namespace Tetatt.Screens
                     return;
                 }
 
-                PlayerInput? playerInput = input.GetPlayerInput(playerIndex);
-                if (playerInput.HasValue)
+                PlayerInput playerInput = input.GetPlayerInput(playerIndex);
+                if (playerInput != PlayerInput.None)
                 {
-                    data.PlayField.Input(playerInput.Value);
+                    data.PlayField.Input(playerInput);
+                    data.InputQueue.Enqueue(new Tuple<int, PlayerInput>(data.PlayField.Time, playerInput));
                 }
             }
         }
@@ -374,7 +464,7 @@ namespace Tetatt.Screens
                     new Vector2(200 - font.MeasureString(score).X, -75) + offset,
                     Color.White * TransitionAlpha);
 
-                string time = String.Format("{0}:{1:00}", data.PlayField.Time / 60, data.PlayField.Time % 60);
+                string time = String.Format("{0}:{1:00}", data.PlayField.Time / (60 * 60), (data.PlayField.Time / 60) % 60);
                 spriteBatch.DrawString(
                     font,
                     Resources.Time,
@@ -477,7 +567,7 @@ namespace Tetatt.Screens
         /// </summary>
         private void PerformedCombo(PlayField sender, Pos pos, bool isChain, int count)
         {
-            LocalNetworkGamer gamer = GetPlayer(sender);
+            NetworkGamer gamer = GetPlayer(sender);
             Player data = (Player)gamer.Tag;
             Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
             ScreenManager.Game.Components.Add(
@@ -496,14 +586,39 @@ namespace Tetatt.Screens
         /// </summary>
         private void PerformedChain(PlayField sender, Chain chain)
         {
-            LocalNetworkGamer gamer = GetPlayer(sender);
-            foreach (GarbageInfo info in chain.garbage)
+            NetworkGamer gamer = GetPlayer(sender);
+
+            // Determine receiver
+            NetworkGamer receiver = gamer;
+            int index = networkSession.AllGamers.IndexOf(gamer);
+            for (int i = 1; i < networkSession.AllGamers.Count; i++)
             {
-                SendGarbage(gamer, info.size, info.type);
+                receiver = networkSession.AllGamers[(index + i) % networkSession.AllGamers.Count];
+                Player data = (Player)receiver.Tag;
+                if (data.PlayField.State == PlayFieldState.Play)
+                    break;
             }
-            if (chain.length > 1)
+
+            // Only enqueue garbage for local players. For other players we expect
+            // to get this information over the network instead to get the exact
+            // frame to insert it.
+            if (receiver.IsLocal)
             {
-                SendGarbage(gamer, chain.length - 1, GarbageType.Chain);
+                Player data = (Player)receiver.Tag;
+                foreach (GarbageInfo info in chain.garbage)
+                {
+                    data.GarbageQueue.Enqueue(new Tuple<int, int, GarbageType>(
+                        data.PlayField.Time,
+                        info.size,
+                        info.type));
+                }
+                if (chain.length > 1)
+                {
+                    data.GarbageQueue.Enqueue(new Tuple<int, int, GarbageType>(
+                        data.PlayField.Time,
+                        chain.length - 1,
+                        GarbageType.Chain));
+                }
             }
 
             if (chain.length == 4)
@@ -521,7 +636,7 @@ namespace Tetatt.Screens
         /// </summary>
         private void Popped(PlayField sender, Pos pos, bool isGarabge, Chain chain)
         {
-            LocalNetworkGamer gamer = GetPlayer(sender);
+            NetworkGamer gamer = GetPlayer(sender);
             Player data = (Player)gamer.Tag;
             Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
 
@@ -542,15 +657,17 @@ namespace Tetatt.Screens
         /// </summary>
         private void Died(PlayField sender)
         {
-            SendPlayerDied(GetPlayer(sender));
+            // If the play field is simulated properly the host will know
+            // when the remote player died anyway, so we don't need to send it.
+            // TODO we don't need this event any more?
         }
 
         /// <summary>
         /// Returns a LocalNetworkGamer corresponding to a playfield, or null if not local.
         /// </summary>
-        private LocalNetworkGamer GetPlayer(PlayField playField)
+        private NetworkGamer GetPlayer(PlayField playField)
         {
-            foreach (var gamer in networkSession.LocalGamers)
+            foreach (var gamer in networkSession.AllGamers)
             {
                 Player data = (Player)gamer.Tag;
                 if (data.PlayField == playField)
@@ -566,14 +683,14 @@ namespace Tetatt.Screens
         /// </summary>
         private void CheckEndOfGame()
         {
-            NetworkGamer winner = null;
+            // Check number of players alive
             int aliveCount = 0;
             foreach (var gamer in networkSession.AllGamers)
             {
                 Player data = (Player)gamer.Tag;
-                if (data.PlayField.State != PlayFieldState.Dead)
+                if (data.PlayField.State == PlayFieldState.Start ||
+                    data.PlayField.State == PlayFieldState.Play)
                 {
-                    winner = gamer;
                     aliveCount++;
                 }
             }
@@ -581,14 +698,6 @@ namespace Tetatt.Screens
             if (aliveCount <= 1)
             {
                 networkSession.EndGame();
-
-                if (aliveCount == 1)
-                {
-                    Player data = (Player)winner.Tag;
-                    data.Wins++;
-                    SendPlayerData(winner);
-                    data.PlayField.State = PlayFieldState.Dead;
-                }
             }
         }
 
@@ -604,17 +713,23 @@ namespace Tetatt.Screens
                     screen.ExitScreen();
             }
 
-            foreach (var gamer in networkSession.AllGamers)
+            foreach (var gamer in networkSession.LocalGamers)
+            {
+                Player data = (Player)gamer.Tag;
+                int seed = unchecked((int)DateTime.Now.Ticks);
+                SendStartPlayfield(gamer, seed);
+                data.PlayField.Reset();
+                data.PlayField.Level = data.StartLevel;
+                data.PlayField.Start(seed);
+                data.InputQueue.Clear();
+                data.GarbageQueue.Clear();
+            }
+
+            foreach (var gamer in networkSession.RemoteGamers)
             {
                 Player data = (Player)gamer.Tag;
                 data.PlayField.Reset();
-                data.PlayField.Level = data.StartLevel;
-                data.PlayField.Start();
-
-                if (!gamer.IsLocal)
-                {
-                    data.PlayField.State = PlayFieldState.Play;
-                }
+                data.PlayField.State = PlayFieldState.Start;
             }
 
             music = normalMusic.CreateInstance();
@@ -627,14 +742,27 @@ namespace Tetatt.Screens
         /// </summary>
         private void GameEnded(object sender, GameEndedEventArgs e)
         {
+            if (networkSession.IsHost)
+            {
+                // Find winner
+                foreach (var gamer in networkSession.AllGamers)
+                {
+                    Player data = (Player)gamer.Tag;
+                    if (data.PlayField.State == PlayFieldState.Play)
+                    {
+                        data.Wins++;
+                        SendPlayerData(gamer);
+                    }
+                }
+            }
+
             foreach (var gamer in networkSession.LocalGamers)
             {
                 Player data = (Player)gamer.Tag;
-                data.PlayField.Stop();
-
-                if (!gamer.IsLocal)
+                if (data.PlayField.State == PlayFieldState.Play)
                 {
-                    gamer.IsReady = true;
+                    data.PlayField.Stop();
+                    SendStopPlayfield(gamer);
                 }
             }
 
@@ -704,16 +832,31 @@ namespace Tetatt.Screens
         {
             foreach (var receiver in networkSession.LocalGamers)
             {
-                Player receiverData = (Player)receiver.Tag;
                 while (receiver.IsDataAvailable)
                 {
                     NetworkGamer sender;
                     receiver.ReceiveData(packetReader, out sender);
                     Player senderData = (Player)sender.Tag;
 
+                    if (sender.IsLocal)
+                    {
+                        continue;
+                    }
+
                     PacketTypes packetType = (PacketTypes)packetReader.ReadByte();
                     switch (packetType)
                     {
+                        case PacketTypes.StartPlayfield:
+                            senderData.PlayField.Level = senderData.StartLevel;
+                            senderData.PlayField.Start(packetReader.ReadInt32());
+                            senderData.InputQueue.Clear();
+                            senderData.GarbageQueue.Clear();
+                            break;
+
+                        case PacketTypes.StopPlayfield:
+                            senderData.PlayField.Stop();
+                            break;
+
                         case PacketTypes.PlayerData:
                             NetworkGamer gamer = networkSession.FindGamerById(packetReader.ReadByte());
                             Player data = (Player)gamer.Tag;
@@ -721,30 +864,23 @@ namespace Tetatt.Screens
                             data.StartLevel = packetReader.ReadByte();
                             break;
 
-                        case PacketTypes.PlayerDied:
-                            senderData.PlayField.State = PlayFieldState.Dead;
-                            break;
-
-                        case PacketTypes.FieldData:
-                            if (!sender.IsLocal)
+                        case PacketTypes.PlayerInput:
+                            while (packetReader.Position < packetReader.Length)
                             {
-                                senderData.PlayField.scrollOffset = ((int)packetReader.ReadByte() - blockSize) / (double)blockSize;
-                                for (int i = 2; i < packetReader.Length; i += 3)
-                                {
-                                    int row = packetReader.ReadByte();
-                                    int col = packetReader.ReadByte();
-                                    int tile = packetReader.ReadByte();
-                                    Block block = (tile != 255) ? new Block(
-                                        BlockType.Blue, BlockState.Idle, null, true, new Anim(tile)) : null;
-                                    senderData.PlayField.field[row, col] = block;
-                                }
+                                senderData.InputQueue.Enqueue(new Tuple<int, PlayerInput>(
+                                    packetReader.ReadInt32(),
+                                    (PlayerInput)packetReader.ReadByte()));
                             }
                             break;
 
                         case PacketTypes.Garbage:
-                            int size = packetReader.ReadByte();
-                            GarbageType type = (GarbageType)packetReader.ReadByte();
-                            receiverData.PlayField.AddGarbage(size, type);
+                            while (packetReader.Position < packetReader.Length)
+                            {
+                                senderData.GarbageQueue.Enqueue(new Tuple<int, int, GarbageType>(
+                                    packetReader.ReadInt32(),
+                                    packetReader.ReadByte(),
+                                    (GarbageType)packetReader.ReadByte()));
+                            }
                             break;
                     }
                 }
@@ -752,9 +888,27 @@ namespace Tetatt.Screens
         }
 
         /// <summary>
+        /// Send random seed used to start
+        /// </summary>
+        public void SendStartPlayfield(LocalNetworkGamer gamer, int seed)
+        {
+            Player data = (Player)gamer.Tag;
+            packetWriter.Write((byte)PacketTypes.StartPlayfield);
+            packetWriter.Write((int)seed);
+        }
+
+        /// <summary>
+        /// Send stop playfield
+        /// </summary>
+        public void SendStopPlayfield(LocalNetworkGamer gamer)
+        {
+            Player data = (Player)gamer.Tag;
+            packetWriter.Write((byte)PacketTypes.StopPlayfield);
+        }
+
+        /// <summary>
         /// Send player data to all players
         /// </summary>
-        /// <param name="player">Player to send</param>
         public void SendPlayerData(NetworkGamer gamer)
         {
             Player data = (Player)gamer.Tag;
@@ -768,64 +922,54 @@ namespace Tetatt.Screens
         }
 
         /// <summary>
-        /// Sends that a player died to all players.
+        /// Send recent input.
         /// </summary>
-        /// <param name="player">Player to send</param>
-        public void SendPlayerDied(LocalNetworkGamer gamer)
+        public void SendInput(LocalNetworkGamer gamer)
         {
-            if (networkSession != null)
+            Player data = (Player)gamer.Tag;
+            packetWriter.Write((byte)PacketTypes.PlayerInput);
+            SendDataOptions options;
+
+            if (data.InputQueue.Count == 0)
             {
-                packetWriter.Write((byte)PacketTypes.PlayerDied);
-                gamer.SendData(packetWriter, SendDataOptions.ReliableInOrder);
+                // Nothing has happened recently. Send dummy input
+                // to not keep others waiting.
+                packetWriter.Write((int)data.PlayField.Time);
+                packetWriter.Write((byte)PlayerInput.None);
+                // This doesn't need to be sent reliably, but must be in order.
+                options = SendDataOptions.InOrder;
             }
+            else
+            {
+                foreach (var input in data.InputQueue)
+                {
+                    packetWriter.Write((int)input.Item1);
+                    packetWriter.Write((byte)input.Item2);
+                }
+                data.InputQueue.Clear();
+                // Real input needs to be sent reliably to avoid desyncing.
+                options = SendDataOptions.ReliableInOrder;
+            }
+            gamer.SendData(packetWriter, options);
         }
 
         /// <summary>
         /// Determine target and send garbage to this player, possibly
         /// over the network.
         /// </summary>
-        public void SendGarbage(LocalNetworkGamer sender, int size, GarbageType type)
-        {
-            // Determine receiver
-            NetworkGamer receiver = sender;
-            int index = networkSession.AllGamers.IndexOf(sender);
-            for (int i = 1; i < networkSession.AllGamers.Count; i++)
-            {
-                var gamer = networkSession.AllGamers[(index + i) % networkSession.AllGamers.Count];
-                Player data = (Player)gamer.Tag;
-                if (data.PlayField.State == PlayFieldState.Play)
-                    receiver = gamer;
-            }
-
-            // Send packet
-            packetWriter.Write((byte)PacketTypes.Garbage);
-            packetWriter.Write((byte)size);
-            packetWriter.Write((byte)type);
-            sender.SendData(packetWriter, SendDataOptions.ReliableInOrder, receiver);
-        }
-
-        /// <summary>
-        /// Send delta of field state.
-        /// </summary>
-        public void SendFieldData(LocalNetworkGamer gamer)
+        public void SendGarbage(LocalNetworkGamer gamer)
         {
             Player data = (Player)gamer.Tag;
-            packetWriter.Write((byte)PacketTypes.FieldData);
-            packetWriter.Write((byte)(data.PlayField.scrollOffset * blockSize + blockSize));
 
-            data.PlayField.EachVisibleBlock((row, col, block) =>
-                {
-                    int tile = (block != null) ? block.Tile : 255;
-                    if (tile != data.LastFieldState[row, col])
-                    {
-                        packetWriter.Write((byte)row);
-                        packetWriter.Write((byte)col);
-                        packetWriter.Write((byte)tile);
-                        data.LastFieldState[row, col] = tile;
-                    }
-                }
-            );
-            gamer.SendData(packetWriter, SendDataOptions.InOrder);
+            packetWriter.Write((byte)PacketTypes.Garbage);
+            foreach (var garbage in data.GarbageQueue)
+            {
+                packetWriter.Write((int)garbage.Item1);
+                packetWriter.Write((byte)garbage.Item2);
+                packetWriter.Write((byte)garbage.Item3);
+            }
+            // Send reliably to avoid desyncing.
+            gamer.SendData(packetWriter, SendDataOptions.ReliableInOrder);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Tetatt.GamePlay
 {
     public enum PlayerInput
     {
+        None,
         Left,
         Right,
         Up,
