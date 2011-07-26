@@ -49,6 +49,10 @@ namespace Microsoft.Xna.Framework.Net
             get { throw new NotImplementedException(); }
         }
 
+        public GamerCollection<NetworkGamer> RemoteGamers
+        {
+            get { throw new NotImplementedException(); }
+        }
 
         public GamerCollection<LocalNetworkGamer> LocalGamers
         {
