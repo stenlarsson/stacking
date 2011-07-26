@@ -12,9 +12,16 @@ namespace Tetatt.GamePlay
             BlockType.Cyan,
         };
 
-        private readonly static Random random = new Random();
+        private Random random;
+        private int kindCount;
 
-        public static BlockType Next(double grayBlockChance = 0.0, int kindCount = 5)
+        public RandomBlocks(int seed, int kindCount)
+        {
+            random = new Random(seed);
+            this.kindCount = kindCount;
+        }
+
+        public BlockType Next(double grayBlockChance)
         {
             if (grayBlockChance > 0.0 && random.NextDouble() < grayBlockChance)
             {

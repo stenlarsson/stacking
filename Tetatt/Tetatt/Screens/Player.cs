@@ -9,26 +9,63 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Tetatt.Screens
 {
+    /// <summary>
+    /// The data associated with a player in a multiplayer game.
+    /// It is stored in the NetworkGamer.Tag property.
+    /// </summary>
     class Player
     {
-        public static byte DefaultLevel = 4;
+        /// <summary>
+        /// Default starting level (range 0-8)
+        /// </summary>
+        public const int DefaultLevel = 4;
 
+        /// <summary>
+        /// Number of won games
+        /// </summary>
         public int Wins;
+        /// <summary>
+        /// Chosen starting level (range 0-8)
+        /// </summary>
         public int StartLevel;
+        /// <summary>
+        /// Playfield for this player
+        /// </summary>
         public PlayField PlayField;
+        /// <summary>
+        /// GamerPicture of this player, or null.
+        /// </summary>
         public Texture2D GamerPicture;
 
-        public int[,] LastFieldState;
-        public int SendFieldStateTimer;
+        /// <summary>
+        /// Number of frames until input should be broadcasted for this player.
+        /// </summary>
+        public int SendInputTimer;
+        /// <summary>
+        /// The input for this player on certain frames. For local players this
+        /// is the input to send, and for remote players it is the input to
+        /// process. Tuples with (frame, input).
+        /// </summary>
+        public Queue<Tuple<int, PlayerInput>> InputQueue;
+        /// <summary>
+        /// The garbage received by this player on certain frames. This is used
+        /// for both local and remote players. Tuples with (frame, size, type).
+        /// </summary>
+        public Queue<Tuple<int, int, GarbageType>> GarbageQueue;
 
+        /// <summary>
+        /// Create new data with default values.
+        /// </summary>
         public Player()
         {
             Wins = 0;
             StartLevel = DefaultLevel;
             PlayField = null;
+            GamerPicture = null;
 
-            LastFieldState = new int[PlayField.visibleHeight + 1, PlayField.width];
-            SendFieldStateTimer = 0;
+            SendInputTimer = 0;
+            InputQueue = new Queue<Tuple<int, PlayerInput>>();
+            GarbageQueue = new Queue<Tuple<int, int, GarbageType>>();
         }
     }
 }

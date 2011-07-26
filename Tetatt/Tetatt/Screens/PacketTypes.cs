@@ -11,9 +11,10 @@ namespace Tetatt.Screens
     /// <remarks>Frequently used in packets to identify their type.</remarks>
     public enum PacketTypes
     {
+        StartPlayfield,
+        StopPlayfield,
         PlayerData,
-        PlayerDied,
-        FieldData,
+        PlayerInput,
         Garbage,
     }
 }

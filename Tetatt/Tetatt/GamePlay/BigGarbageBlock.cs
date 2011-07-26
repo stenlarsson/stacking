@@ -29,7 +29,7 @@ namespace Tetatt.GamePlay
 	    public const int graphicsBottom = tileBlue + tileBottomOffset;
 	    public const int graphicsEvil   = tileGray;
 
-        public BigGarbageBlock(int num, GarbageType type)
+        public BigGarbageBlock(int num, GarbageType type, RandomBlocks randomBlocks)
         {
             blocks = new List<GarbageBlock>();
             numFalling = 0;
@@ -41,7 +41,7 @@ namespace Tetatt.GamePlay
             int blockCount = (type == GarbageType.Combo) ? num : lineCount * PlayField.width;
             for (int i = 0; i < blockCount; i++)
             {
-                blocks.Add(new GarbageBlock(type, RandomBlocks.Next(), this));
+                blocks.Add(new GarbageBlock(type, randomBlocks.Next(0.0), this));
             }
         }
 

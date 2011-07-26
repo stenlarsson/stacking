@@ -316,7 +316,7 @@ namespace Tetatt.Screens
         /// Must be called exactly once each frame for each player. This is separate method because
         /// we don't want key repeat for the menus.
         /// </summary>
-        public PlayerInput? GetPlayerInput(PlayerIndex player)
+        public PlayerInput GetPlayerInput(PlayerIndex player)
         {
             // TODO fix so that this method can be called more than once each frame
 
@@ -405,7 +405,7 @@ namespace Tetatt.Screens
                 }
             }
 
-            return null;
+            return PlayerInput.None;
         }
 
     }

@@ -85,6 +85,8 @@ namespace Tetatt.GamePlay
 
         private bool gotStopBonus = false;
 
+        private RandomBlocks randomBlocks;
+
         public int Level
         {
             get
@@ -106,7 +108,7 @@ namespace Tetatt.GamePlay
             }
         }
 
-        public int Time { get { return timeTicks / 60; } }
+        public int Time { get { return timeTicks; } }
 
         public PlayField(int startLevel)
         {
@@ -153,6 +155,7 @@ namespace Tetatt.GamePlay
             }
 
             gh.Reset();
+            state = PlayFieldState.Init;
         }
 
         public void DelayScroll(int delay)
@@ -175,7 +178,7 @@ namespace Tetatt.GamePlay
                 field[row,col] = null;
                 while (field[row,col] == null)
                 {
-                    BlockType type = RandomBlocks.Next(
+                    BlockType type = randomBlocks.Next(
                         (!grayBlock && scrolledRows > grayBlockDelay) ? grayBlockChance : 0.0);
                     // make sure block won't pop immediately
 
@@ -194,8 +197,9 @@ namespace Tetatt.GamePlay
             }
         }
 
-        public void Start()
+        public void Start(int seed)
         {
+            randomBlocks = new RandomBlocks(seed, levelData[Level].numBlockTypes);
             state = PlayFieldState.Start;
             stateDelay = 150;
             RandomizeField();
@@ -863,7 +867,7 @@ namespace Tetatt.GamePlay
 
         public void AddGarbage(int num, GarbageType type)
         {
-            gh.AddGarbage(num, type);
+            gh.AddGarbage(num, type, randomBlocks);
         }
 
         private void popper_ChainStep(Popper sender, Chain chain)
