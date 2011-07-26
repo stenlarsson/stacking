@@ -1,7 +1,9 @@
 using System;
+using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
+using Microsoft.Xna.Framework;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -55,6 +57,11 @@ namespace Microsoft.Xna.Framework.Graphics
             // mipmaps automatically. In that case, use TextureMinFilter.LinearMipmapLinear to enable them.
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+        }
+
+        public static Texture2D FromStream(GraphicsDevice device, Stream stream)
+        {
+            throw new NotImplementedException();
         }
     }
 }
