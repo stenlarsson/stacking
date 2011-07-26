@@ -21,5 +21,10 @@ namespace Microsoft.Xna.Framework
         {
             return services[type];
         }
+
+        public void RemoveService(Type type)
+        {
+            services.Remove(type);
+        }
     }
 }

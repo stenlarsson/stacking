@@ -6,6 +6,12 @@ namespace Microsoft.Xna.Framework
     {
         public float X, Y;
 
+        public Vector2(float v)
+        {
+            X = v;
+            Y = v;
+        }
+
         public Vector2(float x, float y)
         {
             X = x;
@@ -27,6 +33,7 @@ namespace Microsoft.Xna.Framework
             return new Vector2(a.X / b, a.Y / b);
         }
 
-        public static Vector2 Zero = new Vector2(0, 0);
+        public static Vector2 Zero { get { return new Vector2(0); } }
+        public static Vector2 One { get { return new Vector2(1); } }
     }
 }

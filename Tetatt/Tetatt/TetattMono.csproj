@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -48,10 +48,6 @@
     <ConsolePause>false</ConsolePause>
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
-  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="GameThumbnail.png" />
@@ -72,7 +68,6 @@
     <Compile Include="Screens\MenuScreen.cs" />
     <Compile Include="Screens\MessageBoxScreen.cs" />
     <Compile Include="Screens\OptionsMenuScreen.cs" />
-    <Compile Include="Screens\PauseMenuScreen.cs" />
     <Compile Include="Screens\Player.cs" />
     <Compile Include="Screens\PlayerIndexEventArgs.cs" />
     <Compile Include="Screens\ScreenManager.cs" />
@@ -167,12 +162,56 @@
     <Compile Include="Xna\GameComponent.cs" />
     <Compile Include="Xna\GameTime.cs" />
     <Compile Include="Xna\GameComponentCollectionEventArgs.cs" />
+    <Compile Include="Screens\PacketTypes.cs" />
+    <Compile Include="Networking\AvailableSessionMenuEntry.cs" />
+    <Compile Include="Networking\CreateOrFindSessionScreen.cs" />
+    <Compile Include="Networking\JoinSessionScreen.cs" />
+    <Compile Include="Networking\NetworkBusyScreen.cs" />
+    <Compile Include="Networking\NetworkErrorScreen.cs" />
+    <Compile Include="Networking\NetworkSessionComponent.cs" />
+    <Compile Include="Networking\OperationCompletedEventArgs.cs" />
+    <Compile Include="Networking\ProfileSignInScreen.cs" />
+    <Compile Include="Xna\Net\AvailableNetworkSession.cs" />
+    <Compile Include="Xna\Net\AvailableNetworkSessionCollection.cs" />
+    <Compile Include="Xna\Net\GameEndedEventArgs.cs" />
+    <Compile Include="Xna\Net\GamerJoinedEventArgs.cs" />
+    <Compile Include="Xna\Net\GamerLeftEventArgs.cs" />
+    <Compile Include="Xna\Net\GameStartedEventArgs.cs" />
+    <Compile Include="Xna\Net\InviteAcceptedEventArgs.cs" />
+    <Compile Include="Xna\Net\LocalNetworkGamer.cs" />
+    <Compile Include="Xna\Net\NetworkGamer.cs" />
+    <Compile Include="Xna\Net\NetworkSession.cs" />
+    <Compile Include="Xna\Net\NetworkSessionEndedEventArgs.cs" />
+    <Compile Include="Xna\Net\NetworkSessionType.cs" />
+    <Compile Include="Xna\Net\PacketReader.cs" />
+    <Compile Include="Xna\Net\PacketWriter.cs" />
+    <Compile Include="IMessageDisplay.cs" />
+    <Compile Include="MessageDisplayComponent.cs" />
+    <Compile Include="Xna\Net\NetworkSessionState.cs" />
+    <Compile Include="Resources.Designer.cs" />
+    <Compile Include="Xna\Net\SendDataOptions.cs" />
+    <Compile Include="Xna\Net\QualityOfService.cs" />
+    <Compile Include="Xna\Net\NetworkSessionProperties.cs" />
+    <Compile Include="Xna\Net\NetworkException.cs" />
+    <Compile Include="Xna\Net\NetworkSessionJoinError.cs" />
+    <Compile Include="Xna\Net\NetworkSessionEndReason.cs" />
+    <Compile Include="Xna\GamerServices\Gamer.cs" />
+    <Compile Include="Xna\GamerServices\SignedInGamer.cs" />
+    <Compile Include="Xna\GamerServices\GamerCollection.cs" />
+    <Compile Include="Xna\GamerServices\SignedInGamerCollection.cs" />
+    <Compile Include="Xna\GamerServices\GamerPrivileges.cs" />
+    <Compile Include="Xna\GamerServices\GamerPrivilegeException.cs" />
+    <Compile Include="Xna\GamerServices\GamerProfile.cs" />
+    <Compile Include="Xna\GamerServices\GamerPresenceMode.cs" />
+    <Compile Include="Xna\GamerServices\GamerPresence.cs" />
+    <Compile Include="Xna\GamerServices\Guide.cs" />
+    <Compile Include="Xna\GamerServices\GamerServicesComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.XML" />
+    <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -202,6 +241,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources.resx" />
+  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
@@ -212,4 +254,8 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <Folder Include="Xna\GamerServices\" />
+    <Folder Include="Xna\" />
+  </ItemGroup>
 </Project>
