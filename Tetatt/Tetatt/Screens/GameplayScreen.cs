@@ -246,7 +246,8 @@ namespace Tetatt.Screens
             {
                 Player data = (Player)gamer.Tag;
 
-                if (data.PlayField.State != PlayFieldState.Play)
+                if (data.PlayField.State != PlayFieldState.Start &&
+                    data.PlayField.State != PlayFieldState.Play)
                 {
                     // If not playing we can update freely without desyncing.
                     // PlayField.Time should not change.
@@ -254,30 +255,30 @@ namespace Tetatt.Screens
                     continue;
                 }
 
-                while (data.GarbageQueue.Count > 0)
-                {
-                    // Check if we should add the garbage this frame
-                    var garbage = data.GarbageQueue.Peek();
-                    if (garbage.Item1 <= data.PlayField.Time)
-                    {
-                        data.PlayField.AddGarbage(garbage.Item2, garbage.Item3);
-                        data.GarbageQueue.Dequeue();
-                    }
-                    else
-                    {
-                        // This (and any other) garbage must later
-                        break;
-                    }
-                }
-
                 // Only update remote fields if we know the input,
                 // otherwise we risk getting out of sync
                 int updates = 0;
                 while (data.InputQueue.Count > 0)
                 {
+                    while (data.GarbageQueue.Count > 0)
+                    {
+                        // Check if we should add the garbage this frame
+                        var garbage = data.GarbageQueue.Peek();
+                        if (garbage.Item1 <= data.PlayField.Time)
+                        {
+                            data.PlayField.AddGarbage(garbage.Item2, garbage.Item3);
+                            data.GarbageQueue.Dequeue();
+                        }
+                        else
+                        {
+                            // This (and any other) garbage must later
+                            break;
+                        }
+                    }
+
                     // Try to catch up if multiple input on queue by running
                     // two updates
-                    if (updates == 2 || updates == 1 && data.InputQueue.Count <= 1)
+                    if (updates == 2 || updates == 1 && data.InputQueue.Count <= 2)
                     {
                         break;
                     }
@@ -688,8 +689,7 @@ namespace Tetatt.Screens
             foreach (var gamer in networkSession.AllGamers)
             {
                 Player data = (Player)gamer.Tag;
-                if (data.PlayField.State == PlayFieldState.Start ||
-                    data.PlayField.State == PlayFieldState.Play)
+                if (data.PlayField.State != PlayFieldState.Dead)
                 {
                     aliveCount++;
                 }
@@ -729,7 +729,6 @@ namespace Tetatt.Screens
             {
                 Player data = (Player)gamer.Tag;
                 data.PlayField.Reset();
-                data.PlayField.State = PlayFieldState.Start;
             }
 
             music = normalMusic.CreateInstance();
@@ -779,6 +778,7 @@ namespace Tetatt.Screens
         {
             Player data = new Player();
             data.PlayField = new PlayField(Player.DefaultLevel);
+            data.PlayField.State = PlayFieldState.Dead;
             data.PlayField.PerformedCombo += PerformedCombo;
             data.PlayField.PerformedChain += PerformedChain;
             data.PlayField.Popped += Popped;
@@ -867,19 +867,24 @@ namespace Tetatt.Screens
                         case PacketTypes.PlayerInput:
                             while (packetReader.Position < packetReader.Length)
                             {
+                                int time = packetReader.ReadInt32();
+                                PlayerInput input = (PlayerInput)packetReader.ReadByte();
                                 senderData.InputQueue.Enqueue(new Tuple<int, PlayerInput>(
-                                    packetReader.ReadInt32(),
-                                    (PlayerInput)packetReader.ReadByte()));
+                                    time,
+                                    input));
                             }
                             break;
 
                         case PacketTypes.Garbage:
                             while (packetReader.Position < packetReader.Length)
                             {
+                                int time = packetReader.ReadInt32();
+                                int size = packetReader.ReadByte();
+                                GarbageType type = (GarbageType)packetReader.ReadByte();
                                 senderData.GarbageQueue.Enqueue(new Tuple<int, int, GarbageType>(
-                                    packetReader.ReadInt32(),
-                                    packetReader.ReadByte(),
-                                    (GarbageType)packetReader.ReadByte()));
+                                    time,
+                                    size,
+                                    type));
                             }
                             break;
                     }
@@ -934,7 +939,7 @@ namespace Tetatt.Screens
             {
                 // Nothing has happened recently. Send dummy input
                 // to not keep others waiting.
-                packetWriter.Write((int)data.PlayField.Time);
+                packetWriter.Write((int)(data.PlayField.Time - 1));
                 packetWriter.Write((byte)PlayerInput.None);
                 // This doesn't need to be sent reliably, but must be in order.
                 options = SendDataOptions.InOrder;
