@@ -139,7 +139,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             float x = position.X - scale * origin.X;
             float y = position.Y - scale * origin.Y;
-            foreach (char c in text)
+            foreach (char c in spriteFont.PrepareString(text))
             {
                 if (c == '\n')
                 {
