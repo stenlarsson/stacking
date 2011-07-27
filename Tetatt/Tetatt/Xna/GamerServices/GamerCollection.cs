@@ -4,13 +4,13 @@ using System.Collections.ObjectModel;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
+    // TODO: Sort out the generics mess...
     public class GamerCollection<T>
         : ReadOnlyCollection<T>, IEnumerable<T/* Gamer in documentation */>, System.Collections.IEnumerable
             where T : Gamer
     {
-        public GamerCollection() : base(null)
+        internal GamerCollection(IList<T> list) : base(list)
         {
-            throw new NotImplementedException();
         }
 
         public struct GamerCollectionEnumerator

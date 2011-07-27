@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.GamerServices
     {
         public static bool IsTrialMode
         {
-            get { return false; }
+            get { return true; }
         }
 
         public static bool IsVisible
@@ -19,10 +19,9 @@ namespace Microsoft.Xna.Framework.GamerServices
             throw new NotSupportedException();
         }
 
-        public static void ShowSignIn(
-            int paneCount, bool onlineOnly)
+        public static void ShowSignIn(int paneCount, bool onlineOnly)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }

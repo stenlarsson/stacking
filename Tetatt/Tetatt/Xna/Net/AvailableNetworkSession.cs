@@ -4,23 +4,35 @@ namespace Microsoft.Xna.Framework.Net
 {
 	public class AvailableNetworkSession
 	{
+        internal AvailableNetworkSession(
+            int currentGamerCount,
+            int openPublicGamerSlots,
+            string hostGamertag,
+            QualityOfService qos)
+        {
+            CurrentGamerCount = currentGamerCount;
+            OpenPublicGamerSlots = openPublicGamerSlots;
+            HostGamertag = hostGamertag;
+            QualityOfService = qos;
+        }
+
         public int CurrentGamerCount
         {
-            get { throw new NotImplementedException(); }
+            get; private set;
         }
         public int OpenPublicGamerSlots
         {
-            get { throw new NotImplementedException(); }
+            get; private set;
         }
 
         public string HostGamertag
         {
-            get { throw new NotImplementedException(); }
+            get; private set;
         }
 
         public QualityOfService QualityOfService
         {
-            get { throw new NotImplementedException(); }
+            get; private set;
         }
 	}
 }

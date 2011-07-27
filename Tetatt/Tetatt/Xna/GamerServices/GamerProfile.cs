@@ -5,9 +5,19 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
     public class GamerProfile
     {
-        public Stream GetGamerPicture ()
+        private Gamer gamer;
+
+        internal GamerProfile(Gamer gamer)
         {
-            throw new NotImplementedException();
+            this.gamer = gamer;
+        }
+
+        public Stream GetGamerPicture()
+        {
+            if (gamer.picture == null)
+                return null;
+
+            return new FileStream(gamer.picture, FileMode.Open, FileAccess.Read);
         }
     }
 }
