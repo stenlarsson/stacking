@@ -1,4 +1,8 @@
 using System;
+using System.Drawing;
+using System.ComponentModel;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
@@ -6,7 +10,7 @@ namespace Microsoft.Xna.Framework.GamerServices
     {
         public static bool IsTrialMode
         {
-            get { return true; }
+            get { return false; }
         }
 
         public static bool IsVisible
@@ -16,12 +20,11 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         public static void ShowMarketplace(PlayerIndex id)
         {
-            throw new NotSupportedException();
         }
 
         public static void ShowSignIn(int paneCount, bool onlineOnly)
         {
-            throw new NotSupportedException();
+            // TODO: Implement...
         }
     }
 }

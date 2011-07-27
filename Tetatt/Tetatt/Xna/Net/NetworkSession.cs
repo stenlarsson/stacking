@@ -16,16 +16,12 @@ namespace Microsoft.Xna.Framework.Net
         public event EventHandler<GameEndedEventArgs> GameEnded;
         public event EventHandler<NetworkSessionEndedEventArgs> SessionEnded;
 
-
         public NetworkSession (
             IEnumerable<SignedInGamer> localGamers,
             int maxGamers)
         {
             SessionState = NetworkSessionState.Lobby;
             MaxGamers = maxGamers;
-            foreach (var gamer in localGamers) {
-                AddLocalGamer(gamer);
-            }
         }
 
         public bool AllowHostMigration
@@ -74,6 +70,7 @@ namespace Microsoft.Xna.Framework.Net
         }
 
         IList<LocalNetworkGamer> localGamers = new List<LocalNetworkGamer>();
+        IList<LocalNetworkGamer> waitingLocalGamers = new List<LocalNetworkGamer>();
         public GamerCollection<LocalNetworkGamer> LocalGamers
         {
             get { return new GamerCollection<LocalNetworkGamer>(localGamers); }
@@ -103,12 +100,10 @@ namespace Microsoft.Xna.Framework.Net
 
         public void AddLocalGamer(SignedInGamer gamer)
         {
-            if (allGamers.Count == MaxGamers)
+            if (allGamers.Count + waitingLocalGamers.Count == MaxGamers)
                 throw new InvalidOperationException();
 
-            var local = new LocalNetworkGamer(gamer.Gamertag, (byte)localGamers.Count);
-            localGamers.Add(local);
-            allGamers.Add(local);
+            waitingLocalGamers.Add(new LocalNetworkGamer(gamer.Gamertag, (byte)gamer.PlayerIndex));
         }
 
 
@@ -135,12 +130,14 @@ namespace Microsoft.Xna.Framework.Net
 
             nopDelegate = new NopDelegate(Nop);
             NetworkSession session = new NetworkSession(localGamers, maxGamers);
-            return new NopDelegate(Nop).BeginInvoke(session, callback, asyncState);
+            return nopDelegate.BeginInvoke(session, callback, asyncState);
         }
 
         public static NetworkSession EndCreate(IAsyncResult result)
         {
-            return nopDelegate.EndInvoke(result);
+            NetworkSession session = nopDelegate.EndInvoke(result);
+            nopDelegate = null;
+            return session;
         }
 
         public static IAsyncResult BeginFind(
@@ -190,7 +187,15 @@ namespace Microsoft.Xna.Framework.Net
 
         public void Update()
         {
-            foreach (var sender in LocalGamers)
+            foreach (var gamer in waitingLocalGamers)
+            {
+                localGamers.Add(gamer);
+                allGamers.Add(gamer);
+                GamerJoined.Invoke(this, new GamerJoinedEventArgs(gamer));
+            }
+            waitingLocalGamers.Clear();
+
+            foreach (var sender in localGamers)
             {
                 while (sender.outgoing.Count > 0)
                 {

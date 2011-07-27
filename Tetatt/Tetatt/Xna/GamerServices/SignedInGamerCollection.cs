@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.GamerServices
@@ -11,7 +12,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         public SignedInGamer this [ PlayerIndex id ]
         {
-            get { return this[(int)id]; }
+            get {
+                return this.FirstOrDefault((gamer) => gamer.PlayerIndex == id);
+            }
         }
     }
 }

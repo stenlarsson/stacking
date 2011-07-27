@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Net
 
         public SignedInGamer SignedInGamer
         {
-            get { return new SignedInGamer(Gamertag); }
+            get { return new SignedInGamer(Gamertag, (PlayerIndex)Id); }
         }
 
         public bool IsDataAvailable

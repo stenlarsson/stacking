@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {
@@ -27,9 +28,20 @@ namespace Microsoft.Xna.Framework.GamerServices
             return new GamerProfile(this);
         }
 
+        internal static IList<SignedInGamer> signedInGamers = new List<SignedInGamer>();
         public static SignedInGamerCollection SignedInGamers
         {
-            get { throw new NotImplementedException(); }
+            get {
+                if (signedInGamers.Count == 0)
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        PlayerIndex index = (PlayerIndex)i;
+                        signedInGamers.Add(new SignedInGamer("Player " + index, index));
+                    }
+                }
+                return new SignedInGamerCollection(signedInGamers);
+            }
         }
     }
 }
