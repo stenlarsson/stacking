@@ -4,14 +4,15 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
     public class SignedInGamer : Gamer
     {
-        internal SignedInGamer(string gamertag) : base(gamertag)
+        internal SignedInGamer(string gamertag, PlayerIndex index) : base(gamertag)
         {
             Presence = new GamerPresence();
+            PlayerIndex = index;
         }
 
         public PlayerIndex PlayerIndex
         {
-            get { throw new NotImplementedException(); }
+            get; internal set;
         }
 
         public bool IsSignedInToLive
