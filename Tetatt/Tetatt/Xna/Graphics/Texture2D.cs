@@ -18,18 +18,12 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return new Rectangle(0, 0, Width, Height); }
         }
 
-        internal Texture2D(string filename, System.Drawing.Color? transparent = null)
+        internal Texture2D(GraphicsDevice device, Bitmap bmp)
         {
-            if (String.IsNullOrEmpty(filename))
-                throw new ArgumentException(filename);
+            // TODO: Support more than one graphics device...
 
             id = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, id);
-
-            Bitmap bmp = new Bitmap(filename);
-
-            if (transparent.HasValue)
-                bmp.MakeTransparent(transparent.Value);
 
             BitmapData bmp_data = bmp.LockBits(
                 new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height),
@@ -59,9 +53,22 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
         }
 
+        internal static Texture2D FromPath(string filename, System.Drawing.Color? transparent = null)
+        {
+            if (String.IsNullOrEmpty(filename))
+                throw new ArgumentException(filename);
+
+            Bitmap bmp = new Bitmap(filename);
+
+            if (transparent.HasValue)
+                bmp.MakeTransparent(transparent.Value);
+
+            return new Texture2D(null, bmp);
+        }
+
         public static Texture2D FromStream(GraphicsDevice device, Stream stream)
         {
-            throw new NotImplementedException();
+            return new Texture2D(device, new Bitmap(stream));
         }
     }
 }

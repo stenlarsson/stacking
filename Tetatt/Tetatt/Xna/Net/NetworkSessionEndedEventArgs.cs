@@ -4,9 +4,14 @@ namespace Microsoft.Xna.Framework.Net
 {
 	public class NetworkSessionEndedEventArgs : EventArgs
 	{
+        internal NetworkSessionEndedEventArgs(NetworkSessionEndReason reason)
+        {
+            EndReason = reason;
+        }
+
         public NetworkSessionEndReason EndReason
         {
-            get { throw new NotImplementedException(); }
+            get; private set;
         }
 	}
 }

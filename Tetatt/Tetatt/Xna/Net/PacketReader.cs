@@ -9,14 +9,23 @@ namespace Microsoft.Xna.Framework.Net
         {
         }
 
+        internal void Set(byte[] data)
+        {
+            BaseStream.Position = 0;
+            BaseStream.Write(data, 0, data.Length);
+            BaseStream.Position = 0;
+            BaseStream.SetLength(data.LongLength);
+        }
+
         public int Position
         {
-            get { throw new NotImplementedException(); }
+            get { return (int)BaseStream.Position; }
+            set { BaseStream.Position = value; }
         }
 
         public int Length
         {
-            get { throw new NotImplementedException(); }
+            get { return (int)BaseStream.Length; }
         }
 	}
 }

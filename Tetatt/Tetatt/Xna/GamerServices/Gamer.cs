@@ -4,23 +4,28 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
     public class Gamer
     {
+        internal string picture;
+
+        internal Gamer(string gamertag)
+        {
+            Gamertag = gamertag;
+        }
+
         public object Tag { get; set; }
         public string Gamertag
         {
-            get { throw new NotImplementedException(); }
+            get; private set;
         }
 
-        public IAsyncResult BeginGetProfile(
-            AsyncCallback callback, Object asyncState)
+        public IAsyncResult BeginGetProfile(AsyncCallback callback, Object asyncState)
         {
-            throw new InvalidOperationException();
+            return null;
         }
 
         public GamerProfile EndGetProfile(IAsyncResult result)
         {
-            throw new InvalidOperationException();
+            return new GamerProfile(this);
         }
-
 
         public static SignedInGamerCollection SignedInGamers
         {

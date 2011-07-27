@@ -104,7 +104,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.End();
         }
 
-        public void Draw (
+        public void Draw(
             Texture2D texture,
             Vector2 position,
             Rectangle? sourceRectangle,
@@ -115,7 +115,8 @@ namespace Microsoft.Xna.Framework.Graphics
             SpriteEffects effects,
             float layerDepth)
         {
-            throw new NotImplementedException();
+            // TODO: Implement properly
+            Draw(texture, position, sourceRectangle, color);
         }
 
         public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)

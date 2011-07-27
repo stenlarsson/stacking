@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.GamerServices
     {
         public bool AllowOnlineSessions
         {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
     }
 }

@@ -4,9 +4,9 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
     public class SignedInGamer : Gamer
     {
-        internal SignedInGamer(Gamer org)
+        internal SignedInGamer(string gamertag) : base(gamertag)
         {
-            throw new NotImplementedException();
+            Presence = new GamerPresence();
         }
 
         public PlayerIndex PlayerIndex
@@ -16,22 +16,22 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         public bool IsSignedInToLive
         {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
 
         public GamerPresence Presence
         {
-            get { throw new NotImplementedException(); }
+            get; private set;
         }
 
         public bool IsGuest
         {
-            get { throw new NotImplementedException(); }
+            get { return true; }
         }
 
         public GamerPrivileges Privileges
         {
-            get { throw new NotImplementedException(); }
+            get { return new GamerPrivileges(); }
         }
     }
 }
