@@ -33,7 +33,7 @@ namespace Tetatt.Graphics
             this.spriteBatch = screenManager.SpriteBatch;
             this.pos = pos;
             duration = 9*3+1;
-            offset = GameplayScreen.blockSize / 2;
+            offset = DrawablePlayField.BlockSize / 2;
             mov = 3;
             anim = new Anim(AnimType.Once, frames);
         }
@@ -61,24 +61,24 @@ namespace Tetatt.Graphics
         {
             spriteBatch.Begin();
             spriteBatch.Draw(
-                GameplayScreen.blocksTileSet.Texture,
+                DrawablePlayField.blocksTileSet.Texture,
                 pos + new Vector2(-offset, -offset),
-                GameplayScreen.blocksTileSet.SourceRectangle(anim.GetFrame()),
+                DrawablePlayField.blocksTileSet.SourceRectangle(anim.GetFrame()),
                 Color.White);
             spriteBatch.Draw(
-                GameplayScreen.blocksTileSet.Texture,
+                DrawablePlayField.blocksTileSet.Texture,
                 pos + new Vector2(offset, -offset),
-                GameplayScreen.blocksTileSet.SourceRectangle(anim.GetFrame()),
+                DrawablePlayField.blocksTileSet.SourceRectangle(anim.GetFrame()),
                 Color.White);
             spriteBatch.Draw(
-                GameplayScreen.blocksTileSet.Texture,
+                DrawablePlayField.blocksTileSet.Texture,
                 pos + new Vector2(-offset, offset),
-                GameplayScreen.blocksTileSet.SourceRectangle(anim.GetFrame()),
+                DrawablePlayField.blocksTileSet.SourceRectangle(anim.GetFrame()),
                 Color.White);
             spriteBatch.Draw(
-                GameplayScreen.blocksTileSet.Texture,
+                DrawablePlayField.blocksTileSet.Texture,
                 pos + new Vector2(offset, offset),
-                GameplayScreen.blocksTileSet.SourceRectangle(anim.GetFrame()),
+                DrawablePlayField.blocksTileSet.SourceRectangle(anim.GetFrame()),
                 Color.White);
             spriteBatch.End();
 

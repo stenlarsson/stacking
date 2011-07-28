@@ -614,8 +614,7 @@ namespace Tetatt.GamePlay
                             }
 
                             if (row <= visibleHeight)
-                                Popped(
-                                    this,
+                                ActivatePopped(
                                     new Pos(row, col),
                                     IsGarbage(field[row,col]),
                                     field[row,col].Chain);
@@ -915,7 +914,7 @@ namespace Tetatt.GamePlay
             return levelData[Level];
         }
 
-        public void ActivatePerformedCombo(int pos, bool isChain, int count)
+        public virtual void ActivatePerformedCombo(int pos, bool isChain, int count)
         {
             PerformedCombo(this, new Pos(pos / width, pos % width), isChain, count);
         }
@@ -925,6 +924,10 @@ namespace Tetatt.GamePlay
         public delegate void PerformedChainHandler(PlayField player, Chain chain);
         public event PerformedChainHandler PerformedChain;
 
+        public virtual void ActivatePopped(Pos pos, bool isGarbage, Chain chain)
+        {
+            Popped(this, pos, isGarbage, chain);
+        }
         public delegate void PoppedHandler(PlayField player, Pos pos, bool isGarabge, Chain chain);
         public event PoppedHandler Popped;
 

@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Tetatt.GamePlay;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Graphics;
+using Tetatt.Graphics;
 
 namespace Tetatt.Screens
 {
@@ -31,7 +32,7 @@ namespace Tetatt.Screens
         /// <summary>
         /// Playfield for this player
         /// </summary>
-        public PlayField PlayField;
+        public DrawablePlayField PlayField;
         /// <summary>
         /// GamerPicture of this player, or null.
         /// </summary>
