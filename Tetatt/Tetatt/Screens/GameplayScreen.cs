@@ -26,8 +26,6 @@ namespace Tetatt.Screens
         /// </summary>
         public const int SendInputDelay = 5;
 
-        public const int blockSize = 32;
-
         public static Vector2[] Offsets = new Vector2[] {
             new Vector2(96, 248),
             new Vector2(384, 248),
@@ -36,10 +34,6 @@ namespace Tetatt.Screens
         };
 
         // TODO accessor
-        public static TileSet blocksTileSet;
-        public static Texture2D background;
-        public static Texture2D marker;
-        public static SpriteFont font;
         Texture2D hasVoiceTexture;
         Texture2D isTalkingTexture;
         Texture2D voiceMutedTexture;
@@ -97,12 +91,12 @@ namespace Tetatt.Screens
             ContentManager content = ScreenManager.Game.Content;
 
             // Load graphics
-            background = content.Load<Texture2D>("playfield");
-            marker = content.Load<Texture2D>("marker");
-            blocksTileSet = new TileSet(
-                content.Load<Texture2D>("blocks"), blockSize);
-            font = content.Load<SpriteFont>("ingame_font");
-            font.Spacing = -5;
+            DrawablePlayField.background = content.Load<Texture2D>("playfield");
+            DrawablePlayField.marker = content.Load<Texture2D>("marker");
+            DrawablePlayField.blocksTileSet = new TileSet(
+                content.Load<Texture2D>("blocks"), DrawablePlayField.BlockSize);
+            DrawablePlayField.font = content.Load<SpriteFont>("ingame_font");
+            DrawablePlayField.font.Spacing = -5;
 
             hasVoiceTexture = content.Load<Texture2D>("chat_able");
             isTalkingTexture = content.Load<Texture2D>("chat_talking");
@@ -195,6 +189,14 @@ namespace Tetatt.Screens
                 pauseAlpha = Math.Min(pauseAlpha + 1f / 32, 1);
             else
                 pauseAlpha = Math.Max(pauseAlpha - 1f / 32, 0);
+
+            // Update positions of all PlayFields
+            foreach (var gamer in networkSession.AllGamers)
+            {
+                Player data = (Player)gamer.Tag;
+                Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
+                data.PlayField.Offset = Vector2.Lerp(data.PlayField.Offset, offset, 0.1f);
+            }
 
             // Send input
             foreach (var gamer in networkSession.LocalGamers)
@@ -410,32 +412,28 @@ namespace Tetatt.Screens
             foreach (var gamer in networkSession.AllGamers)
             {
                 Player data = (Player)gamer.Tag;
-                Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
+                SpriteFont font = ScreenManager.Font;
+
+                data.PlayField.Draw(ScreenManager, gameTime, TransitionAlpha);
 
                 spriteBatch.Begin();
-
-                // Draw frame and background
-                spriteBatch.Draw(
-                    background,
-                    offset - new Vector2(16, 16), // Adjust for the frame
-                    Color.White * TransitionAlpha);
 
                 // Draw gamertag and picture
                 spriteBatch.DrawString(
                     font,
                     gamer.Gamertag,
-                    new Vector2(0, -200) + offset,
+                    new Vector2(0, -200) + data.PlayField.Offset,
                     Color.White * TransitionAlpha);
                 if (data.GamerPicture != null)
                 {
                     spriteBatch.Draw(
                         data.GamerPicture,
-                        new Vector2(32, -170) + offset,
+                        new Vector2(32, -170) + data.PlayField.Offset,
                         Color.White * TransitionAlpha);
                 }
 
                 // Draw the "is muted", "is talking", or "has voice" icon.
-                Vector2 iconPosition = new Vector2(0, -170) + offset;
+                Vector2 iconPosition = new Vector2(0, -170) + data.PlayField.Offset;
                 if (gamer.IsMutedByLocalUser)
                 {
                     spriteBatch.Draw(voiceMutedTexture, iconPosition,
@@ -452,90 +450,6 @@ namespace Tetatt.Screens
                                      Color.White * TransitionAlpha);
                 }
 
-                // Draw statistics
-                string score = data.PlayField.Score.ToString();
-                spriteBatch.DrawString(
-                    font,
-                    Resources.Score,
-                    new Vector2(0, -75) + offset,
-                    Color.White * TransitionAlpha);
-                spriteBatch.DrawString(
-                    font,
-                    score,
-                    new Vector2(200 - font.MeasureString(score).X, -75) + offset,
-                    Color.White * TransitionAlpha);
-
-                string time = String.Format("{0}:{1:00}", data.PlayField.Time / (60 * 60), (data.PlayField.Time / 60) % 60);
-                spriteBatch.DrawString(
-                    font,
-                    Resources.Time,
-                    new Vector2(0, -45) + offset,
-                    Color.White * TransitionAlpha);
-                spriteBatch.DrawString(
-                    font,
-                    time,
-                    new Vector2(200 - font.MeasureString(time).X, -45) + offset,
-                    Color.White * TransitionAlpha);
-
-                spriteBatch.End();
-
-                // Setup sprite clipping using scissor test
-                spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null,
-                    new RasterizerState()
-                    {
-                        ScissorTestEnable = true
-                    });
-                spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle(
-                    (int)offset.X,
-                    (int)offset.Y,
-                    PlayField.width * blockSize,
-                    PlayField.visibleHeight * blockSize);
-
-                // Draw blocks
-                data.PlayField.EachVisibleBlock((row, col, block) =>
-                {
-                    if (block != null)
-                    {
-                        int tile = block.Tile;
-                        Vector2 pos = PosToVector(new Pos(row, col), data) + offset;
-                        if(block.IsState(BlockState.Moving))
-                            pos.X += (block.Right ? 1 : -1) * blockSize * block.StateDelay / 5;
-
-                        spriteBatch.Draw(
-                            blocksTileSet.Texture,
-                            new Rectangle(
-                                (int)pos.X,
-                                (int)pos.Y,
-                                blockSize,
-                                blockSize),
-                            blocksTileSet.SourceRectangle(tile),
-                            ((row == 0 || data.PlayField.State == PlayFieldState.Dead) ? Color.DarkGray : Color.White) * TransitionAlpha);
-                    }
-                });
-
-                spriteBatch.End();
-
-                spriteBatch.Begin();
-                if (data.PlayField.State == PlayFieldState.Play || data.PlayField.State == PlayFieldState.Start)
-                {
-                    // Draw marker
-                    spriteBatch.Draw(
-                        marker,
-                        PosToVector(data.PlayField.markerPos, data) + offset - new Vector2(4, 5),
-                        Color.White * TransitionAlpha);
-                }
-
-                if (data.PlayField.State == PlayFieldState.Start)
-                {
-                    string countdown = ((data.PlayField.StateDelay / 60) + 1).ToString();
-                    Vector2 size = font.MeasureString(countdown);
-                    spriteBatch.DrawString(
-                        font,
-                        countdown,
-                        new Vector2(96, 96) - size / 2 + offset,
-                        Color.White * TransitionAlpha);
-                }
-
                 spriteBatch.End();
             }
 
@@ -546,13 +460,6 @@ namespace Tetatt.Screens
             {
                 ScreenManager.FadeBackBufferToBlack(pauseAlpha / 2);
             }
-        }
-
-        public Vector2 PosToVector(Pos pos, Player data)
-        {
-            return new Vector2(
-                pos.Col * blockSize,
-                (PlayField.visibleHeight - pos.Row) * blockSize + (int)(data.PlayField.scrollOffset * blockSize));
         }
 
         /// <summary>
@@ -568,14 +475,6 @@ namespace Tetatt.Screens
         /// </summary>
         private void PerformedCombo(PlayField sender, Pos pos, bool isChain, int count)
         {
-            NetworkGamer gamer = GetPlayer(sender);
-            Player data = (Player)gamer.Tag;
-            Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
-            ScreenManager.Game.Components.Add(
-                new EffCombo(ScreenManager, PosToVector(pos, data) + offset,
-                    isChain, count,
-                    sender.GetLevelData().effComboDuration));
-
             if (isChain)
             {
                 chainEffect.Play();
@@ -637,13 +536,6 @@ namespace Tetatt.Screens
         /// </summary>
         private void Popped(PlayField sender, Pos pos, bool isGarabge, Chain chain)
         {
-            NetworkGamer gamer = GetPlayer(sender);
-            Player data = (Player)gamer.Tag;
-            Vector2 offset = Offsets[networkSession.AllGamers.IndexOf(gamer)];
-
-            ScreenManager.Game.Components.Add(
-                new EffPop(ScreenManager, PosToVector(pos, data) + offset));
-
             SoundEffect effect = popEffect[Math.Min(chain.length, 4) - 1];
             effect.Play(1, chain.popCount / 10.0f, 0);
 
@@ -777,12 +669,13 @@ namespace Tetatt.Screens
         private void GamerJoined(object sender, GamerJoinedEventArgs e)
         {
             Player data = new Player();
-            data.PlayField = new PlayField(Player.DefaultLevel);
+            data.PlayField = new DrawablePlayField(Player.DefaultLevel);
             data.PlayField.State = PlayFieldState.Dead;
             data.PlayField.PerformedCombo += PerformedCombo;
             data.PlayField.PerformedChain += PerformedChain;
             data.PlayField.Popped += Popped;
             data.PlayField.Died += Died;
+            data.PlayField.Offset = Offsets[3]; // It will transition to the correct location
 
             e.Gamer.Tag = data;
 

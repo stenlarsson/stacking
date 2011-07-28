@@ -42,24 +42,24 @@ namespace Tetatt.Graphics
         {
             spriteBatch.Begin();
             spriteBatch.Draw(
-                GameplayScreen.blocksTileSet.Texture,
+                DrawablePlayField.blocksTileSet.Texture,
                 pos,
-                GameplayScreen.blocksTileSet.SourceRectangle(tile),
+                DrawablePlayField.blocksTileSet.SourceRectangle(tile),
                 Color.White);
             spriteBatch.End();
 
             spriteBatch.Begin();
-            float r = radius + GameplayScreen.blockSize;
+            float r = radius + DrawablePlayField.BlockSize;
             int t = Math.Abs(duration - 80);
             for (int i = 0; i < 6; i++)
             {
                 float theta = (t + 60 * i) * (MathHelper.Pi / 180) * 7;
                 spriteBatch.Draw(
-                    GameplayScreen.blocksTileSet.Texture,
+                    DrawablePlayField.blocksTileSet.Texture,
                     new Vector2(
                         (r * (float)Math.Cos(theta) + pos.X),
                         (r * (float)Math.Sin(theta) + pos.Y)),
-                    GameplayScreen.blocksTileSet.SourceRectangle(91),
+                    DrawablePlayField.blocksTileSet.SourceRectangle(91),
                     Color.White);
             }
             spriteBatch.End();
