@@ -486,6 +486,15 @@ namespace Tetatt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Versus AI.
+        /// </summary>
+        internal static string VersusAI {
+            get {
+                return ResourceManager.GetString("VersusAI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wins.
         /// </summary>
         internal static string Wins {

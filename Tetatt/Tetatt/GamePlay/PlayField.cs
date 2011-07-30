@@ -116,7 +116,7 @@ namespace Tetatt.GamePlay
             fieldHeight = new int[width];
             popper = new Popper();
             popper.ChainStep += popper_ChainStep;
-            popper.ChainFinish += (_, chain) => PerformedChain(this, chain);
+            popper.ChainFinish += (_, chain) => ActivatePerformedChain(chain);
             Level = startLevel;
 
             gh = new GarbageHandler();
@@ -318,7 +318,7 @@ namespace Tetatt.GamePlay
             if (state == PlayFieldState.Die)
             {
                 state = PlayFieldState.Dead;
-                Died(this);
+                ActivateDied();
             }
         }
 
@@ -916,21 +916,41 @@ namespace Tetatt.GamePlay
 
         public virtual void ActivatePerformedCombo(int pos, bool isChain, int count)
         {
-            PerformedCombo(this, new Pos(pos / width, pos % width), isChain, count);
+            if (Popped != null)
+            {
+                PerformedCombo(this, new Pos(pos / width, pos % width), isChain, count);
+            }
         }
         public delegate void PerformedComboHandler(PlayField player, Pos pos, bool isChain, int count);
         public event PerformedComboHandler PerformedCombo;
 
+        public virtual void ActivatePerformedChain(Chain chain)
+        {
+            if (PerformedChain != null)
+            {
+                PerformedChain(this, chain);
+            }
+        }
         public delegate void PerformedChainHandler(PlayField player, Chain chain);
         public event PerformedChainHandler PerformedChain;
 
         public virtual void ActivatePopped(Pos pos, bool isGarbage, Chain chain)
         {
-            Popped(this, pos, isGarbage, chain);
+            if (Popped != null)
+            {
+                Popped(this, pos, isGarbage, chain);
+            }
         }
         public delegate void PoppedHandler(PlayField player, Pos pos, bool isGarabge, Chain chain);
         public event PoppedHandler Popped;
 
+        public virtual void ActivateDied()
+        {
+            if (Died != null)
+            {
+                Died(this);
+            }
+        }
         public delegate void DiedHandler(PlayField player);
         public event DiedHandler Died;
     }

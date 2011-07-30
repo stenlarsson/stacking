@@ -266,6 +266,9 @@ B button = cancel</value>
   <data name="Time" xml:space="preserve">
     <value>Time</value>
   </data>
+  <data name="VersusAI" xml:space="preserve">
+    <value>Versus AI</value>
+  </data>
   <data name="Wins" xml:space="preserve">
     <value>Wins</value>
   </data>
