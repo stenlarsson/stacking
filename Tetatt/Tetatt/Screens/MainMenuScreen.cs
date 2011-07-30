@@ -32,18 +32,21 @@ namespace Tetatt.Screens
             : base(Resources.MainMenu)
         {
             // Create our menu entries.
+            MenuEntry versusAIMenuEntry = new MenuEntry(Resources.VersusAI);
             MenuEntry localMenuEntry = new MenuEntry(Resources.Local);
             MenuEntry liveMenuEntry = new MenuEntry(Resources.PlayerMatch);
             MenuEntry systemLinkMenuEntry = new MenuEntry(Resources.SystemLink);
             MenuEntry exitMenuEntry = new MenuEntry(Resources.Exit);
 
             // Hook up menu event handlers.
+            versusAIMenuEntry.Selected += VersusAIMenuEntrySelected;
             localMenuEntry.Selected += LocalMenuEntrySelected;
             liveMenuEntry.Selected += LiveMenuEntrySelected;
             systemLinkMenuEntry.Selected += SystemLinkMenuEntrySelected;
             exitMenuEntry.Selected += OnCancel;
 
             // Add entries to the menu.
+            MenuEntries.Add(versusAIMenuEntry);
             MenuEntries.Add(localMenuEntry);
             MenuEntries.Add(liveMenuEntry);
             MenuEntries.Add(systemLinkMenuEntry);
@@ -54,6 +57,15 @@ namespace Tetatt.Screens
         #endregion
 
         #region Handle Input
+
+
+        /// <summary>
+        /// Event handler for when the Versus AI menu entry is selected.
+        /// </summary>
+        void VersusAIMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        {
+            ScreenManager.AddScreen(new VersusAIScreen(), e.PlayerIndex);
+        }
 
 
         /// <summary>
