@@ -37,7 +37,9 @@ namespace Tetatt.Screens
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
             playerPlayField = new DrawablePlayField(Player.DefaultLevel);
+            playerPlayField.PerformedChain += PerformedChain;
             aiPlayField = new DrawablePlayField(Player.DefaultLevel);
+            aiPlayField.PerformedChain += PerformedChain;
 
             aiPlayer = new AIPlayer(aiPlayField);
 
