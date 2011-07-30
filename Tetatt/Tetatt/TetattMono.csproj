@@ -206,6 +206,7 @@
     <Compile Include="Xna\GamerServices\GamerPresence.cs" />
     <Compile Include="Xna\GamerServices\Guide.cs" />
     <Compile Include="Xna\GamerServices\GamerServicesComponent.cs" />
+    <Compile Include="Graphics\DrawablePlayField.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
