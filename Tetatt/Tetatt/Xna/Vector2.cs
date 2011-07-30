@@ -18,6 +18,11 @@ namespace Microsoft.Xna.Framework
             Y = y;
         }
 
+        public static Vector2 Lerp(Vector2 value1, Vector2 value2, float amount)
+        {
+            return value1 + (value2 - value1) * amount;
+        }
+
         public static Vector2 operator+(Vector2 a, Vector2 b)
         {
             return new Vector2(a.X + b.X, a.Y + b.Y);
@@ -26,6 +31,11 @@ namespace Microsoft.Xna.Framework
         public static Vector2 operator-(Vector2 a, Vector2 b)
         {
             return new Vector2(a.X - b.X, a.Y - b.Y);
+        }
+
+        public static Vector2 operator*(Vector2 a, float b)
+        {
+            return new Vector2(a.X * b, a.Y * b);
         }
 
         public static Vector2 operator/(Vector2 a, float b)
