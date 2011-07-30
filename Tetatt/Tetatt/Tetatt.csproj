@@ -109,6 +109,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtificialIntelligence\AIPlayer.cs" />
+    <Compile Include="ArtificialIntelligence\Location.cs" />
+    <Compile Include="ArtificialIntelligence\SimplifiedPlayField.cs" />
     <Compile Include="GamePlay\LevelData.cs" />
     <Compile Include="GamePlay\PlayerInput.cs" />
     <Compile Include="GamePlay\Pos.cs" />
