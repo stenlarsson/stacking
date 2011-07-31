@@ -9,6 +9,7 @@ namespace Tetatt.ArtificialIntelligence
     class SimplifiedPlayField
     {
         public Location[,] Field;
+        public bool CanRaise;
 
         SimplifiedPlayField()
         {
@@ -25,6 +26,7 @@ namespace Tetatt.ArtificialIntelligence
                     Field[row, col] = playField.Field[row, col];
                 }
             }
+            CanRaise = playField.CanRaise;
         }
 
         public SimplifiedPlayField(PlayField playField)
@@ -43,12 +45,24 @@ namespace Tetatt.ArtificialIntelligence
                 loc.Fallen = false;
                 Field[row, col] = loc;
             });
+
+            CanRaise = true;
+            playField.EachVisibleBlock((row, col, block) =>
+            {
+                if (block != null &&
+                    block.State != BlockState.Idle &&
+                    block.State != BlockState.Moving)
+                {
+                    CanRaise = false;
+                }
+            });
         }
 
         public bool CanSwap(int row, int col)
         {
-            // Cannot swap garbage
+            // Cannot swap garbage, and types must be different for it to make sense
             return
+                Field[row, col].Type != Field[row, col + 1].Type &&
                 Field[row, col].Type != BlockType.Garbage &&
                 Field[row, col + 1].Type != BlockType.Garbage;
         }

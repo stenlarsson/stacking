@@ -26,7 +26,7 @@ namespace Tetatt.ArtificialIntelligence
         {
             SimplifiedPlayField sim = new SimplifiedPlayField(playField);
 
-            if (sim.Height() < RaiseHeight)
+            if (sim.CanRaise && sim.Height() < RaiseHeight)
             {
                 return PlayerInput.Raise;
             }
@@ -50,7 +50,7 @@ namespace Tetatt.ArtificialIntelligence
             {
                 return PlayerInput.Right;
             }
-            else if (swapScore > CalculateScore(sim))
+            else if (swapScore > 0)
             {
                 return PlayerInput.Swap;
             }
@@ -71,43 +71,46 @@ namespace Tetatt.ArtificialIntelligence
                 for (int col = 0; col < sim.Field.GetLength(1) - 1; col++)
                 {
                     float score = 0;
+                    float scoreLeft = 0;
+                    float scoreRight = 0;
 
                     if (!sim.CanSwap(row, col))
                     {
                         continue;
                     }
 
-                    // If swapping causes pieces to drop down it will flatten
-                    // the play field which is a good thing
-                    if (sim.Field[row, col].Type.HasValue &&
-                        !sim.Field[row, col + 1].Type.HasValue &&
-                        !sim.Field[row - 1, col + 1].Type.HasValue ||
-                        sim.Field[row, col + 1].Type.HasValue &&
-                        !sim.Field[row, col].Type.HasValue &&
-                        !sim.Field[row - 1, col].Type.HasValue)
-                    {
-                        score += FlattenScore;
-                    }
-
-                    // Make a copy of the play field and swap to see what happens
                     SimplifiedPlayField simcpy = new SimplifiedPlayField(sim);
                     simcpy.Swap(row, col);
+                    score += CalculateScore(simcpy, row, col);
 
-                    // Let pices fall down
-                    simcpy.Settle();
+                    // Check score if we also swap one piece to the left
+                    if (col > 0 && sim.CanSwap(row, col - 1))
+                    {
+                        simcpy = new SimplifiedPlayField(sim);
+                        simcpy.Swap(row, col);
+                        simcpy.Settle();
+                        simcpy.Swap(row, col - 1);
+                        scoreLeft += CalculateScore(simcpy, row, col - 1) - 1;
+                    }
 
-                    // Can't move diagonally
+                    // Check score if we also swap one piece to the right
+                    if (col < sim.Field.GetLength(1) - 2 && sim.CanSwap(row, col + 1))
+                    {
+                        simcpy = new SimplifiedPlayField(sim);
+                        simcpy.Swap(row, col);
+                        simcpy.Settle();
+                        simcpy.Swap(row, col + 1);
+                        scoreRight += CalculateScore(simcpy, row, col + 1) - 1;
+                    }
+
+                    // Take the best score
+                    score = Math.Max(score, Math.Max(scoreLeft, scoreRight));
+
+                    // Penalty for moving cursor so that in case of equally good
+                    // moves we take the nearest one. (Note: Can't move diagonally)
                     int distance =
                         Math.Abs(playField.markerPos.Row - row) +
                         Math.Abs(playField.markerPos.Col - col);
-
-                    score += CalculateScore(simcpy);
-                    if (simcpy.Field[row, col].Fallen ||
-                        simcpy.Field[row, col + 1].Fallen)
-                    {
-                        score *= ChainMultiplier;
-                    }
-
                     score -= distance;
 
                     if (!moves.ContainsKey(score))
@@ -126,13 +129,28 @@ namespace Tetatt.ArtificialIntelligence
             throw new Exception("Supposedly unreachable code");
         }
 
-        public float CalculateScore(SimplifiedPlayField sim)
+        public float CalculateScore(SimplifiedPlayField sim, int row, int col)
         {
             float score = 0;
 
-            for (int row = 0; row < sim.Field.GetLength(0); row++)
+            // If swapping causes pieces to drop down it will flatten
+            // the play field which is a good thing
+            if (sim.Field[row, col].Type.HasValue &&
+                !sim.Field[row, col + 1].Type.HasValue &&
+                !sim.Field[row - 1, col + 1].Type.HasValue ||
+                sim.Field[row, col + 1].Type.HasValue &&
+                !sim.Field[row, col].Type.HasValue &&
+                !sim.Field[row - 1, col].Type.HasValue)
             {
-                for (int col = 0; col < sim.Field.GetLength(1) ; col++)
+                score += FlattenScore;
+            }
+
+            // Let pices fall down
+            sim.Settle();
+
+            for (row = 0; row < sim.Field.GetLength(0); row++)
+            {
+                for (col = 0; col < sim.Field.GetLength(1) ; col++)
                 {
                     // TODO If there are 4 in a row we will get another PopScore in
                     // next iteration, resulting in PopScore*2 for 4 pieces. If both
@@ -145,6 +163,13 @@ namespace Tetatt.ArtificialIntelligence
                         sim.Field[row, col].Type == sim.Field[row, col + 2].Type)
                     {
                         score += PopScore;
+
+                        if (sim.Field[row, col].Fallen ||
+                            sim.Field[row, col + 1].Fallen ||
+                            sim.Field[row, col + 2].Fallen)
+                        {
+                            score *= ChainMultiplier;
+                        }
                     }
 
                     if (row < sim.Field.GetLength(0) - 2 &&
@@ -153,6 +178,13 @@ namespace Tetatt.ArtificialIntelligence
                         sim.Field[row, col].Type == sim.Field[row + 2, col].Type)
                     {
                         score += PopScore;
+
+                        if (sim.Field[row, col].Fallen ||
+                            sim.Field[row + 1, col].Fallen ||
+                            sim.Field[row + 2, col].Fallen)
+                        {
+                            score *= ChainMultiplier;
+                        }
                     }
                 }
             }
