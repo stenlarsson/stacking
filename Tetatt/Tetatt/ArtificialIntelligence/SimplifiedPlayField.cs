@@ -61,8 +61,8 @@ namespace Tetatt.ArtificialIntelligence
             // Types must be different for it to make sense
             bool isDifferent = Field[row, col].Type != Field[row, col + 1].Type;
             // Cannot swap when something is about to fall down from above
-            bool isBlocked = Field[row, col].Type == null && Field[row + 1, col].Type != null ||
-                Field[row, col + 1].Type == null && Field[row + 1, col + 1].Type != null;
+            bool isBlocked = Field[row, col].Type == null && Field[row + 1, col].Type != null && Field[row + 1, col].Type != BlockType.Garbage ||
+                Field[row, col + 1].Type == null && Field[row + 1, col + 1].Type != null && Field[row + 1, col + 1].Type != BlockType.Garbage;
 
             return !isGarbage && isDifferent && !isBlocked;
         }
@@ -75,9 +75,10 @@ namespace Tetatt.ArtificialIntelligence
             Field[row, col + 1] = tmp;
         }
 
-        public int Height()
+        public void Height(out int height, out int heightWithoutGarbage)
         {
-            int height = 0;
+            height = 0;
+            heightWithoutGarbage = 0;
 
             for (int col = 0; col < Field.GetLength(1); col++)
             {
@@ -85,12 +86,15 @@ namespace Tetatt.ArtificialIntelligence
                 {
                     if (Field[row, col].Type.HasValue)
                     {
+                        if (Field[row, col].Type != BlockType.Garbage)
+                        {
+                            heightWithoutGarbage = Math.Max(heightWithoutGarbage, row);
+                        }
                         height = Math.Max(height, row);
                         break;
                     }
                 }
             }
-            return height;
         }
 
         public void Settle()
@@ -137,6 +141,7 @@ namespace Tetatt.ArtificialIntelligence
 
                     if (col < Field.GetLength(1) - 2 &&
                         Field[row, col].Type.HasValue &&
+                        Field[row, col].Type != BlockType.Garbage &&
                         Field[row, col].Type == Field[row, col + 1].Type &&
                         Field[row, col].Type == Field[row, col + 2].Type)
                     {
@@ -150,6 +155,7 @@ namespace Tetatt.ArtificialIntelligence
 
                     if (row < Field.GetLength(0) - 2 &&
                         Field[row, col].Type.HasValue &&
+                        Field[row, col].Type != BlockType.Garbage &&
                         Field[row, col].Type == Field[row + 1, col].Type &&
                         Field[row, col].Type == Field[row + 2, col].Type)
                     {
