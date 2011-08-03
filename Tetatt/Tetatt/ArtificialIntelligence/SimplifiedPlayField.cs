@@ -34,16 +34,11 @@ namespace Tetatt.ArtificialIntelligence
         {
             playField.EachVisibleBlock((row, col, block) =>
             {
-                Location loc = new Location();
-                if (block != null &&
-                    (block.State == BlockState.Idle ||
-                    block.State == BlockState.Moving ||
-                    block.State == BlockState.Hover))
+                if (block != null)
                 {
-                    loc.Type = block.Type;
+                    Field[row, col].Type = block.Type;
+                    Field[row, col].InChain = (block.Chain != null);
                 }
-                loc.Fallen = false;
-                Field[row, col] = loc;
             });
 
             CanRaise = true;
@@ -60,11 +55,16 @@ namespace Tetatt.ArtificialIntelligence
 
         public bool CanSwap(int row, int col)
         {
-            // Cannot swap garbage, and types must be different for it to make sense
-            return
-                Field[row, col].Type != Field[row, col + 1].Type &&
-                Field[row, col].Type != BlockType.Garbage &&
-                Field[row, col + 1].Type != BlockType.Garbage;
+            // Cannot move garbage
+            bool isGarbage = Field[row, col].Type == BlockType.Garbage ||
+                Field[row, col + 1].Type == BlockType.Garbage;
+            // Types must be different for it to make sense
+            bool isDifferent = Field[row, col].Type != Field[row, col + 1].Type;
+            // Cannot swap when something is about to fall down from above
+            bool isBlocked = Field[row, col].Type == null && Field[row + 1, col].Type != null ||
+                Field[row, col + 1].Type == null && Field[row + 1, col + 1].Type != null;
+
+            return !isGarbage && isDifferent && !isBlocked;
         }
 
         public void Swap(int row, int col)
@@ -111,7 +111,7 @@ namespace Tetatt.ArtificialIntelligence
                             if (!Field[fallRow - 1, col].Type.HasValue)
                             {
                                 Field[fallRow - 1, col] = Field[fallRow, col];
-                                Field[fallRow - 1, col].Fallen = true;
+                                Field[fallRow, col] = new Location();
                             }
                             else
                             {
@@ -120,6 +120,53 @@ namespace Tetatt.ArtificialIntelligence
                         }
                     }
                 }
+            }
+        }
+
+        public void Pop()
+        {
+            // Each row except bottom which cannot pop
+            for (int row = 1; row < Field.GetLength(0); row++)
+            {
+                for (int col = 0; col < Field.GetLength(1); col++)
+                {
+                    // TODO If there are 4 in a row we will get another PopScore in
+                    // next iteration, resulting in PopScore*2 for 4 pieces. If both
+                    // this and the below test are true it will result in
+                    // PopScore*2 for 5 pieces...
+
+                    if (col < Field.GetLength(1) - 2 &&
+                        Field[row, col].Type.HasValue &&
+                        Field[row, col].Type == Field[row, col + 1].Type &&
+                        Field[row, col].Type == Field[row, col + 2].Type)
+                    {
+                        SetChain(row, col);
+                        Field[row, col].Type = null;
+                        SetChain(row, col + 1);
+                        Field[row, col + 1].Type = null;
+                        SetChain(row, col + 2);
+                        Field[row, col + 2].Type = null;
+                    }
+
+                    if (row < Field.GetLength(0) - 2 &&
+                        Field[row, col].Type.HasValue &&
+                        Field[row, col].Type == Field[row + 1, col].Type &&
+                        Field[row, col].Type == Field[row + 2, col].Type)
+                    {
+                        SetChain(row + 2, col);
+                        Field[row, col].Type = null;
+                        Field[row + 1, col].Type = null;
+                        Field[row + 2, col].Type = null;
+                    }
+                }
+            }
+        }
+
+        void SetChain(int row, int col)
+        {
+            for (int y = row + 1; y < Field.GetLength(0) && Field[y, col].Type != null; y++)
+            {
+                Field[y, col].InChain = true;
             }
         }
     }
