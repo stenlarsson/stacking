@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Tetatt.GamePlay;
+using System.Diagnostics;
 
 namespace Tetatt.ArtificialIntelligence
 {
-    class Location
+    [DebuggerDisplay("{Type} {InChain}")]
+    struct Location
     {
         public BlockType? Type;
-        public bool Fallen;
+        public bool InChain;
     }
 }

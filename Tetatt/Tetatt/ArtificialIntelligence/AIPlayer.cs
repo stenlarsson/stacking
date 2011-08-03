@@ -26,6 +26,8 @@ namespace Tetatt.ArtificialIntelligence
         {
             SimplifiedPlayField sim = new SimplifiedPlayField(playField);
 
+            sim.Pop();
+
             if (sim.CanRaise && sim.Height() < RaiseHeight)
             {
                 return PlayerInput.Raise;
@@ -90,7 +92,7 @@ namespace Tetatt.ArtificialIntelligence
                         simcpy.Swap(row, col);
                         simcpy.Settle();
                         simcpy.Swap(row, col - 1);
-                        scoreLeft += CalculateScore(simcpy, row, col - 1) - 1;
+                        scoreLeft += CalculateScore(simcpy, row, col - 1) - 2;
                     }
 
                     // Check score if we also swap one piece to the right
@@ -100,7 +102,7 @@ namespace Tetatt.ArtificialIntelligence
                         simcpy.Swap(row, col);
                         simcpy.Settle();
                         simcpy.Swap(row, col + 1);
-                        scoreRight += CalculateScore(simcpy, row, col + 1) - 1;
+                        scoreRight += CalculateScore(simcpy, row, col + 1) - 2;
                     }
 
                     // Take the best score
@@ -136,11 +138,13 @@ namespace Tetatt.ArtificialIntelligence
             // If swapping causes pieces to drop down it will flatten
             // the play field which is a good thing
             if (sim.Field[row, col].Type.HasValue &&
+                sim.Field[row - 1, col + 1].Type.HasValue &&
                 !sim.Field[row, col + 1].Type.HasValue &&
-                !sim.Field[row - 1, col + 1].Type.HasValue ||
+                !sim.Field[row - 1, col].Type.HasValue ||
                 sim.Field[row, col + 1].Type.HasValue &&
+                sim.Field[row - 1, col].Type.HasValue &&
                 !sim.Field[row, col].Type.HasValue &&
-                !sim.Field[row - 1, col].Type.HasValue)
+                !sim.Field[row - 1, col + 1].Type.HasValue)
             {
                 score += FlattenScore;
             }
@@ -164,9 +168,9 @@ namespace Tetatt.ArtificialIntelligence
                     {
                         score += PopScore;
 
-                        if (sim.Field[row, col].Fallen ||
-                            sim.Field[row, col + 1].Fallen ||
-                            sim.Field[row, col + 2].Fallen)
+                        if (sim.Field[row, col].InChain ||
+                            sim.Field[row, col + 1].InChain ||
+                            sim.Field[row, col + 2].InChain)
                         {
                             score *= ChainMultiplier;
                         }
@@ -179,9 +183,9 @@ namespace Tetatt.ArtificialIntelligence
                     {
                         score += PopScore;
 
-                        if (sim.Field[row, col].Fallen ||
-                            sim.Field[row + 1, col].Fallen ||
-                            sim.Field[row + 2, col].Fallen)
+                        if (sim.Field[row, col].InChain ||
+                            sim.Field[row + 1, col].InChain ||
+                            sim.Field[row + 2, col].InChain)
                         {
                             score *= ChainMultiplier;
                         }
