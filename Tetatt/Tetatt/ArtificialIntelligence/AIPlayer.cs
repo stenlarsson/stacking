@@ -11,7 +11,9 @@ namespace Tetatt.ArtificialIntelligence
         const float PopScore = 40;
         const float FlattenScore = 20;
         const float ChainMultiplier = 2;
-        const int RaiseHeight = 8;
+        const float ClearGarbageMultiplier = 2;
+        const int RaiseHeight = 12;
+        const int RaiseHeightWithoutGarbage = 8;
 
         PlayField playField;
         Random random;
@@ -28,7 +30,11 @@ namespace Tetatt.ArtificialIntelligence
 
             sim.Pop();
 
-            if (sim.CanRaise && sim.Height() < RaiseHeight)
+            int height;
+            int heightWithoutGarbage;
+
+            sim.Height(out height, out heightWithoutGarbage);
+            if (sim.CanRaise && height < RaiseHeight && heightWithoutGarbage < RaiseHeightWithoutGarbage)
             {
                 return PlayerInput.Raise;
             }
@@ -86,23 +92,29 @@ namespace Tetatt.ArtificialIntelligence
                     score += CalculateScore(simcpy, row, col);
 
                     // Check score if we also swap one piece to the left
-                    if (col > 0 && sim.CanSwap(row, col - 1))
+                    if (col > 0)
                     {
                         simcpy = new SimplifiedPlayField(sim);
                         simcpy.Swap(row, col);
                         simcpy.Settle();
-                        simcpy.Swap(row, col - 1);
-                        scoreLeft += CalculateScore(simcpy, row, col - 1) - 2;
+                        if (simcpy.CanSwap(row, col - 1))
+                        {
+                            simcpy.Swap(row, col - 1);
+                            scoreLeft += CalculateScore(simcpy, row, col - 1) - 2;
+                        }
                     }
 
                     // Check score if we also swap one piece to the right
-                    if (col < sim.Field.GetLength(1) - 2 && sim.CanSwap(row, col + 1))
+                    if (col < sim.Field.GetLength(1) - 2)
                     {
                         simcpy = new SimplifiedPlayField(sim);
                         simcpy.Swap(row, col);
                         simcpy.Settle();
-                        simcpy.Swap(row, col + 1);
-                        scoreRight += CalculateScore(simcpy, row, col + 1) - 2;
+                        if (simcpy.CanSwap(row, col + 1))
+                        {
+                            simcpy.Swap(row, col + 1);
+                            scoreRight += CalculateScore(simcpy, row, col + 1) - 2;
+                        }
                     }
 
                     // Take the best score
@@ -137,6 +149,7 @@ namespace Tetatt.ArtificialIntelligence
 
             // If swapping causes pieces to drop down it will flatten
             // the play field which is a good thing
+            // Note that we have already swapped when getting here
             if (sim.Field[row, col].Type.HasValue &&
                 sim.Field[row - 1, col + 1].Type.HasValue &&
                 !sim.Field[row, col + 1].Type.HasValue &&
@@ -152,7 +165,7 @@ namespace Tetatt.ArtificialIntelligence
             // Let pices fall down
             sim.Settle();
 
-            for (row = 0; row < sim.Field.GetLength(0); row++)
+            for (row = 1; row < sim.Field.GetLength(0); row++)
             {
                 for (col = 0; col < sim.Field.GetLength(1) ; col++)
                 {
@@ -163,6 +176,7 @@ namespace Tetatt.ArtificialIntelligence
 
                     if (col < sim.Field.GetLength(1) - 2 &&
                         sim.Field[row, col].Type.HasValue &&
+                        sim.Field[row, col].Type != BlockType.Garbage &&
                         sim.Field[row, col].Type == sim.Field[row, col + 1].Type &&
                         sim.Field[row, col].Type == sim.Field[row, col + 2].Type)
                     {
@@ -174,10 +188,18 @@ namespace Tetatt.ArtificialIntelligence
                         {
                             score *= ChainMultiplier;
                         }
+
+                        if (sim.Field[row + 1, col].Type == BlockType.Garbage ||
+                            sim.Field[row + 1, col + 1].Type == BlockType.Garbage ||
+                            sim.Field[row + 1, col + 2].Type == BlockType.Garbage)
+                        {
+                            score *= ClearGarbageMultiplier;
+                        }
                     }
 
                     if (row < sim.Field.GetLength(0) - 2 &&
                         sim.Field[row, col].Type.HasValue &&
+                        sim.Field[row, col].Type != BlockType.Garbage &&
                         sim.Field[row, col].Type == sim.Field[row + 1, col].Type &&
                         sim.Field[row, col].Type == sim.Field[row + 2, col].Type)
                     {
@@ -188,6 +210,11 @@ namespace Tetatt.ArtificialIntelligence
                             sim.Field[row + 2, col].InChain)
                         {
                             score *= ChainMultiplier;
+                        }
+
+                        if (sim.Field[row + 3, col].Type == BlockType.Garbage)
+                        {
+                            score *= ClearGarbageMultiplier;
                         }
                     }
                 }
