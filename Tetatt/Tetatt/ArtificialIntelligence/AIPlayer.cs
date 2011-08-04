@@ -189,7 +189,8 @@ namespace Tetatt.ArtificialIntelligence
                             score *= ChainMultiplier;
                         }
 
-                        if (sim.Field[row + 1, col].Type == BlockType.Garbage ||
+                        if (row < sim.Field.GetLength(0) - 1 && 
+                            sim.Field[row + 1, col].Type == BlockType.Garbage ||
                             sim.Field[row + 1, col + 1].Type == BlockType.Garbage ||
                             sim.Field[row + 1, col + 2].Type == BlockType.Garbage)
                         {
@@ -212,7 +213,8 @@ namespace Tetatt.ArtificialIntelligence
                             score *= ChainMultiplier;
                         }
 
-                        if (sim.Field[row + 3, col].Type == BlockType.Garbage)
+                        if (row < sim.Field.GetLength(0) - 3 &&
+                            sim.Field[row + 3, col].Type == BlockType.Garbage)
                         {
                             score *= ClearGarbageMultiplier;
                         }
