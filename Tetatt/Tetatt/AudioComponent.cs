@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Media;
 using Tetatt.GamePlay;
 
 namespace Tetatt
@@ -18,11 +19,10 @@ namespace Tetatt
         SoundEffect fanfare1Effect;
         SoundEffect fanfare2Effect;
 
-        SoundEffect normalMusic;
-        SoundEffect stressMusic;
+        Song normalMusic;
+        Song stressMusic;
         SoundEffectInstance music;
         int musicChangeTimer;
-        bool isStressMusic;
 
         List<PlayField> playFields;
 
@@ -57,8 +57,8 @@ namespace Tetatt
             fanfare2Effect = content.Load<SoundEffect>("fanfare2");
 
             // Load music
-            normalMusic = content.Load<SoundEffect>("normal_music");
-            stressMusic = content.Load<SoundEffect>("stress_music");
+            normalMusic = content.Load<Song>("normal_music");
+            stressMusic = content.Load<Song>("stress_music");
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Tetatt
         {
             base.Update(gameTime);
 
-            if (music != null)
+            if (MediaPlayer.State == MediaState.Playing)
             {
                 bool anyStress = false;
                 foreach (var playField in playFields)
@@ -80,13 +80,10 @@ namespace Tetatt
                         break;
                     }
                 }
+                bool isStressMusic = MediaPlayer.Queue.ActiveSong == stressMusic;
                 if (anyStress != isStressMusic && --musicChangeTimer <= 0)
                 {
-                    music.Dispose();
-                    music = (anyStress ? stressMusic : normalMusic).CreateInstance();
-                    music.IsLooped = true;
-                    music.Play();
-                    isStressMusic = anyStress;
+                    MediaPlayer.Play(anyStress ? stressMusic : normalMusic);
                     musicChangeTimer = MusicChangeDelay;
                 }
             }
@@ -121,10 +118,8 @@ namespace Tetatt
         /// </summary>
         public void GameStarted()
         {
-            music = normalMusic.CreateInstance();
-            music.IsLooped = true;
-            music.Play();
-            isStressMusic = false;
+            MediaPlayer.Play(normalMusic);
+            MediaPlayer.IsRepeating = true;
             musicChangeTimer = MusicChangeDelay;
         }
 
@@ -133,11 +128,7 @@ namespace Tetatt
         /// </summary>
         public void GameEnded()
         {
-            if (music != null)
-            {
-                music.Dispose();
-                music = null;
-            }
+            MediaPlayer.Stop();
         }
 
         /// <summary>
@@ -145,11 +136,7 @@ namespace Tetatt
         /// </summary>
         public void Reset()
         {
-            if (music != null)
-            {
-                music.Dispose();
-                music = null;
-            }
+            MediaPlayer.Stop();
 
             // Loop over a copy of the list. Cannot modify a list while iterating over it.
             foreach (var playField in new List<PlayField>(playFields))

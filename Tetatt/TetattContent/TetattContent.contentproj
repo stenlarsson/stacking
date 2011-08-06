@@ -105,12 +105,12 @@
     <Compile Include="normal_music.wav">
       <Name>normal_music</Name>
       <Importer>WavImporter</Importer>
-      <Processor>SoundEffectProcessor</Processor>
+      <Processor>SongProcessor</Processor>
     </Compile>
     <Compile Include="stress_music.wav">
       <Name>stress_music</Name>
       <Importer>WavImporter</Importer>
-      <Processor>SoundEffectProcessor</Processor>
+      <Processor>SongProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
