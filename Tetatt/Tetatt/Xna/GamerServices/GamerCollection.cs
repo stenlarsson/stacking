@@ -16,7 +16,7 @@ namespace Microsoft.Xna.Framework.GamerServices
         public struct GamerCollectionEnumerator
             : IEnumerator<T>, IDisposable, System.Collections.IEnumerator
         {
-            private IEnumerator<T> wrapped;
+            IEnumerator<T> wrapped;
 
             public GamerCollectionEnumerator (IEnumerator<T> wrapped)
             {

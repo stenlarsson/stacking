@@ -4,15 +4,11 @@ namespace Microsoft.Xna.Framework
 {
     public class GameComponentCollectionEventArgs : EventArgs
     {
-        private IGameComponent component;
-        public IGameComponent GameComponent
-        {
-            get { return component; }
-        }
+        public IGameComponent GameComponent { get; private set; }
 
         public GameComponentCollectionEventArgs(IGameComponent component)
         {
-            this.component = component;
+            GameComponent = component;
         }
     }
 }

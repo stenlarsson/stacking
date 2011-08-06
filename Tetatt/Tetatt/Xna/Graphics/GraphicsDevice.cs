@@ -5,29 +5,10 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class GraphicsDevice
     {
-        private GraphicsAdapter adapter;
-        public GraphicsAdapter Adapter
-        {
-            get { return adapter; }
-        }
-
-        private GraphicsProfile graphicsProfile;
-        public GraphicsProfile GraphicsProfile
-        {
-            get { return graphicsProfile; }
-        }
-
-        private PresentationParameters presentationParameters;
-        public PresentationParameters PresentationParameters
-        {
-            get { return presentationParameters; }
-        }
-
-        private Viewport viewport;
-        public Viewport Viewport
-        {
-            get { return viewport; }
-        }
+        public GraphicsAdapter Adapter { get; private set; }
+        public GraphicsProfile GraphicsProfile { get; private set; }
+        public PresentationParameters PresentationParameters { get; private set; }
+        public Viewport Viewport { get; private set; }
 
         public Rectangle ScissorRectangle
         {
@@ -47,10 +28,10 @@ namespace Microsoft.Xna.Framework.Graphics
                               GraphicsProfile graphicsProfile,
                               PresentationParameters presentationParameters)
         {
-            this.adapter = adapter;
-            this.graphicsProfile = graphicsProfile;
-            this.presentationParameters = presentationParameters;
-            this.viewport = new Viewport(presentationParameters);
+            Adapter = adapter;
+            GraphicsProfile = graphicsProfile;
+            PresentationParameters = presentationParameters;
+            Viewport = new Viewport(presentationParameters);
         }
 
         public static void Clear(Color color)
@@ -65,14 +46,14 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.EnableClientState(ArrayCap.VertexArray);
         }
 
-        private static readonly BeginMode[] glPrimitiveTypes = new BeginMode[4]
+        static readonly BeginMode[] glPrimitiveTypes = new BeginMode[4]
         {
             BeginMode.Triangles,
             BeginMode.TriangleStrip,
             BeginMode.Lines,
             BeginMode.LineStrip
         };
-        private static readonly Func<int,int>[] glPrimitiveTriangleCount = new Func<int,int>[4]
+        static readonly Func<int,int>[] glPrimitiveTriangleCount = new Func<int,int>[4]
         {
             c => 3*c,
             c => c+2,

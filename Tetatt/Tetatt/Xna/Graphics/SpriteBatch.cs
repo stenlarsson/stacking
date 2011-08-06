@@ -6,15 +6,11 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class SpriteBatch
     {
-        private GraphicsDevice graphicsDevice;
-        public GraphicsDevice GraphicsDevice
-        {
-            get { return graphicsDevice; }
-        }
+        public GraphicsDevice GraphicsDevice { get; private set; }
 
         public SpriteBatch(GraphicsDevice graphicsDevice)
         {
-            this.graphicsDevice = graphicsDevice;
+            GraphicsDevice = graphicsDevice;
         }
 
         public void Begin ()
@@ -28,8 +24,8 @@ namespace Microsoft.Xna.Framework.Graphics
                            DepthStencilState depthStencilState = null,
                            RasterizerState rasterizerState = null)
         {
-            int width = graphicsDevice.PresentationParameters.BackBufferWidth;
-            int height = graphicsDevice.PresentationParameters.BackBufferHeight;
+            int width = GraphicsDevice.PresentationParameters.BackBufferWidth;
+            int height = GraphicsDevice.PresentationParameters.BackBufferHeight;
 
             GL.PushMatrix();
             GL.LoadIdentity();

@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class EffectPass
     {
-        private BasicEffect effect;
+        BasicEffect effect;
 
         internal EffectPass(BasicEffect effect)
         {

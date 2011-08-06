@@ -31,7 +31,7 @@ namespace Microsoft.Xna.Framework
         {
         }
 
-        private bool visible = true;
+        bool visible = true;
         public bool Visible
         {
             get { return visible; }
@@ -47,7 +47,7 @@ namespace Microsoft.Xna.Framework
         }
         public event EventHandler<EventArgs> VisibleChanged;
 
-        private int drawOrder;
+        int drawOrder;
         public int DrawOrder
         {
             get { return drawOrder; }

@@ -5,12 +5,7 @@ namespace Microsoft.Xna.Framework
 {
     public class GraphicsDeviceManager
     {
-        private GraphicsDevice graphicsDevice;
-        public GraphicsDevice GraphicsDevice
-        {
-            get { return graphicsDevice; }
-        }
-
+        public GraphicsDevice GraphicsDevice { get; private set; }
         public GraphicsProfile GraphicsProfile { get; set; }
 
         public int PreferredBackBufferWidth { get; set; }
@@ -39,12 +34,12 @@ namespace Microsoft.Xna.Framework
                     BackBufferWidth = PreferredBackBufferWidth
                 };
 
-            graphicsDevice = new GraphicsDevice(graphicsAdapter, GraphicsProfile, presentationParameters);
+            GraphicsDevice = new GraphicsDevice(graphicsAdapter, GraphicsProfile, presentationParameters);
         }
 
         public void EndDraw()
         {
-            graphicsDevice.Present();
+            GraphicsDevice.Present();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
     {
         internal Graphics.Texture2D texture;
         internal IDictionary<char, Rectangle> chars;
-        private char backup;
+        char backup;
 
         public SpriteFont(Graphics.Texture2D texture, IDictionary<char, Rectangle> chars) {
             this.texture = texture;

@@ -9,23 +9,18 @@ namespace Microsoft.Xna.Framework.Content
 {
     public class ContentManager
     {
-        private IServiceProvider serviceProvider;
-        public IServiceProvider ServiceProvider
-        {
-            get { return serviceProvider; }
-        }
+        public IServiceProvider ServiceProvider { get; private set; }
         public string RootDirectory { get; set; }
-
 
         public ContentManager(IServiceProvider serviceProvider)
         {
-            this.serviceProvider = serviceProvider;
+            ServiceProvider = serviceProvider;
         }
 
         public ContentManager(IServiceProvider serviceProvider, string rootDirectory)
         {
-            this.serviceProvider = serviceProvider;
-            this.RootDirectory = rootDirectory;
+            ServiceProvider = serviceProvider;
+            RootDirectory = rootDirectory;
         }
 
         public virtual T Load<T>(string assetName)

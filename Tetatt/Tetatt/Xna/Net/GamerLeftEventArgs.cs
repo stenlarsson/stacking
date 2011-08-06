@@ -4,15 +4,11 @@ namespace Microsoft.Xna.Framework.Net
 {
     public class GamerLeftEventArgs : EventArgs
     {
-        private NetworkGamer gamer;
-        public NetworkGamer Gamer
-        {
-            get { return gamer; }
-        }
+        public NetworkGamer Gamer { get; private set; }
 
         public GamerLeftEventArgs(NetworkGamer gamer)
         {
-            this.gamer = gamer;
+            Gamer = gamer;
         }
     }
 }

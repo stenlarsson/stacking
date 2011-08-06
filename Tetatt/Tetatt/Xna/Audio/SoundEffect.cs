@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Audio
     {
         internal int buffer;
 
-        private Queue<SoundEffectInstance> instances = new Queue<SoundEffectInstance>();
+        Queue<SoundEffectInstance> instances = new Queue<SoundEffectInstance>();
 
         // Loads a wave/riff audio file.
         public static byte[] LoadWave(Stream stream, out int channels, out int bits, out int rate)
