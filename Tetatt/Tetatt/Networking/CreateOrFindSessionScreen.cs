@@ -142,7 +142,7 @@ namespace Tetatt.Networking
                 // Go to the gameplay screen. We pass null as the controlling player,
                 // because the gameplay screen accepts input from all local players
                 // who are in the session, not just a single controlling player.
-                ScreenManager.AddScreen(new GameplayScreen(networkSession), null);
+                ScreenManager.AddScreen(new GameplayScreen(ScreenManager, networkSession), null);
             }
             catch (Exception exception)
             {

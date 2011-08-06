@@ -23,15 +23,18 @@ namespace Tetatt.Screens
 
         float pauseAlpha;
 
+
         DrawablePlayField playerPlayField;
         DrawablePlayField aiPlayField;
 
         AIPlayer aiPlayer;
 
+        AudioComponent audioComponent;
+
         /// <summary>
         /// Constructor.
         /// </summary>
-        public VersusAIScreen()
+        public VersusAIScreen(ScreenManager screenManager)
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
@@ -46,6 +49,14 @@ namespace Tetatt.Screens
             int seed = unchecked((int)DateTime.Now.Ticks);
             playerPlayField.Start(seed);
             aiPlayField.Start(seed);
+
+            // Cannot use ScreenManager here yet because we're not yet added, therefore
+            // it must be passed as a paramter so that we can get the AudioComponent.
+            audioComponent = (AudioComponent)screenManager.Game.Services.GetService(
+                typeof(AudioComponent));
+            audioComponent.AddPlayField(playerPlayField);
+            audioComponent.AddPlayField(aiPlayField);
+            audioComponent.GameStarted();
         }
 
         /// <summary>
@@ -216,6 +227,16 @@ namespace Tetatt.Screens
             {
                 ScreenManager.ReturnToMainMenu();
             }
+        }
+
+        /// <summary>
+        /// Called when screen is exiting
+        /// </summary>
+        public override void ExitScreen()
+        {
+            audioComponent.Reset();
+
+            base.ExitScreen();
         }
     }
 }
