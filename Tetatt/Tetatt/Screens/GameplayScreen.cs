@@ -38,18 +38,9 @@ namespace Tetatt.Screens
         Texture2D isTalkingTexture;
         Texture2D voiceMutedTexture;
 
-        SoundEffect[] popEffect;
-        SoundEffect chainEffect;
-        SoundEffect fanfare1Effect;
-        SoundEffect fanfare2Effect;
-
-        SoundEffect normalMusic;
-        SoundEffect stressMusic;
-        SoundEffectInstance music;
-        int musicChangeTimer;
-        bool isStressMusic;
-
         float pauseAlpha;
+
+        AudioComponent audioComponent;
 
         /// <summary>
         /// The network session for this game.
@@ -69,10 +60,15 @@ namespace Tetatt.Screens
         /// <summary>
         /// Constructor.
         /// </summary>
-        public GameplayScreen(NetworkSession networkSession)
+        public GameplayScreen(ScreenManager screenManager, NetworkSession networkSession)
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
+
+            // Cannot use ScreenManager here yet because we're not yet added, therefore
+            // it must be passed as a paramter so that we can get the AudioComponent.
+            audioComponent = (AudioComponent)screenManager.Game.Services.GetService(
+                typeof(AudioComponent));
 
             this.networkSession = networkSession;
 
@@ -101,20 +97,6 @@ namespace Tetatt.Screens
             hasVoiceTexture = content.Load<Texture2D>("chat_able");
             isTalkingTexture = content.Load<Texture2D>("chat_talking");
             voiceMutedTexture = content.Load<Texture2D>("chat_mute");
-
-            // Load sound effects
-            popEffect = new SoundEffect[4];
-            for (int i = 0; i < popEffect.Length; i++)
-            {
-                popEffect[i] = content.Load<SoundEffect>("pop" + (i + 1));
-            }
-            chainEffect = content.Load<SoundEffect>("chain");
-            fanfare1Effect = content.Load<SoundEffect>("fanfare1");
-            fanfare2Effect = content.Load<SoundEffect>("fanfare2");
-
-            // Load music
-            normalMusic = content.Load<SoundEffect>("normal_music");
-            stressMusic = content.Load<SoundEffect>("stress_music");
         }
 
         /// <summary>
@@ -159,28 +141,6 @@ namespace Tetatt.Screens
                 if (networkSession.IsHost)
                 {
                     CheckEndOfGame();
-                }
-
-                // Switch to stressful music if anyone reaches a certain height, or back if
-                // everyone is below again. Use a delay to avoid changing too often.
-                bool anyStress = false;
-                foreach (var gamer in networkSession.AllGamers)
-                {
-                    Player data = (Player)gamer.Tag;
-                    if (data.PlayField.GetHeight() >= PlayField.stressHeight)
-                    {
-                        anyStress = true;
-                        break;
-                    }
-                }
-                if (anyStress != isStressMusic && --musicChangeTimer <= 0)
-                {
-                    music.Dispose();
-                    music = (anyStress ? stressMusic : normalMusic).CreateInstance();
-                    music.IsLooped = true;
-                    music.Play();
-                    isStressMusic = anyStress;
-                    musicChangeTimer = 20;
                 }
             }
 
@@ -370,10 +330,9 @@ namespace Tetatt.Screens
                 networkSession.GameStarted -= GameStarted;
                 networkSession.GameEnded -= GameEnded;
             }
-            if (music != null)
-            {
-                music.Dispose();
-            }
+
+            audioComponent.Reset();
+
             base.ExitScreen();
         }
 
@@ -471,17 +430,6 @@ namespace Tetatt.Screens
         }
         
         /// <summary>
-        /// Called when a playfield performed a combo or a step in a chain 
-        /// </summary>
-        private void PerformedCombo(PlayField sender, Pos pos, bool isChain, int count)
-        {
-            if (isChain)
-            {
-                chainEffect.Play();
-            }
-        }
-
-        /// <summary>
         /// Called when a chain is completed
         /// </summary>
         private void PerformedChain(PlayField sender, Chain chain)
@@ -519,29 +467,6 @@ namespace Tetatt.Screens
                         chain.length - 1,
                         GarbageType.Chain));
                 }
-            }
-
-            if (chain.length == 4)
-            {
-                fanfare1Effect.Play();
-            }
-            else if (chain.length > 4)
-            {
-                fanfare2Effect.Play();
-            }
-        }
-
-        /// <summary>
-        /// Called when a block is popped
-        /// </summary>
-        private void Popped(PlayField sender, Pos pos, bool isGarabge, Chain chain)
-        {
-            SoundEffect effect = popEffect[Math.Min(chain.length, 4) - 1];
-            effect.Play(1, chain.popCount / 10.0f, 0);
-
-            if (chain.popCount < 10)
-            {
-                chain.popCount++;
             }
         }
 
@@ -623,9 +548,7 @@ namespace Tetatt.Screens
                 data.PlayField.Reset();
             }
 
-            music = normalMusic.CreateInstance();
-            music.IsLooped = true;
-            music.Play();
+            audioComponent.GameStarted();
         }
 
         /// <summary>
@@ -657,10 +580,7 @@ namespace Tetatt.Screens
                 }
             }
 
-            if (music != null)
-            {
-                music.Dispose();
-            }
+            audioComponent.GameEnded();
         }
 
         /// <summary>
@@ -671,11 +591,11 @@ namespace Tetatt.Screens
             Player data = new Player();
             data.PlayField = new DrawablePlayField(Player.DefaultLevel);
             data.PlayField.State = PlayFieldState.Dead;
-            data.PlayField.PerformedCombo += PerformedCombo;
             data.PlayField.PerformedChain += PerformedChain;
-            data.PlayField.Popped += Popped;
             data.PlayField.Died += Died;
             data.PlayField.Offset = Offsets[3]; // It will transition to the correct location
+
+            audioComponent.AddPlayField(data.PlayField);
 
             e.Gamer.Tag = data;
 
@@ -712,10 +632,10 @@ namespace Tetatt.Screens
         private void GamerLeft(object sender, GamerLeftEventArgs e)
         {
             Player data = (Player)e.Gamer.Tag;
-            data.PlayField.PerformedCombo -= PerformedCombo;
             data.PlayField.PerformedChain -= PerformedChain;
-            data.PlayField.Popped -= Popped;
             data.PlayField.Died -= Died;
+
+            audioComponent.RemovePlayField(data.PlayField);
         }
 
         /// <summary>

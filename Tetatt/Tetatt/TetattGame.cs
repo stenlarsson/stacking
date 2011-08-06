@@ -55,7 +55,8 @@ namespace Tetatt
 
             Components.Add(screenManager);
             Components.Add(new MessageDisplayComponent(this));
-            //Components.Add(new GamerServicesComponent(this));
+            Components.Add(new GamerServicesComponent(this));
+            Components.Add(new AudioComponent(this));
 
             // load the initial screens
             screenManager.AddScreen(new BackgroundScreen(), null);

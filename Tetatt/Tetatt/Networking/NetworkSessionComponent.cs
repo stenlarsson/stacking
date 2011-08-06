@@ -291,7 +291,7 @@ namespace Tetatt.Networking
                 NetworkSessionComponent.Create(screenManager, networkSession);
 
                 // Go to the gameplay screen.
-                screenManager.AddScreen(new GameplayScreen(networkSession), null);
+                screenManager.AddScreen(new GameplayScreen(screenManager, networkSession), null);
             }
             catch (Exception exception)
             {
