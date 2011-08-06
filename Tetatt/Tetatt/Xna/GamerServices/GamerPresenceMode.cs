@@ -2,6 +2,6 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
     public enum GamerPresenceMode
     {
-        LocalVersus, OnlineVersus
+        LocalVersus, OnlineVersus, VersusComputer
     }
 }

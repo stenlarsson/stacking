@@ -207,6 +207,15 @@
     <Compile Include="Xna\GamerServices\Guide.cs" />
     <Compile Include="Xna\GamerServices\GamerServicesComponent.cs" />
     <Compile Include="Graphics\DrawablePlayField.cs" />
+    <Compile Include="Screens\VersusAIScreen.cs" />
+    <Compile Include="ArtificialIntelligence\AIPlayer.cs" />
+    <Compile Include="ArtificialIntelligence\Location.cs" />
+    <Compile Include="ArtificialIntelligence\SimplifiedPlayField.cs" />
+    <Compile Include="AudioComponent.cs" />
+    <Compile Include="Xna\Media\Song.cs" />
+    <Compile Include="Xna\Media\MediaPlayer.cs" />
+    <Compile Include="Xna\Media\MediaState.cs" />
+    <Compile Include="Xna\Media\MediaQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

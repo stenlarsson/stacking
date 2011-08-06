@@ -3,6 +3,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace Microsoft.Xna.Framework.Content
 {
@@ -33,7 +34,10 @@ namespace Microsoft.Xna.Framework.Content
             {
                 return (T)(object)Texture2D.FromPath(string.Format("../../../TetattContent/{0}.png", assetName));
             }
-
+            else if (typeof(T) == typeof(Song))
+            {
+                return (T)(object)new Song(string.Format("../../../TetattContent/{0}.wav", assetName));
+            }
             else if (typeof(T) == typeof(SoundEffect))
             {
                 return (T)(object)new SoundEffect(string.Format("../../../TetattContent/{0}.wav", assetName));
