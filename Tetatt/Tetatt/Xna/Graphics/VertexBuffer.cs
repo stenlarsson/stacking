@@ -7,11 +7,8 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class VertexBuffer : GraphicsResource
     {
-        public BufferUsage BufferUsage { get { return usage; } }
-        private BufferUsage usage;
-
-        public int VertexCount { get { return count; } }
-        private int count;
+        public BufferUsage BufferUsage { get; private set; }
+        public int VertexCount { get; private set; }
 
         internal uint buffer;
         internal VertexDeclaration decl;
@@ -24,8 +21,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public VertexBuffer(GraphicsDevice device, VertexDeclaration decl, int count, BufferUsage usage)
             : base(device)
         {
-            this.usage = usage;
-            this.count = count;
+            BufferUsage = usage;
+            VertexCount = count;
             this.decl = decl;
 
             GL.GenBuffers(1, out buffer);
@@ -45,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
             // TODO: Check that count/size agrees with the data array
             int size = decl.VertexStride;
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-            GL.BufferData<T>(BufferTarget.ArrayBuffer, new IntPtr(count * size), data, BufferUsageHint.StaticDraw);
+            GL.BufferData<T>(BufferTarget.ArrayBuffer, new IntPtr(VertexCount * size), data, BufferUsageHint.StaticDraw);
             foreach (VertexElement e in decl.GetVertexElements())
             {
                 switch(e.ElementFormat)

@@ -4,15 +4,11 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public abstract class GraphicsResource : IDisposable
     {
-        private GraphicsDevice device;
-        public GraphicsDevice GraphicsDevice
-        {
-            get { return device; }
-        }
+        public GraphicsDevice GraphicsDevice { get; private set; }
 
         public GraphicsResource(GraphicsDevice device)
         {
-            this.device = device;
+            GraphicsDevice = device;
         }
 
         ~GraphicsResource()

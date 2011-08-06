@@ -5,22 +5,18 @@ namespace Microsoft.Xna.Framework
 {
     public class GameComponent : IGameComponent, IUpdateable, IDisposable
     {
-        private Game game;
-        public Game Game
-        {
-            get { return game; }
-        }
+        public Game Game { get; private set; }
 
         public GameComponent(Game game)
         {
-            this.game = game;
+            Game = game;
         }
 
         ~GameComponent() {
             Dispose(false);
         }
 
-        private bool disposed = false;
+        bool disposed = false;
         public void Dispose()
         {
             Dispose(true);
@@ -46,7 +42,7 @@ namespace Microsoft.Xna.Framework
         {
         }
 
-        private bool enabled = true;
+        bool enabled = true;
         public bool Enabled {
             get {
                 return enabled;
@@ -63,7 +59,7 @@ namespace Microsoft.Xna.Framework
         }
         public event EventHandler<EventArgs> EnabledChanged;
 
-        private int updateOrder;
+        int updateOrder;
         public int UpdateOrder {
             get {
                 return updateOrder;

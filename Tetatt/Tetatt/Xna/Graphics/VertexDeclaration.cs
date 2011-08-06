@@ -4,17 +4,13 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class VertexDeclaration
     {
-        private VertexElement[] elems;
+        VertexElement[] elems;
 
-        private int stride;
-        public int VertexStride
-        {
-            get { return stride; }
-        }
+        public int VertexStride { get; private set; }
 
         public VertexDeclaration(int stride, params VertexElement[] elems)
         {
-            this.stride = stride;
+            VertexStride = stride;
             this.elems = elems;
         }
 

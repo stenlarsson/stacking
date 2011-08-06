@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 {
     public class GamerProfile
     {
-        private Gamer gamer;
+        Gamer gamer;
 
         internal GamerProfile(Gamer gamer)
         {

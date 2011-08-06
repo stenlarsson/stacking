@@ -8,7 +8,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Viewport
     {
-        private Rectangle bounds;
+        Rectangle bounds;
         public Rectangle Bounds {
             get { return bounds; }
             set { bounds = value; glViewport(); }
@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public int Width { get { return bounds.Width; } }
         public int Height { get { return bounds.Height; } }
 
-        private PresentationParameters presentationParameters;
+        PresentationParameters presentationParameters;
         internal Viewport(PresentationParameters presentationParameters)
         {
             this.presentationParameters = presentationParameters;
@@ -28,19 +28,18 @@ namespace Microsoft.Xna.Framework.Graphics
             this.bounds = presentationParameters.Bounds;
         }
 
-        private float scale;
-        internal float windowScale { get { return scale; } }
-        private Rectangle window;
+        internal float windowScale { get; private set; }
+        Rectangle window;
         internal Rectangle windowRectangle {
             get { return window; }
             set {
                 // Use the new window rectangle, but shrunken to maintain aspect ratio
                 var pb = presentationParameters.Bounds;
-                scale = Math.Min(
+                windowScale = Math.Min(
                      (float)value.Width / pb.Width,
                      (float)value.Height / pb.Height);
-                window.Width = (int)(scale * pb.Width);
-                window.Height = (int)(scale * pb.Height);
+                window.Width = (int)(windowScale * pb.Width);
+                window.Height = (int)(windowScale * pb.Height);
                 window.X = (value.Width - window.Width) / 2;
                 window.Y = (value.Height - window.Height) / 2;
 
@@ -48,13 +47,13 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
-        private void glViewport()
+        void glViewport()
         {
             GL.Viewport(
-                (int)(scale * bounds.X + window.X),
-                (int)(scale * bounds.Y + window.Y),
-                (int)(scale * bounds.Width),
-                (int)(scale * bounds.Height));
+                (int)(windowScale * bounds.X + window.X),
+                (int)(windowScale * bounds.Y + window.Y),
+                (int)(windowScale * bounds.Width),
+                (int)(windowScale * bounds.Height));
         }
     }
 }

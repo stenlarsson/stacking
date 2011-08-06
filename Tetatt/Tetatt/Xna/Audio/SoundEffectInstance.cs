@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Audio
 {
     public class SoundEffectInstance : IDisposable
     {
-        private int source;
+        int source;
 
         internal SoundEffectInstance(SoundEffect effect)
         {

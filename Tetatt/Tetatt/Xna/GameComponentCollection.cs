@@ -27,13 +27,13 @@ namespace Microsoft.Xna.Framework
             base.RemoveItem(index);
         }
 
-        private void OnComponentAdded(IGameComponent component)
+        void OnComponentAdded(IGameComponent component)
         {
             if (ComponentAdded != null)
                 ComponentAdded(this, new GameComponentCollectionEventArgs(component));
         }
 
-        private void OnComponentRemoved(IGameComponent component)
+        void OnComponentRemoved(IGameComponent component)
         {
             if (ComponentRemoved != null)
                 ComponentRemoved(this, new GameComponentCollectionEventArgs(component));

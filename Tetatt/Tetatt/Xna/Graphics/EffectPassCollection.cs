@@ -6,7 +6,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public sealed class EffectPassCollection : IEnumerable<EffectPass>
     {
-        private EffectPass pass;
+        EffectPass pass;
 
         internal EffectPassCollection(BasicEffect effect)
         {

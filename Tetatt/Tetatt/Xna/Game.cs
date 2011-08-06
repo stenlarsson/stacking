@@ -15,9 +15,9 @@ namespace Microsoft.Xna.Framework
 {
     public class Game : IDisposable
     {
-        private GameWindow gameWindow;
-        private GraphicsDeviceManager graphicsDeviceManager;
-        private AudioContext audioContext = new AudioContext();
+        GameWindow gameWindow;
+        GraphicsDeviceManager graphicsDeviceManager;
+        AudioContext audioContext = new AudioContext();
 
         public GameComponentCollection Components { get; set; }
         public GameServiceContainer Services { get; set; }
@@ -64,14 +64,14 @@ namespace Microsoft.Xna.Framework
             gameWindow.Exit();
         }
 
-        private void OnUpdateFrame(object sender, FrameEventArgs e)
+        void OnUpdateFrame(object sender, FrameEventArgs e)
         {
             GameTime gameTime = new GameTime(e.Time);
             GameTime.totalGameTime += gameTime.ElapsedGameTime;
             Update(gameTime);
         }
 
-        private void OnRenderFrame(object sender, FrameEventArgs e)
+        void OnRenderFrame(object sender, FrameEventArgs e)
         {
             GameTime gameTime = new GameTime(e.Time);
             Draw(gameTime);
@@ -133,18 +133,18 @@ namespace Microsoft.Xna.Framework
             // TODO implement
         }
 
-        private void ComponentAdded(object sender, GameComponentCollectionEventArgs e)
+        void ComponentAdded(object sender, GameComponentCollectionEventArgs e)
         {
             e.GameComponent.Initialize();
             ((GameComponent)e.GameComponent).Disposed += ComponentDisposed;
         }
 
-        private void ComponentRemoved(object sender, GameComponentCollectionEventArgs e)
+        void ComponentRemoved(object sender, GameComponentCollectionEventArgs e)
         {
             ((GameComponent)e.GameComponent).Disposed -= ComponentDisposed;
         }
 
-        private void ComponentDisposed(object sender, EventArgs e)
+        void ComponentDisposed(object sender, EventArgs e)
         {
             Components.Remove((GameComponent)sender);
         }
