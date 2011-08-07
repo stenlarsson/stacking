@@ -5,7 +5,7 @@ namespace Microsoft.Xna.Framework.Net
 {
 	public class NetworkGamer : Gamer
 	{
-        internal NetworkGamer(string gamertag, byte id) : base(gamertag)
+        internal protected NetworkGamer(string gamertag, byte id) : base(gamertag)
         {
             Id = id;
         }

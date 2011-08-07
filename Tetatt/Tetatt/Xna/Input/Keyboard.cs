@@ -4,7 +4,7 @@ namespace Microsoft.Xna.Framework.Input
 {
     public class Keyboard
     {
-        static internal bool[] keys =
+        static readonly internal bool[] keys =
             new bool[Enum.GetValues(typeof(OpenTK.Input.Key)).Length];
 
         public static KeyboardState GetState()

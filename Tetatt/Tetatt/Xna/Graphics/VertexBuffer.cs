@@ -10,8 +10,8 @@ namespace Microsoft.Xna.Framework.Graphics
         public BufferUsage BufferUsage { get; private set; }
         public int VertexCount { get; private set; }
 
-        internal uint buffer;
-        internal VertexDeclaration decl;
+        uint buffer;
+        VertexDeclaration decl;
 
         public VertexBuffer(GraphicsDevice device, Type type, int count, BufferUsage usage)
             : this(device, ((IVertexType)Activator.CreateInstance(type)).VertexDeclaration, count, usage)
@@ -58,6 +58,11 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+        }
+
+        internal void glBindBuffer(BufferTarget target)
+        {
+             GL.BindBuffer(target, buffer);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Microsoft.Xna.Framework.GamerServices
     {
         internal string picture;
 
-        internal Gamer(string gamertag)
+        internal protected Gamer(string gamertag)
         {
             Gamertag = gamertag;
         }
@@ -28,7 +28,7 @@ namespace Microsoft.Xna.Framework.GamerServices
             return new GamerProfile(this);
         }
 
-        internal static IList<SignedInGamer> signedInGamers = new List<SignedInGamer>();
+        static IList<SignedInGamer> signedInGamers = new List<SignedInGamer>();
         public static SignedInGamerCollection SignedInGamers
         {
             get {

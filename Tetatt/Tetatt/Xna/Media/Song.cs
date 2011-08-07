@@ -4,7 +4,7 @@ namespace Microsoft.Xna.Framework.Media
 {
     public class Song
     {
-        internal SoundEffect effect = null;
+        internal SoundEffect effect;
 
         internal Song(string path)
         {

@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class Texture2D
     {
-        internal int id;
+        int id;
 
         public int Width { get; set; }
         public int Height { get; set; }
@@ -18,7 +18,7 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return new Rectangle(0, 0, Width, Height); }
         }
 
-        internal Texture2D(GraphicsDevice device, Bitmap bmp)
+        Texture2D(GraphicsDevice device, Bitmap bmp)
         {
             // TODO: Support more than one graphics device...
 
@@ -70,6 +70,12 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             return new Texture2D(device, new Bitmap(stream));
         }
+
+        internal void glBindTexture(TextureTarget target)
+        {
+            GL.BindTexture(target, id);
+        }
+
     }
 }
 
