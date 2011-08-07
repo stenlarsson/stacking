@@ -2,7 +2,6 @@ using System;
 using System.Drawing;
 using System.ComponentModel;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace Microsoft.Xna.Framework.GamerServices
 {

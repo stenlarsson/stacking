@@ -8,6 +8,7 @@ namespace Microsoft.Xna.Framework.Net
 {
 	public sealed class NetworkSession : IDisposable
 	{
+#pragma warning disable 0067
         public static event EventHandler<InviteAcceptedEventArgs> InviteAccepted;
 
         public event EventHandler<GamerJoinedEventArgs> GamerJoined;
@@ -15,6 +16,7 @@ namespace Microsoft.Xna.Framework.Net
         public event EventHandler<GameStartedEventArgs> GameStarted;
         public event EventHandler<GameEndedEventArgs> GameEnded;
         public event EventHandler<NetworkSessionEndedEventArgs> SessionEnded;
+#pragma warning restore 0067
 
         public NetworkSession (
             IEnumerable<SignedInGamer> localGamers,
