@@ -42,7 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetVertexBuffer(VertexBuffer buffer)
         {
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, buffer.buffer);
+            buffer.glBindBuffer(BufferTarget.ElementArrayBuffer);
             GL.EnableClientState(ArrayCap.VertexArray);
         }
 

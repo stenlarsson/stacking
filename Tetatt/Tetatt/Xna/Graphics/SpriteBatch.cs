@@ -87,7 +87,7 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.LoadIdentity();
             GL.Scale(1.0f / texture.Width, 1.0f / texture.Height, 1);
 
-            GL.BindTexture(TextureTarget.Texture2D, texture.id);
+            texture.glBindTexture(TextureTarget.Texture2D);
             GL.Begin(BeginMode.TriangleStrip);
             GL.TexCoord2(src.Left, src.Top);
             GL.Vertex2(dest.Left, dest.Top);

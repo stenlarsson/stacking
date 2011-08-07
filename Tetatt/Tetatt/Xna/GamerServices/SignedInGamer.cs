@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.GamerServices
 
         public PlayerIndex PlayerIndex
         {
-            get; internal set;
+            get; private set;
         }
 
         public bool IsSignedInToLive

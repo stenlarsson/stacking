@@ -14,15 +14,12 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void Apply()
         {
-            Matrix m = effect.Projection;
             GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref m.m);
+            effect.Projection.glLoadMatrix();
 
             GL.MatrixMode(MatrixMode.Modelview);
-            m = effect.World;
-            GL.LoadMatrix(ref m.m);
-            m = effect.View;
-            GL.MultMatrix(ref m.m);
+            effect.World.glLoadMatrix();
+            effect.View.glMultMatrix();
 
             if (effect.VertexColorEnabled)
             {

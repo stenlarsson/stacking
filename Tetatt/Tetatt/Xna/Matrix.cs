@@ -1,14 +1,15 @@
 using System;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace Microsoft.Xna.Framework
 {
     [Serializable]
     public struct Matrix
     {
-        internal Matrix4 m;
+        Matrix4 m;
 
-        internal Matrix(Matrix4 m)
+        Matrix(Matrix4 m)
         {
             this.m = m;
         }
@@ -33,6 +34,16 @@ namespace Microsoft.Xna.Framework
                 top,
                 zNearPlane,
                 zFarPlane));
+        }
+
+        internal void glLoadMatrix()
+        {
+            GL.LoadMatrix(ref m);
+        }
+
+        internal void glMultMatrix()
+        {
+            GL.MultMatrix(ref m);
         }
     }
 }

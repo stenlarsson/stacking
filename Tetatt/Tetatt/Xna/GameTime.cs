@@ -7,12 +7,11 @@ namespace Microsoft.Xna.Framework
         internal static TimeSpan totalGameTime;
         public TimeSpan TotalGameTime { get { return totalGameTime; } }
 
-        internal TimeSpan elapsedGameTime;
-        public TimeSpan ElapsedGameTime { get { return elapsedGameTime; } }
+        public TimeSpan ElapsedGameTime { get; private set; }
 
         internal GameTime(double elapsedTime)
         {
-            elapsedGameTime = new TimeSpan((long)(elapsedTime * 10000000));
+            ElapsedGameTime = new TimeSpan((long)(elapsedTime * 10000000));
         }
     }
 }
