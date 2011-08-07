@@ -9,16 +9,17 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class SpriteFont
     {
-        internal Graphics.Texture2D texture;
-        internal IDictionary<char, Rectangle> chars;
+        Graphics.Texture2D texture;
+        IDictionary<char, Rectangle> chars;
         char backup;
 
-        public SpriteFont(Graphics.Texture2D texture, IDictionary<char, Rectangle> chars) {
+        public SpriteFont(Graphics.Texture2D texture, IDictionary<char, Rectangle> chars)
+        {
             this.texture = texture;
             this.chars = chars;
             this.backup = chars.ContainsKey('?') ? '?' : chars.First().Key;
-            Spacing = 0.0f;
-            LineSpacing = chars.First().Value.Height;
+            this.Spacing = 0.0f;
+            this.LineSpacing = chars.First().Value.Height;
         }
 
         public float Spacing { get; set; }
@@ -28,7 +29,7 @@ namespace Microsoft.Xna.Framework.Graphics
             int x = 0;
             int y = chars.First().Value.Height;
             int line = 0;
-            foreach (char c in PrepareString(text))
+            foreach (char c in CleanString(text))
             {
                 if (c == '\n')
                 {
@@ -42,33 +43,49 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Vector2(Math.Max(line, x), y);
         }
 
-        internal string PrepareString(string text)
+        internal delegate void _DrawAction(Texture2D texture, Rectangle source, Vector2 position);
+        internal void _Draw(string text, _DrawAction callback)
         {
-            StringBuilder result = new StringBuilder(text.Length);
-            bool ignoreline = false;
-            foreach (char c in text)
+            Vector2 pos = new Vector2(0, 0);
+            foreach (char c in CleanString(text))
             {
+                if (c == '\n')
+                {
+                    pos.X = 0;
+                    pos.Y += LineSpacing;
+                }
+                else
+                {
+                    Rectangle rect = chars[c];
+                    callback(texture, rect, pos);
+                    pos.X += rect.Width + Spacing;
+                }
+            }
+        }
+
+
+        IEnumerable<char> CleanString(string text)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
                 switch (c)
                 {
-                case '\n':
-                    if (ignoreline)
-                        break;
-                    goto case '\0';
                 case '\r':
-                    ignoreline = true;
-                    goto case '\0';
-                case '\0':
-                    result.Append('\n');
+                    if (text[++i] != '\n')
+                        i--;
+                    goto case '\n';
+                case '\n':
+                    yield return '\n';
                     break;
                 default:
                     if (chars.ContainsKey(c))
-                        result.Append(c);
+                        yield return c;
                     else
-                        result.Append(backup);
+                        yield return backup;
                     break;
                 }
             }
-            return result.ToString();
         }
 
         internal static SpriteFont _FromTextureAndXmlStream(Texture2D texture, Stream stream)
