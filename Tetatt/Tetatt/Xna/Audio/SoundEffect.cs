@@ -12,7 +12,7 @@ namespace Microsoft.Xna.Framework.Audio
         Queue<SoundEffectInstance> instances = new Queue<SoundEffectInstance>();
 
         // Loads a wave/riff audio file.
-        public static byte[] LoadWave(Stream stream, out int channels, out int bits, out int rate)
+        static byte[] LoadWave(Stream stream, out int channels, out int bits, out int rate)
         {
             if (stream == null)
                 throw new ArgumentNullException("stream");
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        public static ALFormat GetSoundFormat(int channels, int bits)
+        static ALFormat GetSoundFormat(int channels, int bits)
         {
             switch (channels)
             {
@@ -67,10 +67,10 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        internal SoundEffect (string file)
+        SoundEffect (Stream stream)
         {
             int channels, bits_per_sample, sample_rate;
-            byte[] sound_data = LoadWave(File.Open(file, FileMode.Open), out channels, out bits_per_sample, out sample_rate);
+            byte[] sound_data = LoadWave(stream, out channels, out bits_per_sample, out sample_rate);
             buffer = AL.GenBuffer();
             CheckAL();
             AL.BufferData(buffer, GetSoundFormat(channels, bits_per_sample), sound_data, sound_data.Length, sample_rate);
@@ -134,6 +134,11 @@ namespace Microsoft.Xna.Framework.Audio
             ALError error = AL.GetError();
             if (error != ALError.NoError)
                 throw new Exception(AL.GetErrorString(error));
+        }
+
+        internal static SoundEffect _FromWavStream(Stream stream)
+        {
+            return new SoundEffect(stream);
         }
     }
 }

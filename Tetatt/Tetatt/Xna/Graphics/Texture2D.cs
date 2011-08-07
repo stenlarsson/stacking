@@ -53,12 +53,9 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
         }
 
-        internal static Texture2D FromPath(string filename, System.Drawing.Color? transparent = null)
+        internal static Texture2D _FromPngStream(Stream stream, System.Drawing.Color? transparent = null)
         {
-            if (String.IsNullOrEmpty(filename))
-                throw new ArgumentException(filename);
-
-            Bitmap bmp = new Bitmap(filename);
+            Bitmap bmp = new Bitmap(stream);
 
             if (transparent.HasValue)
                 bmp.MakeTransparent(transparent.Value);

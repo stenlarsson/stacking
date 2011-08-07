@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.Xna.Framework.Audio;
 
 namespace Microsoft.Xna.Framework.Media
@@ -6,9 +7,14 @@ namespace Microsoft.Xna.Framework.Media
     {
         internal SoundEffect effect;
 
-        internal Song(string path)
+        Song(SoundEffect effect)
         {
-            effect = new SoundEffect(path);
+            this.effect = effect;
+        }
+
+        internal static Song _FromWavStream(Stream stream)
+        {
+            return new Song(SoundEffect._FromWavStream(stream));
         }
     }
 }
