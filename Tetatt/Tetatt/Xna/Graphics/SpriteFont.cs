@@ -1,7 +1,9 @@
 using System;
+using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace Microsoft.Xna.Framework.Graphics
 {
@@ -67,6 +69,20 @@ namespace Microsoft.Xna.Framework.Graphics
                 }
             }
             return result.ToString();
+        }
+
+        internal static SpriteFont _FromTextureAndXmlStream(Texture2D texture, Stream stream)
+        {
+            return new SpriteFont(texture,
+                XDocument.Load(stream).Root.Elements("character").ToDictionary(
+                    e => (char)int.Parse(e.Attribute("key").Value),
+                    e => new Rectangle(
+                         int.Parse(e.Element("x").Value),
+                         int.Parse(e.Element("y").Value),
+                         int.Parse(e.Element("width").Value),
+                         int.Parse(e.Element("height").Value))
+                    )
+                );
         }
     }
 }
