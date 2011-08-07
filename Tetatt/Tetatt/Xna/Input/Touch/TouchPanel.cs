@@ -7,6 +7,12 @@ namespace Microsoft.Xna.Framework.Input.Touch
 {
     public class TouchPanel
     {
+        static TouchPanel()
+        {
+            IsGestureAvailable = false;
+            EnabledGestures = GestureType.None;
+        }
+
         public static GestureType EnabledGestures { get; set; }
 
         public static TouchCollection GetState()
@@ -14,9 +20,9 @@ namespace Microsoft.Xna.Framework.Input.Touch
             return new TouchCollection();
         }
 
-        public static bool IsGestureAvailable { get; set; }
+        public static bool IsGestureAvailable { get; private set; }
 
-        internal static GestureSample ReadGesture()
+        public static GestureSample ReadGesture()
         {
             throw new NotImplementedException();
         }
