@@ -153,7 +153,7 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <ProjectReference Include="..\FakeXna.csproj">
+    <ProjectReference Include="..\FakeXna\FakeXna.csproj">
       <Project>{47E3B0B0-247E-4EC7-B451-A7FF321BC900}</Project>
       <Name>FakeXna</Name>
     </ProjectReference>
