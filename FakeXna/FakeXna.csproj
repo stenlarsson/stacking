@@ -184,4 +184,10 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <ProjectReference Include="..\FFmpeg\FFmpeg.csproj">
+      <Project>{5C83C587-D7A1-4B76-A95C-9AF20174601B}</Project>
+      <Name>FFmpeg</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

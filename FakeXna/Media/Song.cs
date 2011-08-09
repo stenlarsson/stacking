@@ -16,6 +16,11 @@ namespace Microsoft.Xna.Framework.Media
         {
             return new Song(SoundEffect._FromWavStream(stream));
         }
+
+        internal static Song _FromGenericStream(Stream stream)
+        {
+            return new Song(SoundEffect._FromGenericStream(stream));
+        }
     }
 }
 

@@ -38,8 +38,25 @@ namespace Microsoft.Xna.Framework.Content
             }
             else if (typeof(T) == typeof(Song))
             {
-                using (var stream = GetResource(assetName, "wav"))
-                    return (T)(object)Song._FromWavStream(stream);
+                var di = new DirectoryInfo("../../../TetattContent");
+                Exception finale = null;
+                try {
+                    using (var stream = GetResource(assetName, "wav"))
+                        return (T)(object)Song._FromWavStream(stream);
+                } catch (Exception e) {
+                    finale = e;
+                }
+                foreach (var fi in di.EnumerateFiles(string.Format("{0}.*", assetName)))
+                {
+                    try {
+                        using (var stream = GetResource(assetName, fi.Extension.Substring(1)))
+                            return (T)(object)Song._FromGenericStream(stream);
+                    } catch (Exception e) {
+                        // Ignore all errors but last one
+                        finale = e;
+                    }
+                }
+                throw finale; // If we couldn't find anything that loads.
             }
             else if (typeof(T) == typeof(SoundEffect))
             {

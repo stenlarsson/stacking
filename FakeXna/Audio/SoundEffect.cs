@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using OpenTK.Audio.OpenAL;
+using FakeXna.FFmpeg.AVCodec;
+using FakeXna.FFmpeg.AVFormat;
+using FakeXna.FFmpeg.AVUtil;
+using Stream = System.IO.Stream;
 
 namespace Microsoft.Xna.Framework.Audio
 {
@@ -67,13 +71,11 @@ namespace Microsoft.Xna.Framework.Audio
             }
         }
 
-        SoundEffect (Stream stream)
+        SoundEffect (byte [] sound_data, int length, ALFormat format, int sample_rate)
         {
-            int channels, bits_per_sample, sample_rate;
-            byte[] sound_data = LoadWave(stream, out channels, out bits_per_sample, out sample_rate);
             buffer = AL.GenBuffer();
             CheckAL();
-            AL.BufferData(buffer, GetSoundFormat(channels, bits_per_sample), sound_data, sound_data.Length, sample_rate);
+            AL.BufferData(buffer, format, sound_data, length, sample_rate);
             CheckAL();
             instances.Enqueue(new SoundEffectInstance(this));
         }
@@ -138,7 +140,52 @@ namespace Microsoft.Xna.Framework.Audio
 
         internal static SoundEffect _FromWavStream(Stream stream)
         {
-            return new SoundEffect(stream);
+            int channels, bits_per_sample, sample_rate;
+            byte[] sound_data = LoadWave(stream, out channels, out bits_per_sample, out sample_rate);
+            return
+                new SoundEffect(
+                     sound_data,
+                     sound_data.Length,
+                     GetSoundFormat(channels, bits_per_sample),
+                     sample_rate);
+        }
+
+        internal static SoundEffect _FromGenericStream(Stream stream)
+        {
+            FormatContext.Init();
+            Codec.Init();
+
+            using (var ms = new MemoryStream())
+            using (var input = new FormatContext(IOContext.FromStream(stream)))
+            {
+                Codec decoder;
+                var context = input.FindBestStream(MediaType.Audio, out decoder).Codec;
+                context.Open(decoder);
+
+                byte[] buffer = new byte[CodecContext.MinimumOutputBufferSize];
+                foreach (var packet in input.Frames)
+                {
+                    int bytes = context.DecodeAudio(buffer, packet);
+                    ms.Write(buffer, 0, bytes);
+                }
+
+                if (context.Channels > 2)
+                    throw new NotSupportedException();
+
+                bool stereo = context.Channels == 2;
+                ALFormat format;
+                switch (context.SampleFormat)
+                {
+                case SampleFormat.Unsigned8:
+                    format = stereo ? ALFormat.Stereo8 : ALFormat.Mono8; break;
+                case SampleFormat.Signed16:
+                    format = stereo ? ALFormat.Stereo16 : ALFormat.Mono16; break;
+                default:
+                    throw new NotSupportedException();
+                }
+
+                return new SoundEffect(ms.GetBuffer(), (int)ms.Length, format, context.SampleRate);
+            }
         }
     }
 }
