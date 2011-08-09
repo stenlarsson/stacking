@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5C83C587-D7A1-4B76-A95C-9AF20174601B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>FakeXna.FFmpeg</RootNamespace>
+    <AssemblyName>FakeXna.FFmpeg</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AVCodec\Codec.cs" />
+    <Compile Include="AVCodec\CodecContext.cs" />
+    <Compile Include="AVCodec\NativeMethods.cs" />
+    <Compile Include="AVCodec\Packet.cs" />
+    <Compile Include="AVFormat\Delegates.cs" />
+    <Compile Include="AVFormat\FormatContext.cs" />
+    <Compile Include="AVFormat\IOContext.cs" />
+    <Compile Include="AVFormat\MediaType.cs" />
+    <Compile Include="AVFormat\NativeIOContext.cs" />
+    <Compile Include="AVFormat\NativeMethods.cs" />
+    <Compile Include="AVFormat\Stream.cs" />
+    <Compile Include="AVFormat\StreamCollection.cs" />
+    <Compile Include="AVFormat\StreamIOContext.cs" />
+    <Compile Include="AVUtil\Memory.cs" />
+    <Compile Include="AVUtil\SampleFormat.cs" />
+    <Compile Include="AVUtil\NativeMethods.cs" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <DotNetNamingPolicy DirectoryNamespaceAssociation="PrefixedHierarchical" ResourceNamePolicy="FileFormatDefault" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>
