@@ -25,7 +25,7 @@ namespace Microsoft.Xna.Framework.Content
         Stream GetResource(string name, string type)
         {
             return new FileStream(
-                String.Format("../../../TetattContent/{0}.{1}", name, type),
+                String.Format("{0}/{1}.{2}", RootDirectory, name, type),
                 FileMode.Open);
         }
 
@@ -38,7 +38,7 @@ namespace Microsoft.Xna.Framework.Content
             }
             else if (typeof(T) == typeof(Song))
             {
-                var di = new DirectoryInfo("../../../TetattContent");
+                var di = new DirectoryInfo(RootDirectory);
                 Exception finale = null;
                 try {
                     using (var stream = GetResource(assetName, "wav"))
