@@ -157,5 +157,9 @@
       <Project>{47E3B0B0-247E-4EC7-B451-A7FF321BC900}</Project>
       <Name>FakeXna</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TetattContent\TetattContent.mdproj">
+      <Project>{0275B22B-9170-4916-8A2A-72E375775FEE}</Project>
+      <Name>TetattContent</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
