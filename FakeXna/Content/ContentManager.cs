@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
@@ -8,6 +9,7 @@ namespace Microsoft.Xna.Framework.Content
 {
     public class ContentManager
     {
+        Dictionary<string, object> loaded = new Dictionary<string, object>();
         public IServiceProvider ServiceProvider { get; private set; }
         public string RootDirectory { get; set; }
 
@@ -29,12 +31,31 @@ namespace Microsoft.Xna.Framework.Content
                 FileMode.Open);
         }
 
+        object Cache(string assetName, object obj)
+        {
+            loaded.Add(assetName, obj);
+            return obj;
+        }
+
         public virtual T Load<T>(string assetName)
         {
+            object val;
+            if (loaded.TryGetValue(assetName, out val))
+            {
+                try {
+                    return (T)val;
+                } catch (InvalidCastException ice) {
+                    throw new ContentLoadException(
+                         string.Format(
+                             "Couldn't load asset '{0}' of type '{1}'",
+                             assetName, typeof(T).Name), ice);
+                }
+            }
+
             if (typeof(T) == typeof(Texture2D))
             {
                 using(var stream = GetResource(assetName, "png"))
-                    return (T)(object)Texture2D._FromPngStream(stream);
+                    return (T)Cache(assetName, Texture2D._FromPngStream(stream));
             }
             else if (typeof(T) == typeof(Song))
             {
@@ -42,7 +63,7 @@ namespace Microsoft.Xna.Framework.Content
                 Exception finale = null;
                 try {
                     using (var stream = GetResource(assetName, "wav"))
-                        return (T)(object)Song._FromWavStream(stream);
+                        return (T)Cache(assetName, Song._FromWavStream(stream));
                 } catch (Exception e) {
                     finale = e;
                 }
@@ -50,7 +71,7 @@ namespace Microsoft.Xna.Framework.Content
                 {
                     try {
                         using (var stream = GetResource(assetName, fi.Extension.Substring(1)))
-                            return (T)(object)Song._FromGenericStream(stream);
+                            return (T)Cache(assetName, Song._FromGenericStream(stream));
                     } catch (Exception e) {
                         // Ignore all errors but last one
                         finale = e;
@@ -61,15 +82,15 @@ namespace Microsoft.Xna.Framework.Content
             else if (typeof(T) == typeof(SoundEffect))
             {
                 using (var stream = GetResource(assetName, "wav"))
-                    return (T)(object)SoundEffect._FromWavStream(stream);
+                    return (T)Cache(assetName, SoundEffect._FromWavStream(stream));
             }
             else if (typeof(T)==typeof(SpriteFont))
             {
                 using (var pngStream = GetResource(assetName, "png"))
                     using (var xmlStream = GetResource(assetName, "xml"))
-                        return (T)(object)SpriteFont._FromTextureAndXmlStream(
+                        return (T)Cache(assetName, SpriteFont._FromTextureAndXmlStream(
                             Texture2D._FromPngStream(pngStream, System.Drawing.Color.Magenta),
-                            xmlStream);
+                            xmlStream));
             }
             return default(T);
         }
