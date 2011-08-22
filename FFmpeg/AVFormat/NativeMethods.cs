@@ -46,7 +46,7 @@ namespace FakeXna.FFmpeg.AVFormat
 			MediaType type,
 			int wanted_stream_nb,
 			int related_stream,
-			ref IntPtr decoder_ret,
+			out IntPtr decoder_ret,
 			int flags);
 
 		[DllImport(Library, CallingConvention = CallConv)]

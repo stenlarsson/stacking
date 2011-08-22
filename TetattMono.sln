@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetattMono", "Tetatt\TetattMono.csproj", "{18FD06A8-7F62-439C-AA81-446E2B1BC16E}"
@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXna", "FakeXna\FakeXna.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFmpeg", "FFmpeg\FFmpeg.csproj", "{5C83C587-D7A1-4B76-A95C-9AF20174601B}"
 EndProject
-Project("{9344bdbb-3e7f-41fc-a0dd-8665d75ee146}") = "TetattContent", "TetattContent\TetattContent.mdproj", "{0275B22B-9170-4916-8A2A-72E375775FEE}"
+Project("{9344bdbb-3e7f-41fc-a0dd-8665d75ee146}") = "TetattContent", "TetattContent\TetattContent.csproj", "{0275B22B-9170-4916-8A2A-72E375775FEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
