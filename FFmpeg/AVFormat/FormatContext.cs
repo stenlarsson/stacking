@@ -66,7 +66,7 @@ namespace FakeXna.FFmpeg.AVFormat
 		public Stream FindBestStream(MediaType type, out Codec decoder)
 		{
 			IntPtr decptr;
-			int index = NativeMethods.av_find_best_stream(native, type, -1, -1, ref decptr, 0);
+			int index = NativeMethods.av_find_best_stream(native, type, -1, -1, out decptr, 0);
 			if (index < 0)
 				throw new ArgumentException();
 			decoder = (decptr == IntPtr.Zero) ? null : new Codec(decptr);
