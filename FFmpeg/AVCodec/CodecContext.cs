@@ -1,15 +1,18 @@
 using System;
 using System.Runtime.InteropServices;
 using FakeXna.FFmpeg.AVUtil;
+using FakeXna.FFmpeg.AVFormat;
 
 namespace FakeXna.FFmpeg.AVCodec
 {
 	public class CodecContext
 	{
+		FormatContext owner;
 		IntPtr native;
 
-		internal CodecContext(IntPtr native)
+		internal CodecContext(FormatContext owner, IntPtr native)
 		{
+			this.owner = owner;
 			this.native = native;
 		}
 
@@ -18,6 +21,9 @@ namespace FakeXna.FFmpeg.AVCodec
 			// TODO: Implement lookup of codec id...
 			if (codec == null)
 				throw new ArgumentException();
+
+			if (owner.Disposed)
+				throw new InvalidOperationException();
 
 			int r = NativeMethods.avcodec_open(native, codec.native);
 			if (r != 0)
@@ -28,6 +34,9 @@ namespace FakeXna.FFmpeg.AVCodec
 		int offset
 		{
 			get {
+				if (owner.Disposed)
+					throw new InvalidOperationException();
+
 				// Offset: 1 ptr, 5 int, 1 ptr, 7 int, maybe 1 int, 1 ptr
 				// NOTE: This will break for 128-bit processors, but perhaps we don't need to be that future proof. :)
 				if (Memory.IntPtrSize == 8)
@@ -47,6 +56,9 @@ namespace FakeXna.FFmpeg.AVCodec
 
 		public int DecodeAudio(byte[] outputBuffer, Packet inputPacket)
 		{
+			if (owner.Disposed)
+				throw new InvalidOperationException();
+
 			int outputSize = outputBuffer.Length;
 			if (outputSize < MinimumOutputBufferSize)
 				throw new ArgumentException();

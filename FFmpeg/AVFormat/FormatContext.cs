@@ -10,6 +10,7 @@ namespace FakeXna.FFmpeg.AVFormat
 	{
 		IntPtr native;
 		IOContext io;
+		internal bool Disposed { get { return native != IntPtr.Zero; } }
 
 		public FormatContext(IOContext pb)
 		{
@@ -69,7 +70,7 @@ namespace FakeXna.FFmpeg.AVFormat
 			int index = NativeMethods.av_find_best_stream(native, type, -1, -1, out decptr, 0);
 			if (index < 0)
 				throw new ArgumentException();
-			decoder = (decptr == IntPtr.Zero) ? null : new Codec(decptr);
+			decoder = (decptr == IntPtr.Zero) ? null : new Codec(this, decptr);
 			return Streams[index];
 		}
 
@@ -88,7 +89,7 @@ namespace FakeXna.FFmpeg.AVFormat
 				if (Marshal.ReadInt32(streams, Memory.IntPtrSize) == 0x40404040) // '@@@@'
 					streams = Marshal.ReadIntPtr(streams);
 
-				return new StreamCollection(count, streams);
+				return new StreamCollection(this, count, streams);
 			}
 		}
 
