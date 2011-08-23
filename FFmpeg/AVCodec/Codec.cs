@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using FakeXna.FFmpeg.AVFormat;
 
 namespace FakeXna.FFmpeg.AVCodec
 {
@@ -7,7 +8,7 @@ namespace FakeXna.FFmpeg.AVCodec
 	{
 		internal IntPtr native;
 
-		internal Codec(IntPtr native)
+		internal Codec(FormatContext owner, IntPtr native)
 		{
 			this.native = native;
 		}
