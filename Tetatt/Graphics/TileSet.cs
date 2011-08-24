@@ -11,11 +11,11 @@ namespace Tetatt.Graphics
     public class TileSet
     {
         List<Rectangle> rectangles;
-        Texture2D texture;
 
         public TileSet(Texture2D texture, int tileSize)
         {
-            this.texture = texture;
+            Texture = texture;
+            TileSize = tileSize;
 
             rectangles = new List<Rectangle>();
 
@@ -35,7 +35,14 @@ namespace Tetatt.Graphics
 
         public Texture2D Texture
         {
-            get { return texture; }
+            get;
+            private set;
+        }
+
+        public int TileSize
+        {
+            get;
+            private set;
         }
     }
 }

@@ -299,6 +299,31 @@ namespace Tetatt.Screens
 
 
         /// <summary>
+        /// Checks for a "menu toggle" input action.
+        /// The controllingPlayer parameter specifies which player to read input for.
+        /// If this is null, it will accept input from any player. When the action
+        /// is detected, the output playerIndex reports which player pressed it.
+        /// </summary>
+        public bool IsMenuToggle(PlayerIndex? controllingPlayer,
+                                 out PlayerIndex playerIndex)
+        {
+            if (IsNewKeyPress(Keys.RightShift, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.One;
+                return true;
+            }
+            else if (IsNewKeyPress(Keys.LeftShift, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.Two;
+                return true;
+            }
+            else
+            {
+                return IsNewButtonPress(Buttons.X, controllingPlayer, out playerIndex);
+            }
+        }
+
+        /// <summary>
         /// Checks for a "pause the game" input action.
         /// The controllingPlayer parameter specifies which player to read
         /// input for. If this is null, it will accept input from any player. When the action

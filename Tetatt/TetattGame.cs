@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Net;
 using System.Reflection;
 using Tetatt.Networking;
+using Tetatt.Graphics;
 
 namespace Tetatt
 {
@@ -31,6 +32,7 @@ namespace Tetatt
             "fanfare2",
             "gradient",
             "ingame_font",
+            "logo",
             "marker",
             "normal_music",
             "playfield",

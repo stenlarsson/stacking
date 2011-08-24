@@ -126,6 +126,15 @@ namespace Tetatt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copyright Flatware Design 2011.
+        /// </summary>
+        internal static string Copyright {
+            get {
+                return ResourceManager.GetString("Copyright", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Session.
         /// </summary>
         internal static string CreateSession {
@@ -294,8 +303,7 @@ namespace Tetatt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Press A
-        ///to join.
+        ///   Looks up a localized string similar to { Join.
         /// </summary>
         internal static string JoinInstruction {
             get {
@@ -358,7 +366,7 @@ namespace Tetatt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Main Menu.
+        ///   Looks up a localized string similar to .
         /// </summary>
         internal static string MainMenu {
             get {
@@ -368,8 +376,8 @@ namespace Tetatt {
         
         /// <summary>
         ///   Looks up a localized string similar to 
-        ///A button = ok
-        ///B button = cancel.
+        ///{ Ok
+        ///| Cancel.
         /// </summary>
         internal static string MessageBoxUsage {
             get {
@@ -482,6 +490,15 @@ namespace Tetatt {
         internal static string Time {
             get {
                 return ResourceManager.GetString("Time", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to } Toggle.
+        /// </summary>
+        internal static string ToggleReady {
+            get {
+                return ResourceManager.GetString("ToggleReady", resourceCulture);
             }
         }
         

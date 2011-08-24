@@ -8,11 +8,13 @@
 #endregion
 
 #region Using Statements
+using System;
+using System.Reflection;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Net;
 using Tetatt.Networking;
-using Microsoft.Xna.Framework.GamerServices;
-using System.Collections.Generic;
 #endregion
 
 namespace Tetatt.Screens
@@ -24,6 +26,8 @@ namespace Tetatt.Screens
     {
         #region Initialization
 
+        Texture2D logo;
+        string version;
 
         /// <summary>
         /// Constructor fills in the menu contents.
@@ -51,8 +55,17 @@ namespace Tetatt.Screens
             MenuEntries.Add(liveMenuEntry);
             MenuEntries.Add(systemLinkMenuEntry);
             MenuEntries.Add(exitMenuEntry);
+
+            version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
+        public override void LoadContent()
+        {
+            base.LoadContent();
+
+            ContentManager content = ScreenManager.Game.Content;
+            logo = content.Load<Texture2D>("logo");
+        }
 
         #endregion
 
@@ -139,6 +152,60 @@ namespace Tetatt.Screens
         void ConfirmExitMessageBoxAccepted(object sender, PlayerIndexEventArgs e)
         {
             ScreenManager.Game.Exit();
+        }
+
+
+        #endregion
+
+        #region Update and Draw
+
+
+        public override void Draw(GameTime gameTime)
+        {
+            base.Draw(gameTime);
+            GraphicsDevice graphics = ScreenManager.GraphicsDevice;
+            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
+            SpriteFont font = ScreenManager.Font;
+
+            float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
+
+            spriteBatch.Begin();
+
+            // Draw logo
+            Vector2 titlePosition = new Vector2(graphics.Viewport.Width / 2, 40);
+            Color titleColor = Color.White * TransitionAlpha;
+
+            titlePosition.X -= logo.Width / 2;
+            titlePosition.Y -= transitionOffset * 100;
+
+            spriteBatch.Draw(logo, titlePosition, titleColor);
+
+            // Draw copyright message
+            Vector2 copyrightPosition = new Vector2(
+                graphics.Viewport.Width / 2,
+                graphics.Viewport.Height - 80);
+            Vector2 copyrightOrigin = font.MeasureString(Resources.Copyright) / 2;
+            Color copyrightColor = Color.White * TransitionAlpha;
+
+            copyrightPosition.Y -= transitionOffset * 100;
+
+            spriteBatch.DrawString(font, Resources.Copyright, copyrightPosition, copyrightColor,
+                                   0, copyrightOrigin, 1.0f, SpriteEffects.None, 0);
+
+            // Draw version
+            Vector2 versionPosition = new Vector2(
+                graphics.Viewport.TitleSafeArea.Right,
+                graphics.Viewport.TitleSafeArea.Bottom);
+            Vector2 versionOrigin = font.MeasureString(version);
+            Color versionColor = Color.White * TransitionAlpha;
+
+            versionPosition.Y -= transitionOffset * 100;
+
+            spriteBatch.DrawString(font, version, versionPosition, versionColor,
+                                   0, versionOrigin, 0.75f, SpriteEffects.None, 0);
+            
+
+            spriteBatch.End();
         }
 
 
