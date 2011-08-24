@@ -14,7 +14,7 @@ namespace Tetatt.GamePlay
         Red = 24,
         Cyan = 30,
         Gray = 36,
-        Garbage = 64,
-        EvilGarbage = 72
+        Garbage = 72,
+        EvilGarbage = 80
     }
 }

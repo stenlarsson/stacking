@@ -9,15 +9,15 @@ namespace Tetatt.Graphics
     {
         private static AnimFrame[] frames =
         {
-            new AnimFrame(84, 3),
-            new AnimFrame(85, 3),
-            new AnimFrame(86, 3),
-            new AnimFrame(87, 3),
-            new AnimFrame(88, 3),
-            new AnimFrame(89, 3),
-            new AnimFrame(90, 3),
-            new AnimFrame(91, 3),
-            new AnimFrame(92, 3)
+            new AnimFrame(92, 3),
+            new AnimFrame(93, 3),
+            new AnimFrame(94, 3),
+            new AnimFrame(95, 3),
+            new AnimFrame(96, 3),
+            new AnimFrame(97, 3),
+            new AnimFrame(98, 3),
+            new AnimFrame(99, 3),
+            new AnimFrame(100, 3)
         };
 
         private int duration;
