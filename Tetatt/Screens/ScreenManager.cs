@@ -121,6 +121,7 @@ namespace Tetatt.Screens
             spriteBatch = new SpriteBatch(GraphicsDevice);
             //font = content.Load<SpriteFont>("menufont");
             font = content.Load<SpriteFont>("ingame_font");
+            font.Spacing = -5;
             blankTexture = content.Load<Texture2D>("blank");
 
             // Tell each of the screens to load their content.

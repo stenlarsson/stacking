@@ -549,31 +549,25 @@
   <character key="123">
     <x>327</x>
     <y>218</y>
-    <width>15</width>
+    <width>34</width>
     <height>34</height>
   </character>
   <character key="124">
-    <x>350</x>
+    <x>369</x>
     <y>218</y>
-    <width>12</width>
+    <width>34</width>
     <height>34</height>
   </character>
   <character key="125">
     <x>370</x>
     <y>218</y>
-    <width>15</width>
+    <width>34</width>
     <height>34</height>
   </character>
   <character key="126">
-    <x>393</x>
+    <x>411</x>
     <y>218</y>
-    <width>22</width>
-    <height>34</height>
-  </character>
-  <character key="127">
-    <x>423</x>
-    <y>218</y>
-    <width>21</width>
+    <width>34</width>
     <height>34</height>
   </character>
 </fontMetrics>

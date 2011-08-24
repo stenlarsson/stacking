@@ -44,7 +44,7 @@ namespace Tetatt.Screens
                 return;
             }
 
-            // Check if anyone wants to start the game
+            // Check if anyone wants to join
             if (input.IsMenuSelect(null, out playerIndex))
             {
                 LocalNetworkGamer gamer = FindGamer(playerIndex);
@@ -52,9 +52,15 @@ namespace Tetatt.Screens
                 {
                     AddLocalPlayer(playerIndex);
                 }
-                else
+            }
+
+            // Check if anyone wants to start the game
+            if (input.IsMenuToggle(null, out playerIndex))
+            {
+                LocalNetworkGamer gamer = FindGamer(playerIndex);
+                if (gamer != null)
                 {
-                    gamer.IsReady = !gamer.IsReady;
+                   gamer.IsReady = !gamer.IsReady;
                 }
             }
 
@@ -165,8 +171,17 @@ namespace Tetatt.Screens
                 spriteBatch.DrawString(
                     font,
                     ready,
-                    new Vector2(16, 16 + font.LineSpacing * 2) + offset,
+                    new Vector2(16, 16 + font.LineSpacing * 3) + offset,
                     Color.White);
+
+                if (gamer.IsLocal)
+                {
+                    spriteBatch.DrawString(
+                        font,
+                        Resources.ToggleReady,
+                        new Vector2(16, 16 + font.LineSpacing * 4) + offset,
+                        Color.White);
+                }
             }
 
             for (int i = networkSession.AllGamers.Count; i < 4; i++)

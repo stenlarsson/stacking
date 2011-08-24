@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
+using Tetatt.Graphics;
 #endregion
 
 namespace Tetatt.Screens
@@ -44,6 +45,11 @@ namespace Tetatt.Screens
             get { return menuEntries; }
         }
 
+        public TileSet TileSet
+        {
+            get;
+            private set;
+        }
 
         #endregion
 
@@ -59,6 +65,15 @@ namespace Tetatt.Screens
 
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
+        }
+
+        public override void LoadContent()
+        {
+            base.LoadContent();
+
+            TileSet = new TileSet(
+                ScreenManager.Game.Content.Load<Texture2D>("blocks"),
+                DrawablePlayField.BlockSize);
         }
 
 
@@ -153,7 +168,7 @@ namespace Tetatt.Screens
             float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
 
             // start at Y = 175; each X value is generated per entry
-            Vector2 position = new Vector2(0f, 175f);
+            Vector2 position = new Vector2(0f, 350f);
 
             // update each menu entry's location in turn
             for (int i = 0; i < menuEntries.Count; i++)

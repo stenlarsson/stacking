@@ -11,6 +11,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Tetatt.Graphics;
 #endregion
 
 namespace Tetatt.Screens
@@ -149,10 +150,6 @@ namespace Tetatt.Screens
             // Pulsate the size of the selected menu entry.
             double time = gameTime.TotalGameTime.TotalSeconds;
             
-            float pulsate = (float)Math.Sin(time * 6) + 1;
-
-            float scale = 1 + pulsate * 0.05f * selectionFade;
-
             // Modify the alpha to fade text out during transitions.
             color *= screen.TransitionAlpha;
 
@@ -160,11 +157,25 @@ namespace Tetatt.Screens
             ScreenManager screenManager = screen.ScreenManager;
             SpriteBatch spriteBatch = screenManager.SpriteBatch;
             SpriteFont font = screenManager.Font;
+            TileSet tileSet = screen.TileSet;
 
-            Vector2 origin = new Vector2(0, font.LineSpacing / 2);
+            Vector2 origin = new Vector2(0, font.LineSpacing / 2 - 4);
 
             spriteBatch.DrawString(font, text, position, color, 0,
-                                   origin, scale, SpriteEffects.None, 0);
+                                   origin, 1.0f, SpriteEffects.None, 0);
+
+            if (isSelected)
+            {
+                float cursorRotation = (float)gameTime.TotalGameTime.TotalSeconds * 3;
+                Vector2 cursorPosition = position;
+                Color cursorColor = Color.White * screen.TransitionAlpha;
+                Vector2 cursorOrigin = new Vector2(
+                    tileSet.TileSize / 2,
+                    tileSet.TileSize / 2);
+                cursorPosition.X -= 32;
+                spriteBatch.Draw(tileSet.Texture, cursorPosition, tileSet.SourceRectangle(91),
+                    cursorColor, cursorRotation, cursorOrigin, 1.0f, SpriteEffects.None, 0);
+            }
         }
 
 
