@@ -126,7 +126,7 @@ namespace Tetatt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copyright Flatware Design 2011.
+        ///   Looks up a localized string similar to © Flatware Design 2011.
         /// </summary>
         internal static string Copyright {
             get {
@@ -303,7 +303,7 @@ namespace Tetatt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to { Join.
+        ///   Looks up a localized string similar to Ⓐ Join.
         /// </summary>
         internal static string JoinInstruction {
             get {
@@ -376,8 +376,8 @@ namespace Tetatt {
         
         /// <summary>
         ///   Looks up a localized string similar to 
-        ///{ Ok
-        ///| Cancel.
+        ///Ⓐ Ok
+        ///Ⓑ Cancel.
         /// </summary>
         internal static string MessageBoxUsage {
             get {
@@ -494,7 +494,7 @@ namespace Tetatt {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to } Toggle.
+        ///   Looks up a localized string similar to Ⓧ Toggle.
         /// </summary>
         internal static string ToggleReady {
             get {

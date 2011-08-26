@@ -159,7 +159,7 @@ namespace Tetatt.Screens
             SpriteFont font = screenManager.Font;
             TileSet tileSet = screen.TileSet;
 
-            Vector2 origin = new Vector2(0, font.LineSpacing / 2 - 4);
+            Vector2 origin = new Vector2(0, font.LineSpacing / 2);
 
             spriteBatch.DrawString(font, text, position, color, 0,
                                    origin, 1.0f, SpriteEffects.None, 0);
