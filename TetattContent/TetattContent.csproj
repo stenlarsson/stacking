@@ -7,19 +7,24 @@
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0275B22B-9170-4916-8A2A-72E375775FEE}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TetattContent</RootNamespace>
+    <AssemblyName>TetattContent</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\Tetatt\bin\Debug\Content</OutputPath>
+    <DebugType>none</DebugType>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>..\Tetatt\bin\Release\Content</OutputPath>
+    <DebugType>none</DebugType>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
-  <Target Name="Build">
-  <AssignTargetPath Files="@(None)" RootFolder="$(MSBuildProjectDirectory)">
-    <Output TaskParameter="AssignedFiles" ItemName="NoneWithTargetPath" />
-  </AssignTargetPath>
-  <Copy SourceFiles="@(NoneWithTargetPath->'%(FullPath)')" DestinationFiles="@(NoneWithTargetPath->'$(OutputPath)\%(TargetPath)2')" />
-  </Target>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="blank.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -84,5 +89,11 @@
     <None Include="stress_music.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
 </Project>
