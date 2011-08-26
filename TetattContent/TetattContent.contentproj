@@ -132,7 +132,7 @@
     <Compile Include="ingame_font.png">
       <Name>ingame_font</Name>
       <Importer>TextureImporter</Importer>
-      <Processor>FontTextureProcessor</Processor>
+      <Processor>FontTextureAndXmlProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +208,12 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TetattContentPipelineExtension\TetattContentPipelineExtension.csproj">
+      <Project>{5D055716-4EE3-4CE3-9249-21615CC45C6A}</Project>
+      <Name>TetattContentPipelineExtension</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <!--  To modify your build process, add your task inside one of the targets below and uncomment it. 

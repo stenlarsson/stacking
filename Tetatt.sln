@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tetatt", "Tetatt\Tetatt.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetattContent", "TetattContent\TetattContent.contentproj", "{9A3F384F-B3B2-4716-B37B-36E97CB0BABF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetattContentPipelineExtension", "TetattContentPipelineExtension\TetattContentPipelineExtension.csproj", "{5D055716-4EE3-4CE3-9249-21615CC45C6A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -17,6 +19,10 @@ Global
 		{75998BE6-0D82-4787-8542-29CCDA60E030}.Release|x86.Build.0 = Release|x86
 		{9A3F384F-B3B2-4716-B37B-36E97CB0BABF}.Debug|x86.ActiveCfg = Debug|x86
 		{9A3F384F-B3B2-4716-B37B-36E97CB0BABF}.Release|x86.ActiveCfg = Release|x86
+		{5D055716-4EE3-4CE3-9249-21615CC45C6A}.Debug|x86.ActiveCfg = Debug|x86
+		{5D055716-4EE3-4CE3-9249-21615CC45C6A}.Debug|x86.Build.0 = Debug|x86
+		{5D055716-4EE3-4CE3-9249-21615CC45C6A}.Release|x86.ActiveCfg = Debug|x86
+		{5D055716-4EE3-4CE3-9249-21615CC45C6A}.Release|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
