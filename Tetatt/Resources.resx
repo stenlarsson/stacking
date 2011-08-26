@@ -141,7 +141,7 @@ Would you like to purchase this game?</value>
     <value>Are you sure you want to quit this game?</value>
   </data>
   <data name="Copyright" xml:space="preserve">
-    <value>Copyright Flatware Design 2011</value>
+    <value>© Flatware Design 2011</value>
   </data>
   <data name="CreateSession" xml:space="preserve">
     <value>Create Session</value>
@@ -204,7 +204,7 @@ the lobby before you can join this session</value>
     <value>Ready!</value>
   </data>
   <data name="JoinInstruction" xml:space="preserve">
-    <value>{ Join</value>
+    <value>Ⓐ Join</value>
   </data>
   <data name="JoinSession" xml:space="preserve">
     <value>Join Session</value>
@@ -229,8 +229,8 @@ the lobby before you can join this session</value>
   </data>
   <data name="MessageBoxUsage" xml:space="preserve">
     <value>
-{ Ok
-| Cancel</value>
+Ⓐ Ok
+Ⓑ Cancel</value>
   </data>
   <data name="MessageGamerJoined" xml:space="preserve">
     <value>{0} joined</value>
@@ -269,7 +269,7 @@ the lobby before you can join this session</value>
     <value>Time</value>
   </data>
   <data name="ToggleReady" xml:space="preserve">
-    <value>} Toggle</value>
+    <value>Ⓧ Toggle</value>
   </data>
   <data name="VersusAI" xml:space="preserve">
     <value>Versus AI</value>
