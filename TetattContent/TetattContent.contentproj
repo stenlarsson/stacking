@@ -189,7 +189,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="menu.png">
-      <Name>logo</Name>
+      <Name>menu</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
