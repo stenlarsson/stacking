@@ -453,8 +453,6 @@ namespace Tetatt.GamePlay
                 {
                     state = PlayFieldState.Die;
                     stateDelay = deathDuration;
-                    // TODO sound
-                    //Sound::PlayDieEffect();
                 }
             }
         }
