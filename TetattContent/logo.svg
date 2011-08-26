@@ -74,8 +74,8 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="437.03333"
-     inkscape:cy="-4.0502644"
+     inkscape:cx="368.08149"
+     inkscape:cy="28.700823"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -92,6 +92,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -101,8 +102,11 @@
      id="layer1"
      transform="translate(0,-796.36218)">
     <g
-       transform="matrix(8.5333333,0,0,8.5333333,-828.76182,-4915.5284)"
-       id="g5201">
+       transform="matrix(5.6666666,0,0,5.6666666,-730.99999,-2910.6901)"
+       id="g5201"
+       inkscape:export-filename="C:\Users\Sten\Documents\Visual Studio 2010\Projects\Tetatt\TetattContent\logo.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <rect
          inkscape:export-ydpi="9.4799995"
          inkscape:export-xdpi="9.4799995"
@@ -137,21 +141,19 @@
     <text
        xml:space="preserve"
        style="font-size:47.73157883px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:2.84011388;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;font-family:Gunship;-inkscape-font-specification:Gunship"
-       x="400.82993"
-       y="971.64319"
+       x="185.66737"
+       y="987.74994"
        id="text5483"
        sodipodi:linespacing="125%"
-       transform="scale(0.99823541,1.0017677)"><tspan
+       transform="scale(0.99823541,1.0017677)"
+       inkscape:export-filename="C:\Users\Sten\Documents\Visual Studio 2010\Projects\Tetatt\TetattContent\logo.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
-         x="400.82993"
-         y="971.64319"
-         id="tspan5487"
-         style="font-size:56px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;stroke-width:2.84011388;stroke-miterlimit:4;stroke-dasharray:none;font-family:Gunship;-inkscape-font-specification:Gunship">A Stack of Tiles</tspan><tspan
-         sodipodi:role="line"
-         x="400.82993"
-         y="1025.8407"
-         style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;stroke-width:2.84011388;stroke-miterlimit:4;stroke-dasharray:none;font-family:Gunship;-inkscape-font-specification:Gunship"
-         id="tspan6602">Totally Not A Clone</tspan></text>
+         x="185.66737"
+         y="987.74994"
+         style="font-size:100px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;text-anchor:start;stroke-width:2.84011388;stroke-miterlimit:4;stroke-dasharray:none;font-family:Motorwerk;-inkscape-font-specification:Motorwerk"
+         id="tspan3019">Stack o' Tiles</tspan></text>
     <flowRoot
        xml:space="preserve"
        id="flowRoot6592"
@@ -163,5 +165,20 @@
            height="89"
            x="26"
            y="144" /></flowRegion><flowPara
-         id="flowPara6598"></flowPara></flowRoot>  </g>
+         id="flowPara6598" /></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="358.86969"
+       y="1033.3622"
+       id="text3789"
+       sodipodi:linespacing="125%"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"
+       inkscape:export-filename="C:\Users\Sten\Documents\Visual Studio 2010\Projects\Tetatt\TetattContent\logo.png"><tspan
+         sodipodi:role="line"
+         id="tspan3791"
+         x="358.86969"
+         y="1033.3622"
+         style="font-size:32px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-opacity:1;font-family:Moire;-inkscape-font-specification:Moire Bold">- TOTALLY NOT A CLONE</tspan></text>
+  </g>
 </svg>
