@@ -16,12 +16,10 @@ namespace Tetatt.ArtificialIntelligence
         const int RaiseHeightWithoutGarbage = 8;
 
         PlayField playField;
-        Random random;
 
         public AIPlayer(PlayField playField)
         {
             this.playField = playField;
-            random = new Random();
         }
 
         public PlayerInput GetInput()

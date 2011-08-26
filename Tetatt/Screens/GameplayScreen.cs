@@ -296,7 +296,6 @@ namespace Tetatt.Screens
                 playerIndex = gamer.SignedInGamer.PlayerIndex;
                 int playerInt = (int)playerIndex;
 
-                KeyboardState keyboardState = input.CurrentKeyboardStates[playerInt];
                 GamePadState gamePadState = input.CurrentGamePadStates[playerInt];
 
                 // The game pauses if the user unplugs the active gamepad. This requires
@@ -710,7 +709,6 @@ namespace Tetatt.Screens
         /// </summary>
         public void SendStartPlayfield(LocalNetworkGamer gamer, int seed)
         {
-            Player data = (Player)gamer.Tag;
             packetWriter.Write((byte)PacketTypes.StartPlayfield);
             packetWriter.Write((int)seed);
         }
@@ -720,7 +718,6 @@ namespace Tetatt.Screens
         /// </summary>
         public void SendStopPlayfield(LocalNetworkGamer gamer)
         {
-            Player data = (Player)gamer.Tag;
             packetWriter.Write((byte)PacketTypes.StopPlayfield);
         }
 

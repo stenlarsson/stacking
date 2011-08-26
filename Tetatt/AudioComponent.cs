@@ -21,7 +21,6 @@ namespace Tetatt
 
         Song normalMusic;
         Song stressMusic;
-        SoundEffectInstance music;
         int musicChangeTimer;
 
         List<PlayField> playFields;
@@ -190,6 +189,7 @@ namespace Tetatt
         /// </summary>
         private void Died(PlayField sender)
         {
+            // TODO: Sound::PlayDieEffect();
         }
     }
 }

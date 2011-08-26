@@ -163,8 +163,6 @@ namespace Tetatt.Screens
         /// </summary>
         public override void Draw(GameTime gameTime)
         {
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
-
             playerPlayField.Offset = Offsets[0];
             playerPlayField.Draw(ScreenManager, gameTime, TransitionAlpha);
             aiPlayField.Offset = Offsets[1];
