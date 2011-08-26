@@ -26,7 +26,7 @@ namespace Tetatt.Screens
     {
         #region Initialization
 
-        Texture2D logo;
+        Texture2D logo, menu;
         string version;
 
         /// <summary>
@@ -65,6 +65,7 @@ namespace Tetatt.Screens
 
             ContentManager content = ScreenManager.Game.Content;
             logo = content.Load<Texture2D>("logo");
+            menu = content.Load<Texture2D>("menu");
         }
 
         #endregion
@@ -180,6 +181,13 @@ namespace Tetatt.Screens
 
             spriteBatch.Draw(logo, titlePosition, titleColor);
 
+
+            Vector2 iconOffset = new Vector2(64, 150);
+            for (int i = 0; i < MenuEntries.Count; i++)
+            {
+                spriteBatch.Draw(menu, MenuEntries[i].Position - iconOffset, new Rectangle(128 * i, 0, 128, 128), titleColor);
+            }
+
             // Draw copyright message
             Vector2 copyrightPosition = new Vector2(
                 graphics.Viewport.Width / 2,
@@ -210,5 +218,28 @@ namespace Tetatt.Screens
 
 
         #endregion
+
+        protected override void UpdateMenuEntryLocations()
+        {
+            float transitionOffset = 256 * (float)Math.Pow(TransitionPosition, 2);
+            if (ScreenState == ScreenState.TransitionOff)
+                transitionOffset *= 2;
+
+            Vector2 center = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 500);
+
+            for (int i = 0; i < MenuEntries.Count; i++)
+            {
+                MenuEntry menuEntry = MenuEntries[i];
+                int direction = (i - MenuEntries.Count / 2);
+                Vector2 position = new Vector2(
+                    transitionOffset * (0.5f + direction) + 200 * direction  + center.X, center.Y);
+
+                // set the entry's position
+                menuEntry.Position = position;
+
+                // move down for the next entry the size of this entry
+                position.Y += menuEntry.GetHeight(this);
+            }
+        }
     }
 }

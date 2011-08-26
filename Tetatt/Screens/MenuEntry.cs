@@ -159,7 +159,7 @@ namespace Tetatt.Screens
             SpriteFont font = screenManager.Font;
             TileSet tileSet = screen.TileSet;
 
-            Vector2 origin = new Vector2(0, font.LineSpacing / 2);
+            Vector2 origin = font.MeasureString(text) / 2;
 
             spriteBatch.DrawString(font, text, position, color, 0,
                                    origin, 1.0f, SpriteEffects.None, 0);
@@ -167,7 +167,7 @@ namespace Tetatt.Screens
             if (isSelected)
             {
                 float cursorRotation = (float)gameTime.TotalGameTime.TotalSeconds * 3;
-                Vector2 cursorPosition = position;
+                Vector2 cursorPosition = new Vector2(position.X - origin.X, position.Y);
                 Color cursorColor = Color.White * screen.TransitionAlpha;
                 Vector2 cursorOrigin = new Vector2(
                     tileSet.TileSize / 2,
