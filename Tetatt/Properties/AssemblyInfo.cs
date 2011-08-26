@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("A Stack of Tiles")]
-[assembly: AssemblyProduct("A Stack of Tiles")]
+[assembly: AssemblyTitle("Stack O' Tiles - Totally not a Clone")]
+[assembly: AssemblyProduct("Stack O' Tiles - Totally not a Clone")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("Flatware Design")]
 [assembly: AssemblyCopyright("Copyright © Flatware Design 2011")]
