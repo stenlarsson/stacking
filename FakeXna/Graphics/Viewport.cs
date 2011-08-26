@@ -13,10 +13,14 @@ namespace Microsoft.Xna.Framework.Graphics
             get { return bounds; }
             set { bounds = value; glViewport(); }
         }
+        public Rectangle TitleSafeArea {
+            get { return bounds; }
+        }
         public int X { get { return bounds.X; } }
         public int Y { get { return bounds.Y; } }
         public int Width { get { return bounds.Width; } }
         public int Height { get { return bounds.Height; } }
+
 
         PresentationParameters presentationParameters;
         internal Viewport(PresentationParameters presentationParameters)

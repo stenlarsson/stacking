@@ -11,26 +11,26 @@ Project("{9344bdbb-3e7f-41fc-a0dd-8665d75ee146}") = "TetattContent", "TetattCont
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x86 = Debug|x86
-		Release|x86 = Release|x86
+		Debug = Debug
+		Release = Release
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0275B22B-9170-4916-8A2A-72E375775FEE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0275B22B-9170-4916-8A2A-72E375775FEE}.Debug|x86.Build.0 = Debug|Any CPU
-		{0275B22B-9170-4916-8A2A-72E375775FEE}.Release|x86.ActiveCfg = Release|Any CPU
-		{0275B22B-9170-4916-8A2A-72E375775FEE}.Release|x86.Build.0 = Release|Any CPU
-		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Debug|x86.ActiveCfg = Debug|x86
-		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Debug|x86.Build.0 = Debug|x86
-		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Release|x86.ActiveCfg = Release|x86
-		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Release|x86.Build.0 = Release|x86
-		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Debug|x86.Build.0 = Debug|Any CPU
-		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Release|x86.ActiveCfg = Release|Any CPU
-		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Release|x86.Build.0 = Release|Any CPU
-		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Debug|x86.Build.0 = Debug|Any CPU
-		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Release|x86.ActiveCfg = Release|Any CPU
-		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Release|x86.Build.0 = Release|Any CPU
+		{0275B22B-9170-4916-8A2A-72E375775FEE}.Debug.ActiveCfg = Debug|Any CPU
+		{0275B22B-9170-4916-8A2A-72E375775FEE}.Debug.Build.0 = Debug|Any CPU
+		{0275B22B-9170-4916-8A2A-72E375775FEE}.Release.ActiveCfg = Release|Any CPU
+		{0275B22B-9170-4916-8A2A-72E375775FEE}.Release.Build.0 = Release|Any CPU
+		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Debug.ActiveCfg = Debug|Any CPU
+		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Debug.Build.0 = Debug|Any CPU
+		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Release.ActiveCfg = Release|Any CPU
+		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Release.Build.0 = Release|Any CPU
+		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Debug.ActiveCfg = Debug|Any CPU
+		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Debug.Build.0 = Debug|Any CPU
+		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Release.ActiveCfg = Release|Any CPU
+		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Release.Build.0 = Release|Any CPU
+		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Debug.ActiveCfg = Debug|Any CPU
+		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Debug.Build.0 = Debug|Any CPU
+		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Release.ActiveCfg = Release|Any CPU
+		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Release.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Tetatt\TetattMono.csproj
