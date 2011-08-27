@@ -144,6 +144,15 @@ namespace Tetatt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Easy.
+        /// </summary>
+        internal static string Easy {
+            get {
+                return ResourceManager.GetString("Easy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to End Session.
         /// </summary>
         internal static string EndSession {
@@ -272,6 +281,15 @@ namespace Tetatt {
         internal static string FindSessions {
             get {
                 return ResourceManager.GetString("FindSessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hard.
+        /// </summary>
+        internal static string Hard {
+            get {
+                return ResourceManager.GetString("Hard", resourceCulture);
             }
         }
         
@@ -413,6 +431,15 @@ namespace Tetatt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Normal.
+        /// </summary>
+        internal static string Normal {
+            get {
+                return ResourceManager.GetString("Normal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No sessions found.
         /// </summary>
         internal static string NoSessionsFound {
@@ -436,6 +463,15 @@ namespace Tetatt {
         internal static string PlayerMatch {
             get {
                 return ResourceManager.GetString("PlayerMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ⓐ Continue.
+        /// </summary>
+        internal static string PressAToContinue {
+            get {
+                return ResourceManager.GetString("PressAToContinue", resourceCulture);
             }
         }
         
@@ -476,6 +512,15 @@ namespace Tetatt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stage {0}.
+        /// </summary>
+        internal static string Stage {
+            get {
+                return ResourceManager.GetString("Stage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to System Link.
         /// </summary>
         internal static string SystemLink {
@@ -499,6 +544,15 @@ namespace Tetatt {
         internal static string ToggleReady {
             get {
                 return ResourceManager.GetString("ToggleReady", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total.
+        /// </summary>
+        internal static string Total {
+            get {
+                return ResourceManager.GetString("Total", resourceCulture);
             }
         }
         

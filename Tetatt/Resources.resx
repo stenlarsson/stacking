@@ -146,6 +146,9 @@ Would you like to purchase this game?</value>
   <data name="CreateSession" xml:space="preserve">
     <value>Create Session</value>
   </data>
+  <data name="Easy" xml:space="preserve">
+    <value>Easy</value>
+  </data>
   <data name="EndSession" xml:space="preserve">
     <value>End Session</value>
   </data>
@@ -194,6 +197,9 @@ the lobby before you can join this session</value>
   <data name="FindSessions" xml:space="preserve">
     <value>Find Sessions</value>
   </data>
+  <data name="Hard" xml:space="preserve">
+    <value>Hard</value>
+  </data>
   <data name="HostSuffix" xml:space="preserve">
     <value> (host)</value>
   </data>
@@ -241,6 +247,9 @@ the lobby before you can join this session</value>
   <data name="NetworkBusy" xml:space="preserve">
     <value>Networking...</value>
   </data>
+  <data name="Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
   <data name="NoSessionsFound" xml:space="preserve">
     <value>No sessions found</value>
   </data>
@@ -249,6 +258,9 @@ the lobby before you can join this session</value>
   </data>
   <data name="PlayerMatch" xml:space="preserve">
     <value>LIVE</value>
+  </data>
+  <data name="PressAToContinue" xml:space="preserve">
+    <value>Ⓐ Continue</value>
   </data>
   <data name="QuitGame" xml:space="preserve">
     <value>Quit Game</value>
@@ -262,6 +274,9 @@ the lobby before you can join this session</value>
   <data name="Score" xml:space="preserve">
     <value>Score</value>
   </data>
+  <data name="Stage" xml:space="preserve">
+    <value>Stage {0}</value>
+  </data>
   <data name="SystemLink" xml:space="preserve">
     <value>System Link</value>
   </data>
@@ -270,6 +285,9 @@ the lobby before you can join this session</value>
   </data>
   <data name="ToggleReady" xml:space="preserve">
     <value>Ⓧ Toggle</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
   </data>
   <data name="VersusAI" xml:space="preserve">
     <value>Versus AI</value>

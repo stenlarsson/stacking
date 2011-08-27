@@ -159,6 +159,7 @@
     </Compile>
     <Compile Include="Screens\GameScreen.cs" />
     <Compile Include="Screens\InputState.cs" />
+    <Compile Include="Screens\LevelScreen.cs" />
     <Compile Include="Screens\LobbyScreen.cs" />
     <Compile Include="Screens\MenuEntry.cs" />
     <Compile Include="Screens\PacketTypes.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Screens\MessageBoxScreen.cs" />
     <Compile Include="Screens\OptionsMenuScreen.cs" />
     <Compile Include="Screens\PlayerIndexEventArgs.cs" />
+    <Compile Include="Screens\StageScreen.cs" />
     <Compile Include="Screens\VersusAIScreen.cs" />
     <Compile Include="TetattGame.cs" />
     <Compile Include="Graphics\TileSet.cs" />

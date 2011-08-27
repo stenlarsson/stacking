@@ -130,7 +130,7 @@ namespace Tetatt.Screens
         }
 
         /// <summary>
-        /// Draws the gameplay screen.
+        /// Draws the lobby screen.
         /// </summary>
         public override void Draw(GameTime gameTime)
         {

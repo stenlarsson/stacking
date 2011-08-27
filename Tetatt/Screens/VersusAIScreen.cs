@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Input;
 using Tetatt.ArtificialIntelligence;
 using Tetatt.GamePlay;
 using Tetatt.Graphics;
+using System.Collections.Generic;
 
 namespace Tetatt.Screens
 {
@@ -16,6 +17,13 @@ namespace Tetatt.Screens
     /// </summary>
     class VersusAIScreen : GameScreen
     {
+        public const int NumStages = 10;
+
+        public int Level { get; private set; }
+        public int Stage { get; private set; }
+        public bool GameOver { get; private set; }
+        public int[] Times { get; private set; }
+
         public static Vector2[] Offsets = new Vector2[] {
             new Vector2(384, 248),
             new Vector2(672, 248),
@@ -34,21 +42,24 @@ namespace Tetatt.Screens
         /// <summary>
         /// Constructor.
         /// </summary>
-        public VersusAIScreen(ScreenManager screenManager)
+        public VersusAIScreen(int level, ScreenManager screenManager)
         {
+            Level = level;
+            Stage = 0;
+            GameOver = false;
+            Times = new int[NumStages];
+
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
             playerPlayField = new DrawablePlayField(Player.DefaultLevel);
             playerPlayField.PerformedChain += PerformedChain;
+            playerPlayField.State = PlayFieldState.Dead;
             aiPlayField = new DrawablePlayField(Player.DefaultLevel);
             aiPlayField.PerformedChain += PerformedChain;
+            aiPlayField.State = PlayFieldState.Dead;
 
             aiPlayer = new AIPlayer(aiPlayField);
-
-            int seed = unchecked((int)DateTime.Now.Ticks);
-            playerPlayField.Start(seed);
-            aiPlayField.Start(seed);
 
             // Cannot use ScreenManager here yet because we're not yet added, therefore
             // it must be passed as a paramter so that we can get the AudioComponent.
@@ -56,7 +67,6 @@ namespace Tetatt.Screens
                 typeof(AudioComponent));
             audioComponent.AddPlayField(playerPlayField);
             audioComponent.AddPlayField(aiPlayField);
-            audioComponent.GameStarted();
         }
 
         /// <summary>
@@ -89,6 +99,17 @@ namespace Tetatt.Screens
             {
                 return;
             }
+
+
+            // Show stage screen if we're not playing and not already showing it
+            if (playerPlayField.State == PlayFieldState.Dead &&
+                aiPlayField.State == PlayFieldState.Dead &&
+                !coveredByOtherScreen)
+            {
+                ScreenManager.AddScreen(new StageScreen(this), ControllingPlayer);
+            }
+
+
 
             CheckEndOfGame();
 
@@ -197,7 +218,7 @@ namespace Tetatt.Screens
 
             ScreenManager.AddScreen(confirmMessageBox, playerIndex);
         }
-        
+
         /// <summary>
         /// Called when a chain is completed
         /// </summary>
@@ -216,14 +237,49 @@ namespace Tetatt.Screens
         }
 
         /// <summary>
+        /// Called by Stage screen to start game
+        /// </summary>
+        public void Start()
+        {
+            aiPlayer.SetDifficulty(Level, Stage);
+
+            int seed = unchecked((int)DateTime.Now.Ticks);
+            playerPlayField.Reset();
+            playerPlayField.Start(seed);
+            aiPlayField.Reset();
+            aiPlayField.Start(seed);
+
+            audioComponent.GameStarted();
+        }
+
+        /// <summary>
         /// Check end of game. Should only be called if we are the host.
         /// </summary>
         private void CheckEndOfGame()
         {
-            if (playerPlayField.State == PlayFieldState.Dead ||
-                aiPlayField.State == PlayFieldState.Dead)
+            // If player died first
+            if (playerPlayField.State == PlayFieldState.Die &&
+                aiPlayField.State == PlayFieldState.Play)
             {
-                ScreenManager.ReturnToMainMenu();
+                aiPlayField.State = PlayFieldState.Dead;
+                GameOver = true;
+                audioComponent.GameEnded();
+            }
+            
+            // If ai died first
+            if (aiPlayField.State == PlayFieldState.Die &&
+                playerPlayField.State == PlayFieldState.Play)
+            {
+                playerPlayField.State = PlayFieldState.Dead;
+                Times[Stage] = playerPlayField.Time;
+                Stage += 1;
+
+                if (Stage == NumStages)
+                {
+                    GameOver = true;
+                }
+
+                audioComponent.GameEnded();
             }
         }
 

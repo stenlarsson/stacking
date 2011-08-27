@@ -8,22 +8,84 @@ namespace Tetatt.ArtificialIntelligence
 {
     class AIPlayer
     {
+        /// <summary>
+        /// Parameters used on each stage. Currently only contains
+        /// the InputDelay.
+        /// </summary>
+        public readonly int[,] Stages = new int[,] {
+            {60, 59, 58, 57, 56, 55, 54, 53, 52, 51},
+            {30, 29, 28, 27, 26, 25, 24, 23, 22, 21},
+            {10,  9,  8,  7,  6,  5,  4,  3,  2,  1},
+        };
+
+        /// <summary>
+        /// Score for making three blocks pop
+        /// </summary>
         const float PopScore = 40;
+        /// <summary>
+        /// Score for making a block drop down
+        /// </summary>
         const float FlattenScore = 20;
+        /// <summary>
+        /// Multiplier for making a chain
+        /// </summary>
         const float ChainMultiplier = 2;
+        /// <summary>
+        /// Multiplier for making a garbage chain
+        /// </summary>
         const float ClearGarbageMultiplier = 2;
+        /// <summary>
+        /// Raise if field, counting garbage, is lower than this height
+        /// </summary>
         const int RaiseHeight = 12;
+        /// <summary>
+        /// Raise if field, not counting garbage, is lower than this height
+        /// </summary>
         const int RaiseHeightWithoutGarbage = 8;
+        /// <summary>
+        /// Number of frames between each input
+        /// </summary>
+        int InputDelay = 1;
+
+        int inputDelayTimer;
 
         PlayField playField;
 
+        /// <summary>
+        /// Create new AI player controlling specified field.
+        /// </summary>
         public AIPlayer(PlayField playField)
         {
             this.playField = playField;
         }
 
+        /// <summary>
+        /// Set difficulty according to stage
+        /// </summary>
+        public void SetDifficulty(int level, int stage)
+        {
+            // TODO RaiseHeight and other values should also be modified
+            InputDelay = Stages[level, stage];
+        }
+
+        /// <summary>
+        /// Return the input the AI wants to perform this frame
+        /// </summary>
         public PlayerInput GetInput()
         {
+            // Only make a move every InputDelay frames
+            if (inputDelayTimer > 0)
+            {
+                // TODO This is too crude. A player can hold down button to
+                // make a skill chain, and the AI can't.
+                inputDelayTimer--;
+                return PlayerInput.None;
+            }
+            else
+            {
+                inputDelayTimer = InputDelay;
+            }
+
             SimplifiedPlayField sim = new SimplifiedPlayField(playField);
 
             sim.Pop();
@@ -66,6 +128,10 @@ namespace Tetatt.ArtificialIntelligence
             }
         }
 
+        /// <summary>
+        /// Calculate where it is most benficial to input a swap, considering the number of
+        /// moves needed to get there.
+        /// </summary>
         public Pos CalculateBestSwap(SimplifiedPlayField sim, out float result)
         {
             SortedDictionary<float, Pos> moves = new SortedDictionary<float, Pos>();
@@ -141,6 +207,9 @@ namespace Tetatt.ArtificialIntelligence
             throw new Exception("Supposedly unreachable code");
         }
 
+        /// <summary>
+        /// Calculate the score for making a swap at the specified position
+        /// </summary>
         public float CalculateScore(SimplifiedPlayField sim, int row, int col)
         {
             float score = 0;
