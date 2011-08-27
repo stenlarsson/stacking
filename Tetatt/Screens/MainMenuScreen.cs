@@ -78,7 +78,7 @@ namespace Tetatt.Screens
         /// </summary>
         void VersusAIMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            ScreenManager.AddScreen(new VersusAIScreen(ScreenManager), e.PlayerIndex);
+            ScreenManager.AddScreen(new LevelScreen(), e.PlayerIndex);
         }
 
 
