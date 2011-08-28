@@ -93,16 +93,13 @@ namespace Microsoft.Xna.Framework.Graphics
                 SetupTexture(texture);
         }
 
-        void SetupModelview()
+        void SetupModelview(float x, float y, float rotation = 0, float ox = 0, float oy = 0, float scale = 1)
         {
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
-        }
-
-        void SetupPositionWithRotation(float x, float y, float rotation, float ox, float oy)
-        {
             GL.Translate(x, y, 0);
             GL.Rotate(180 * rotation / Math.PI, 0, 0, 1);
+            GL.Scale(scale, scale, 1);
             GL.Translate(-ox, -oy, 0);
         }
 
@@ -143,8 +140,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             SetupColor(color);
             SetupTexture(texture);
-            SetupModelview();
-            GL.Translate(position.X, position.Y, 0);
+            SetupModelview(position.X, position.Y);
             FillRectangle(texture.Width, texture.Height);
         }
 
@@ -152,8 +148,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             SetupColor(color);
             SetupTextureSourceMaybeRectangle(texture, sourceRectangle);
-            SetupModelview();
-            GL.Translate(position.X, position.Y, 0);
+            SetupModelview(position.X, position.Y);
             FillSourceRectangle(texture, sourceRectangle);
         }
 
@@ -161,8 +156,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             SetupColor(color);
             SetupTexture(texture);
-            SetupModelview();
-            GL.Translate(dest.X, dest.Y, 0);
+            SetupModelview(dest.X, dest.Y);
             FillRectangle(dest.Width, dest.Height);
         }
 
@@ -170,8 +164,7 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             SetupColor(color);
             SetupTextureSourceMaybeRectangle(texture, sourceRectangle);
-            SetupModelview();
-            GL.Translate(destinationRectangle.X, destinationRectangle.Y, 0);
+            SetupModelview(destinationRectangle.X, destinationRectangle.Y);
             FillRectangle(destinationRectangle.Width, destinationRectangle.Height);
         }
 
@@ -190,9 +183,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SetupTextureSourceMaybeRectangle(texture, sourceRectangle);
             SetupSpriteEffects(effects);
 
-            SetupModelview();
-            SetupPositionWithRotation(position.X, position.Y, rotation, origin.X, origin.Y);
-            GL.Scale(scale, scale, 1);
+            SetupModelview(position.X, position.Y, rotation, origin.X, origin.Y, scale);
             GL.Translate(0, 0, layerDepth); // TODO: Could we handle layerDepth like this?
 
             FillSourceRectangle(texture, sourceRectangle);
@@ -216,30 +207,20 @@ namespace Microsoft.Xna.Framework.Graphics
             float layerDepth)
         {
             SetupColor(color);
-
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.PushMatrix();
-            // Apply position and rotation to projection so that we can use
-            // the modelview matrix for string-internal positions.
-            SetupPositionWithRotation(position.X, position.Y, rotation, origin.X, origin.Y);
-            GL.Scale(scale, scale, 1);
+            SetupModelview(position.X, position.Y, rotation, origin.X, origin.Y, scale);
 
             // TODO: Handle effects, which probably requires using MeasureString to figure
             // out the width and height of the string that we are drawing...
 
-            SetupModelview();
-
-            spriteFont._Draw(text, (texture, rect, pos) => {
-                SetupTextureSourceRectangle(texture, rect);
-
-                SetupModelview();
-                GL.Translate(pos.X, pos.Y, 0);
+            Vector2 prev = Vector2.Zero;
+            spriteFont.EachChar(text, (rect, pos) =>
+            {
+                SetupTextureSourceRectangle(spriteFont.texture, rect);
+                GL.MatrixMode(MatrixMode.Modelview);
+                GL.Translate(pos.X - prev.X, pos.Y - prev.Y, 0);
                 FillRectangle(rect.Width, rect.Height);
+                prev = pos;
             });
-
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.PopMatrix();
-
         }
     }
 }

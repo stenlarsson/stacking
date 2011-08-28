@@ -206,7 +206,7 @@ namespace Tetatt.Screens
                     scale += .18f * (float)Math.Sin(0.008*(gameTime.TotalGameTime - timestamp).TotalMilliseconds);
                 }
 
-                Vector2 iconOrigin = new Vector2(scale * MenuTiles.TileSize / 2);
+                Vector2 iconOrigin = new Vector2(MenuTiles.TileSize / 2);
                 if (ScreenState == ScreenState.TransitionOff && SelectedEntry == i)
                 {
                     iconPosition = new Vector2(
