@@ -9,7 +9,7 @@ namespace Microsoft.Xna.Framework.Graphics
 {
     public class SpriteFont
     {
-        Graphics.Texture2D texture;
+        internal Graphics.Texture2D texture;
         IDictionary<char, Rectangle> chars;
         char backup;
 
@@ -43,8 +43,8 @@ namespace Microsoft.Xna.Framework.Graphics
             return new Vector2(Math.Max(line, x), y);
         }
 
-        internal delegate void _DrawAction(Texture2D texture, Rectangle source, Vector2 position);
-        internal void _Draw(string text, _DrawAction callback)
+        internal delegate void _DrawAction(Rectangle source, Vector2 position);
+        internal void EachChar(string text, _DrawAction callback)
         {
             Vector2 pos = new Vector2(0, 0);
             foreach (char c in CleanString(text))
@@ -57,7 +57,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 else
                 {
                     Rectangle rect = chars[c];
-                    callback(texture, rect, pos);
+                    callback(rect, pos);
                     pos.X += rect.Width + Spacing;
                 }
             }
