@@ -31,7 +31,7 @@ namespace TetattContentPipelineExtension
             using (var stream = new FileStream(filename, FileMode.Open))
             {
                 chars = XDocument.Load(stream).Root.Elements("character").Select(
-                    e => (char)int.Parse(e.Attribute("key").Value)
+                    e => (char)(int)e.Attribute("key")
                 ).ToList();
             }
 
