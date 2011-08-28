@@ -57,10 +57,7 @@ namespace Tetatt.Networking
                     break;
             }
 
-            // Add the Back menu entry.
-            MenuEntry backMenuEntry = new MenuEntry(Resources.Back);
-            backMenuEntry.Selected += BackMenuEntrySelected;
-            MenuEntries.Add(backMenuEntry);
+            AddSimpleEntry(Resources.Back, BackMenuEntrySelected);
         }
 
 

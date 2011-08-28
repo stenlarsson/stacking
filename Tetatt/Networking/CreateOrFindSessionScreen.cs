@@ -37,24 +37,14 @@ namespace Tetatt.Networking
         /// Constructor fills in the menu contents.
         /// </summary>
         public CreateOrFindSessionScreen(NetworkSessionType sessionType)
-            : base(GetMenuTitle(sessionType))
+            : base(GetMenuTitle(sessionType), GetIconTile(sessionType))
         {
             this.sessionType = sessionType;
 
             // Create our menu entries.
-            MenuEntry createSessionMenuEntry = new MenuEntry(Resources.CreateSession);
-            MenuEntry findSessionsMenuEntry = new MenuEntry(Resources.FindSessions);
-            MenuEntry backMenuEntry = new MenuEntry(Resources.Back);
-
-            // Hook up menu event handlers.
-            createSessionMenuEntry.Selected += CreateSessionMenuEntrySelected;
-            findSessionsMenuEntry.Selected += FindSessionsMenuEntrySelected;
-            backMenuEntry.Selected += OnCancel;
-
-            // Add entries to the menu.
-            MenuEntries.Add(createSessionMenuEntry);
-            MenuEntries.Add(findSessionsMenuEntry);
-            MenuEntries.Add(backMenuEntry);
+            AddSimpleEntry(Resources.CreateSession, CreateSessionMenuEntrySelected);
+            AddSimpleEntry(Resources.FindSessions, FindSessionsMenuEntrySelected);
+            AddSimpleEntry(Resources.Back, OnCancel);
         }
 
 
@@ -79,6 +69,23 @@ namespace Tetatt.Networking
             }
         }
 
+        static int GetIconTile(NetworkSessionType sessionType)
+        {
+            switch (sessionType)
+            {
+                case NetworkSessionType.Local:
+                    return 1;
+
+                case NetworkSessionType.PlayerMatch:
+                    return 2;
+
+                case NetworkSessionType.SystemLink:
+                    return 3;
+
+                default:
+                    throw new NotSupportedException();
+            }
+        }
 
         #endregion
 

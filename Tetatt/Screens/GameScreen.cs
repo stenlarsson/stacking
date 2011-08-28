@@ -90,11 +90,24 @@ namespace Tetatt.Screens
         public float TransitionPosition
         {
             get { return transitionPosition; }
-            protected set { transitionPosition = value; }
+            protected set {
+                transitionPosition = value;
+                transitionPower = (float)Math.Pow(value, 2);
+            }
         }
-
         float transitionPosition = 1;
 
+        /// <summary>
+        /// Gets the current position power curve, which is useful for
+        /// transition movements making them appear as they slow down when
+        /// they approach fully active. Range is as transition position,
+        /// zero when fully active and one when fully off
+        /// </summary>
+        public float TransitionPower
+        {
+            get { return transitionPower; }
+        }
+        float transitionPower = 1;
 
         /// <summary>
         /// Gets the current alpha of the screen transition, ranging
@@ -297,13 +310,13 @@ namespace Tetatt.Screens
                                           time.TotalMilliseconds);
 
             // Update the transition position.
-            transitionPosition += transitionDelta * direction;
+            TransitionPosition += transitionDelta * direction;
 
             // Did we reach the end of the transition?
             if (((direction < 0) && (transitionPosition <= 0)) ||
                 ((direction > 0) && (transitionPosition >= 1)))
             {
-                transitionPosition = MathHelper.Clamp(transitionPosition, 0, 1);
+                transitionPower = transitionPosition = MathHelper.Clamp(transitionPosition, 0, 1);
                 return false;
             }
 

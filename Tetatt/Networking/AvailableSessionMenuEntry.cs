@@ -79,17 +79,14 @@ namespace Tetatt.Networking
         /// Updates the menu item text, adding information about the network
         /// quality of service as soon as that becomes available.
         /// </summary>
-        public override void Update(MenuScreen screen, bool isSelected,
-                                                       GameTime gameTime)
+        public override void Update(GameTime gameTime)
         {
-            base.Update(screen, isSelected, gameTime);
-
             // Quality of service data can take some time to query, so it will not
             // be filled in straight away when NetworkSession.Find returns. We want
             // to display the list of available sessions straight away, and then
             // fill in the quality of service data whenever that becomes available,
             // so we keep checking until this data shows up.
-            if (screen.IsActive && !gotQualityOfService)
+            if (!gotQualityOfService)
             {
                 QualityOfService qualityOfService = availableSession.QualityOfService;
 
@@ -97,7 +94,7 @@ namespace Tetatt.Networking
                 {
                     TimeSpan pingTime = qualityOfService.AverageRoundtripTime;
 
-                    Text += string.Format(" - {0:0} ms", pingTime.TotalMilliseconds);
+                    Label += string.Format(" - {0:0} ms", pingTime.TotalMilliseconds);
 
                     gotQualityOfService = true;
                 }

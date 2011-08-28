@@ -7,10 +7,8 @@
 //-----------------------------------------------------------------------------
 #endregion
 
-#region Using Statements
 using System;
 using Microsoft.Xna.Framework;
-#endregion
 
 namespace Tetatt.Screens
 {
@@ -20,23 +18,11 @@ namespace Tetatt.Screens
     /// </summary>
     class PlayerIndexEventArgs : EventArgs
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public PlayerIndexEventArgs(PlayerIndex playerIndex)
         {
-            this.playerIndex = playerIndex;
+            PlayerIndex = playerIndex;
         }
 
-
-        /// <summary>
-        /// Gets the index of the player who triggered this event.
-        /// </summary>
-        public PlayerIndex PlayerIndex
-        {
-            get { return playerIndex; }
-        }
-
-        PlayerIndex playerIndex;
+        public PlayerIndex PlayerIndex { get; private set; }
     }
 }

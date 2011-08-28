@@ -9,19 +9,11 @@ namespace Tetatt.Screens
     class LevelScreen : MenuScreen
     {
         public LevelScreen()
-            : base(Resources.Level)
+            : base(Resources.Level, 0)
         {
-            MenuEntry easyMenuEntry = new MenuEntry(Resources.Easy);
-            MenuEntry normalMenuEntry = new MenuEntry(Resources.Normal);
-            MenuEntry hardMenuEntry = new MenuEntry(Resources.Hard);
-
-            easyMenuEntry.Selected += (sender, e) => LevelMenuEntrySelected(0, e.PlayerIndex);
-            normalMenuEntry.Selected += (sender, e) => LevelMenuEntrySelected(1, e.PlayerIndex);
-            hardMenuEntry.Selected += (sender, e) => LevelMenuEntrySelected(2, e.PlayerIndex);
-
-            MenuEntries.Add(easyMenuEntry);
-            MenuEntries.Add(normalMenuEntry);
-            MenuEntries.Add(hardMenuEntry);
+            AddSimpleEntry(Resources.Easy, (player) => LevelMenuEntrySelected(0, player));
+            AddSimpleEntry(Resources.Normal, (player) => LevelMenuEntrySelected(1, player));
+            AddSimpleEntry(Resources.Hard, (player) => LevelMenuEntrySelected(2, player));
         }
 
         void LevelMenuEntrySelected(int level, PlayerIndex controllingPlayer)
