@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Net;
 using Tetatt.Networking;
+using Tetatt.Graphics;
 #endregion
 
 namespace Tetatt.Screens
@@ -26,8 +27,10 @@ namespace Tetatt.Screens
     {
         #region Initialization
 
-        Texture2D logo, menu;
         string version;
+        TimeSpan timestamp;
+        int prevSelectedEntry = -1;
+        Vector2 selectedPosition;
 
         /// <summary>
         /// Constructor fills in the menu contents.
@@ -35,37 +38,15 @@ namespace Tetatt.Screens
         public MainMenuScreen()
             : base(Resources.MainMenu)
         {
-            // Create our menu entries.
-            MenuEntry versusAIMenuEntry = new MenuEntry(Resources.VersusAI);
-            MenuEntry localMenuEntry = new MenuEntry(Resources.Local);
-            MenuEntry liveMenuEntry = new MenuEntry(Resources.PlayerMatch);
-            MenuEntry systemLinkMenuEntry = new MenuEntry(Resources.SystemLink);
-            MenuEntry exitMenuEntry = new MenuEntry(Resources.Exit);
-
-            // Hook up menu event handlers.
-            versusAIMenuEntry.Selected += VersusAIMenuEntrySelected;
-            localMenuEntry.Selected += LocalMenuEntrySelected;
-            liveMenuEntry.Selected += LiveMenuEntrySelected;
-            systemLinkMenuEntry.Selected += SystemLinkMenuEntrySelected;
-            exitMenuEntry.Selected += OnCancel;
-
-            // Add entries to the menu.
-            MenuEntries.Add(versusAIMenuEntry);
-            MenuEntries.Add(localMenuEntry);
-            MenuEntries.Add(liveMenuEntry);
-            MenuEntries.Add(systemLinkMenuEntry);
-            MenuEntries.Add(exitMenuEntry);
+            AddSimpleEntry(Resources.VersusAI, VersusAIMenuEntrySelected);
+            AddSimpleEntry(Resources.Local, LocalMenuEntrySelected);
+            AddSimpleEntry(Resources.PlayerMatch, LiveMenuEntrySelected);
+            AddSimpleEntry(Resources.SystemLink, SystemLinkMenuEntrySelected);
+            AddSimpleEntry(Resources.Exit, OnCancel);
 
             version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        }
-
-        public override void LoadContent()
-        {
-            base.LoadContent();
-
-            ContentManager content = ScreenManager.Game.Content;
-            logo = content.Load<Texture2D>("logo");
-            menu = content.Load<Texture2D>("menu");
+            timestamp = TimeSpan.Zero;
+            selectedPosition = Vector2.Zero;
         }
 
         #endregion
@@ -161,84 +142,88 @@ namespace Tetatt.Screens
         #region Update and Draw
 
 
-        public override void Draw(GameTime gameTime)
+        protected override void DrawExtras(GameTime gameTime)
         {
-            base.Draw(gameTime);
-            GraphicsDevice graphics = ScreenManager.GraphicsDevice;
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
-            SpriteFont font = ScreenManager.Font;
-
-            float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
-
-            spriteBatch.Begin();
-
-            // Draw logo
-            Vector2 titlePosition = new Vector2(graphics.Viewport.Width / 2, 40);
-            Color titleColor = Color.White * TransitionAlpha;
-
-            titlePosition.X -= logo.Width / 2;
-            titlePosition.Y -= transitionOffset * 100;
-
-            spriteBatch.Draw(logo, titlePosition, titleColor);
-
-
-            Vector2 iconOffset = new Vector2(64, 150);
-            for (int i = 0; i < MenuEntries.Count; i++)
-            {
-                spriteBatch.Draw(menu, MenuEntries[i].Position - iconOffset, new Rectangle(128 * i, 0, 128, 128), titleColor);
-            }
-
-            // Draw copyright message
-            Vector2 copyrightPosition = new Vector2(
-                graphics.Viewport.Width / 2,
-                graphics.Viewport.Height - 80);
-            Vector2 copyrightOrigin = font.MeasureString(Resources.Copyright) / 2;
+            Vector2 copyrightPosition = new Vector2(Viewport.Width / 2, Viewport.Height - 80);
+            Vector2 copyrightOrigin = Font.MeasureString(Resources.Copyright) / 2;
             Color copyrightColor = Color.White * TransitionAlpha;
 
-            copyrightPosition.Y -= transitionOffset * 100;
+            copyrightPosition.Y -= TransitionPower * 100;
 
-            spriteBatch.DrawString(font, Resources.Copyright, copyrightPosition, copyrightColor,
+            SpriteBatch.DrawString(Font, Resources.Copyright, copyrightPosition, copyrightColor,
                                    0, copyrightOrigin, 1.0f, SpriteEffects.None, 0);
-
-            // Draw version
             Vector2 versionPosition = new Vector2(
-                graphics.Viewport.TitleSafeArea.Right,
-                graphics.Viewport.TitleSafeArea.Bottom);
-            Vector2 versionOrigin = font.MeasureString(version);
+                Viewport.TitleSafeArea.Right,
+                Viewport.TitleSafeArea.Bottom);
+            Vector2 versionOrigin = Font.MeasureString(version);
             Color versionColor = Color.White * TransitionAlpha;
 
-            versionPosition.Y -= transitionOffset * 100;
+            versionPosition.Y -= TransitionPower * 100;
 
-            spriteBatch.DrawString(font, version, versionPosition, versionColor,
+            SpriteBatch.DrawString(Font, version, versionPosition, versionColor,
                                    0, versionOrigin, 0.75f, SpriteEffects.None, 0);
-            
-
-            spriteBatch.End();
         }
 
 
         #endregion
 
-        protected override void UpdateMenuEntryLocations()
+        protected override void DrawEntries(GameTime gameTime)
         {
-            float transitionOffset = 256 * (float)Math.Pow(TransitionPosition, 2);
+            float transitionOffset = TransitionPower;
             if (ScreenState == ScreenState.TransitionOff)
                 transitionOffset *= 2;
 
-            Vector2 center = new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, 500);
+            const int width = 640;
+            float distanceX = (1 + transitionOffset) * 2 * (width - MenuTiles.TileSize) / MenuEntries.Count;
+            float startX =
+                ScreenManager.GraphicsDevice.Viewport.Width / 2 - // Center
+                (MenuEntries.Count / 2) * (distanceX + transitionOffset) + // Leftmost center
+                0.5f * transitionOffset; // Force center object to transition towards right...
 
+            Color color = Color.White * TransitionAlpha;
+            Vector2 iconOffset = new Vector2(0, 96);
+            Vector2 position = new Vector2(startX, 500);
             for (int i = 0; i < MenuEntries.Count; i++)
             {
                 MenuEntry menuEntry = MenuEntries[i];
-                int direction = (i - MenuEntries.Count / 2);
-                Vector2 position = new Vector2(
-                    transitionOffset * (0.5f + direction) + 200 * direction  + center.X, center.Y);
+                bool isSelected = IsActive && SelectedEntry == i;
 
-                // set the entry's position
-                menuEntry.Position = position;
+                Vector2 origin = Font.MeasureString(menuEntry.Label) / 2;
+                SpriteBatch.DrawString(
+                    Font, menuEntry.Label, position, color, 0, origin,
+                    1.0f, SpriteEffects.None, 0);
 
-                // move down for the next entry the size of this entry
-                position.Y += menuEntry.GetHeight(this);
+                float scale = 1.0f;
+                Vector2 iconPosition = position - iconOffset;
+                if (isSelected)
+                {
+                    selectedPosition = iconPosition;
+                    if (i != prevSelectedEntry)
+                    {
+                        prevSelectedEntry = i;
+                        timestamp = gameTime.TotalGameTime;
+                    }
+                    scale += .18f * (float)Math.Sin(0.008*(gameTime.TotalGameTime - timestamp).TotalMilliseconds);
+                }
+
+                Vector2 iconOrigin = new Vector2(scale * MenuTiles.TileSize / 2);
+                if (ScreenState == ScreenState.TransitionOff && SelectedEntry == i)
+                {
+                    iconPosition = new Vector2(
+                        MathHelper.Lerp(selectedPosition.X, LogoPosition.X-2, TransitionPosition),
+                        MathHelper.Lerp(selectedPosition.Y, LogoPosition.Y-2, TransitionPower));
+                    iconOrigin = new Vector2(
+                        MathHelper.Lerp(iconOrigin.X, 1, TransitionPosition),
+                        MathHelper.Lerp(iconOrigin.Y, 1, TransitionPosition));
+                    scale = MathHelper.Lerp(1f, 172f/(MenuTiles.TileSize - 2), TransitionPosition);
+                    color = Color.White;
+                }
+
+                SpriteBatch.Draw(
+                    MenuTiles.Texture, iconPosition, MenuTiles.SourceRectangle(i), color,
+                    0, iconOrigin, scale, SpriteEffects.None, 0);
+
+                position.X += distanceX;
             }
         }
     }

@@ -7,7 +7,6 @@
 //-----------------------------------------------------------------------------
 #endregion
 
-#region Using Statements
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
@@ -15,7 +14,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input.Touch;
 using Microsoft.Xna.Framework.Input;
 using Tetatt.Graphics;
-#endregion
 
 namespace Tetatt.Screens
 {
@@ -25,16 +23,23 @@ namespace Tetatt.Screens
     /// </summary>
     abstract class MenuScreen : GameScreen
     {
-        #region Fields
-
         List<MenuEntry> menuEntries = new List<MenuEntry>();
-        int selectedEntry = 0;
         string menuTitle;
+        TileSet tileSet;
+        Texture2D logo;
+        int iconTile;
 
-        #endregion
+        protected int SelectedEntry {
+            get; private set;
+        }
 
-        #region Properties
+        protected TileSet MenuTiles {
+            get; private set;
+        }
 
+        protected Vector2 LogoPosition {
+            get { return new Vector2((Viewport.Width - logo.Width) / 2, 40); }
+        }
 
         /// <summary>
         /// Gets the list of menu entries, so derived classes can add
@@ -45,42 +50,28 @@ namespace Tetatt.Screens
             get { return menuEntries; }
         }
 
-        public TileSet TileSet
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Initialization
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MenuScreen(string menuTitle)
+        public MenuScreen(string menuTitle, int iconTile = -1)
         {
             this.menuTitle = menuTitle;
+            this.iconTile = iconTile;
 
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
+            SelectedEntry = 0;
         }
 
         public override void LoadContent()
         {
             base.LoadContent();
 
-            TileSet = new TileSet(
+            logo = ScreenManager.Game.Content.Load<Texture2D>("logo");
+            tileSet = new TileSet(
                 ScreenManager.Game.Content.Load<Texture2D>("blocks"),
                 DrawablePlayField.BlockSize);
+            MenuTiles = new TileSet(
+                ScreenManager.Game.Content.Load<Texture2D>("menu"),
+                128);
         }
-
-
-        #endregion
-
-        #region Handle Input
-
 
         /// <summary>
         /// Responds to user input, changing the selected entry and accepting
@@ -90,32 +81,25 @@ namespace Tetatt.Screens
         {
             PlayerIndex playerIndex;
 
-            // Move to the previous menu entry?
             if (input.IsMenuUp(ControllingPlayer, out playerIndex))
             {
-                selectedEntry--;
+                SelectedEntry--;
 
-                if (selectedEntry < 0)
-                    selectedEntry = menuEntries.Count - 1;
+                if (SelectedEntry < 0)
+                    SelectedEntry = menuEntries.Count - 1;
             }
 
-            // Move to the next menu entry?
             if (input.IsMenuDown(ControllingPlayer, out playerIndex))
             {
-                selectedEntry++;
+                SelectedEntry++;
 
-                if (selectedEntry >= menuEntries.Count)
-                    selectedEntry = 0;
+                if (SelectedEntry >= menuEntries.Count)
+                    SelectedEntry = 0;
             }
 
-            // Accept or cancel the menu? We pass in our ControllingPlayer, which may
-            // either be null (to accept input from any player) or a specific index.
-            // If we pass a null controlling player, the InputState helper returns to
-            // us which player actually provided the input. We pass that through to
-            // OnSelectEntry and OnCancel, so they can tell which player triggered them.
             if (input.IsMenuSelect(ControllingPlayer, out playerIndex))
             {
-                OnSelectEntry(selectedEntry, playerIndex);
+                OnSelectEntry(SelectedEntry, playerIndex);
             }
             else if (input.IsMenuCancel(ControllingPlayer, out playerIndex))
             {
@@ -123,137 +107,119 @@ namespace Tetatt.Screens
             }
         }
 
-
-        /// <summary>
-        /// Handler for when the user has chosen a menu entry.
-        /// </summary>
         protected virtual void OnSelectEntry(int entryIndex, PlayerIndex playerIndex)
         {
             menuEntries[entryIndex].OnSelectEntry(playerIndex);
         }
 
-
-        /// <summary>
-        /// Handler for when the user has cancelled the menu.
-        /// </summary>
         protected virtual void OnCancel(PlayerIndex playerIndex)
         {
             ExitScreen();
         }
 
-
-        /// <summary>
-        /// Helper overload makes it easy to use OnCancel as a MenuEntry event handler.
-        /// </summary>
-        protected void OnCancel(object sender, PlayerIndexEventArgs e)
+        protected virtual void DrawEntries(GameTime gameTime)
         {
-            OnCancel(e.PlayerIndex);
-        }
+            float transitionOffset = 256 * TransitionPower;
+            if (ScreenState == ScreenState.TransitionOff)
+                transitionOffset *= 2;
 
+            Color normal = Color.White * TransitionAlpha;
+            Color selected = Color.Yellow * TransitionAlpha;
 
-        #endregion
+            float cursorRotation = (float)gameTime.TotalGameTime.TotalSeconds * 3;
+            Vector2 cursorOrigin = new Vector2(tileSet.TileSize) / 2;
 
-        #region Update and Draw
+            Vector2 position = new Vector2(
+                Viewport.Width / 2 - transitionOffset, 300f);
 
-
-        /// <summary>
-        /// Allows the screen the chance to position the menu entries. By default
-        /// all menu entries are lined up in a vertical list, centered on the screen.
-        /// </summary>
-        protected virtual void UpdateMenuEntryLocations()
-        {
-            // Make the menu slide into place during transitions, using a
-            // power curve to make things look more interesting (this makes
-            // the movement slow down as it nears the end).
-            float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
-
-            // start at Y = 175; each X value is generated per entry
-            Vector2 position = new Vector2(0f, 300f);
-
-            // update each menu entry's location in turn
             for (int i = 0; i < menuEntries.Count; i++)
             {
                 MenuEntry menuEntry = menuEntries[i];
-                
-                // each entry is to be centered horizontally
-                position.X = ScreenManager.GraphicsDevice.Viewport.Width / 2;
+                bool isSelected = IsActive && SelectedEntry == i;
 
-                if (ScreenState == ScreenState.TransitionOn)
-                    position.X -= transitionOffset * 256;
-                else
-                    position.X += transitionOffset * 512;
+                Vector2 origin = Font.MeasureString(menuEntry.Label) / 2;
+                SpriteBatch.DrawString(
+                    Font, menuEntry.Label, position, isSelected ? selected : normal, 0, origin,
+                    1.0f, SpriteEffects.None, 0);
 
-                // set the entry's position
-                menuEntry.Position = position;
+                if (isSelected)
+                {
+                    Vector2 cursorPosition = new Vector2(position.X - origin.X - 32, position.Y);
+                    SpriteBatch.Draw(
+                        tileSet.Texture, cursorPosition, tileSet.SourceRectangle(91),
+                        normal, cursorRotation, cursorOrigin,
+                        1.0f, SpriteEffects.None, 0);
+                }
 
-                // move down for the next entry the size of this entry
-                position.Y += menuEntry.GetHeight(this);
+                position.Y += Font.MeasureString(menuEntry.Label).Y;
             }
+
         }
 
-
-        /// <summary>
-        /// Updates the menu.
-        /// </summary>
         public override void Update(GameTime gameTime, bool otherScreenHasFocus,
                                                        bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
 
-            // Update each nested MenuEntry object.
             for (int i = 0; i < menuEntries.Count; i++)
-            {
-                bool isSelected = IsActive && (i == selectedEntry);
-
-                menuEntries[i].Update(this, isSelected, gameTime);
-            }
+                menuEntries[i].Update(gameTime);
         }
 
+        protected SpriteBatch SpriteBatch {
+            get { return ScreenManager.SpriteBatch; }
+        }
+        protected SpriteFont Font {
+            get { return ScreenManager.Font; }
+        }
+        protected Viewport Viewport {
+            get { return ScreenManager.GraphicsDevice.Viewport; }
+        }
 
-        /// <summary>
-        /// Draws the menu.
-        /// </summary>
         public override void Draw(GameTime gameTime)
         {
-            // make sure our entries are in the right place before we draw them
-            UpdateMenuEntryLocations();
-
-            GraphicsDevice graphics = ScreenManager.GraphicsDevice;
-            SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
-            SpriteFont font = ScreenManager.Font;
-
-            spriteBatch.Begin();
-
-            // Draw each menu entry in turn.
-            for (int i = 0; i < menuEntries.Count; i++)
-            {
-                MenuEntry menuEntry = menuEntries[i];
-
-                bool isSelected = IsActive && (i == selectedEntry);
-
-                menuEntry.Draw(this, isSelected, gameTime);
-            }
-
-            // Make the menu slide into place during transitions, using a
-            // power curve to make things look more interesting (this makes
-            // the movement slow down as it nears the end).
-            float transitionOffset = (float)Math.Pow(TransitionPosition, 2);
-
-            // Draw the menu title centered on the screen
-            Vector2 titlePosition = new Vector2(graphics.Viewport.Width / 2, 80);
-            Vector2 titleOrigin = font.MeasureString(menuTitle) / 2;
-            Color titleColor = new Color(192, 192, 192) * TransitionAlpha;
-            float titleScale = 1.25f;
-
-            titlePosition.Y -= transitionOffset * 100;
-
-            spriteBatch.DrawString(font, menuTitle, titlePosition, titleColor, 0,
-                                   titleOrigin, titleScale, SpriteEffects.None, 0);
-
-            spriteBatch.End();
+            SpriteBatch.Begin();
+            DrawGameLogo();
+            DrawMenuTitle();
+            DrawEntries(gameTime);
+            DrawExtras(gameTime);
+            SpriteBatch.End();
         }
 
+        protected virtual void DrawGameLogo()
+        {
+            Vector2 position = LogoPosition;
+            Color color = Color.White * TransitionAlpha;
+            if (iconTile < 0 || ScreenState != ScreenState.TransitionOn)
+                SpriteBatch.Draw(logo, position, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 1f);
+            if (iconTile >= 0 && ScreenState != ScreenState.TransitionOn)
+                SpriteBatch.Draw(
+                    MenuTiles.Texture, position, MenuTiles.SourceRectangle(iconTile), color,
+                    0, new Vector2(2), 172f/(MenuTiles.TileSize-2), SpriteEffects.None, 0);
+        }
 
-        #endregion
+        protected virtual void DrawMenuTitle()
+        {
+            Vector2 titlePosition = new Vector2(40, 100 - TransitionPower * 100);
+            float titleScale = 1.5f;
+            Vector2 titleOrigin = new Vector2(Font.MeasureString(menuTitle).X * titleScale, 0);
+            Color titleColor = new Color(192, 192, 192) * TransitionAlpha;
+
+            SpriteBatch.DrawString(Font, menuTitle, titlePosition, titleColor, -MathHelper.Pi/2,
+                                   titleOrigin, titleScale, SpriteEffects.None, 0);
+        }
+
+        protected virtual void DrawExtras(GameTime gameTime)
+        {
+        }
+
+        protected void AddSimpleEntry(string label, EventHandler<PlayerIndexEventArgs> handler)
+        {
+            menuEntries.Add(new MenuEntry(label, handler));
+        }
+
+        protected void AddSimpleEntry(string label, MenuEntry.PlayerIndexDelegate handler)
+        {
+            menuEntries.Add(new MenuEntry(label, handler));
+        }
     }
 }

@@ -108,6 +108,8 @@
     <Compile Include="ArtificialIntelligence\Location.cs" />
     <Compile Include="ArtificialIntelligence\SimplifiedPlayField.cs" />
     <Compile Include="AudioComponent.cs" />
+    <Compile Include="Screens\LevelScreen.cs" />
+    <Compile Include="Screens\StageScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
