@@ -122,6 +122,7 @@ namespace Tetatt.Screens
             //font = content.Load<SpriteFont>("menufont");
             font = content.Load<SpriteFont>("ingame_font");
             font.Spacing = -5;
+            font.LineSpacing = 33;
             blankTexture = content.Load<Texture2D>("blank");
 
             // Tell each of the screens to load their content.
