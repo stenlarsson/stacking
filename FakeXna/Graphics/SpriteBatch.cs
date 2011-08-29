@@ -208,19 +208,39 @@ namespace Microsoft.Xna.Framework.Graphics
         {
             SetupColor(color);
             SetupModelview(position.X, position.Y, rotation, origin.X, origin.Y, scale);
+            SetupTexture(spriteFont.texture);
+            GL.Scale(1.0f / spriteFont.texture.Width, 1.0f / spriteFont.texture.Height, 1);
 
             // TODO: Handle effects, which probably requires using MeasureString to figure
             // out the width and height of the string that we are drawing...
 
-            Vector2 prev = Vector2.Zero;
-            spriteFont.EachChar(text, (rect, pos) =>
+            VertexPositionTexture[] data = new VertexPositionTexture[4 * text.Length];
+            int count = 0;
+            spriteFont.EachChar(text, (pos, source) =>
             {
-                SetupTextureSourceRectangle(spriteFont.texture, rect);
-                GL.MatrixMode(MatrixMode.Modelview);
-                GL.Translate(pos.X - prev.X, pos.Y - prev.Y, 0);
-                FillRectangle(rect.Width, rect.Height);
-                prev = pos;
+                float sx1 = source.Left, sx2 = source.Right, sy1 = source.Top, sy2 = source.Bottom;
+                float dx1 = pos.X, dx2 = pos.X + source.Width, dy1 = pos.Y, dy2 = pos.Y + source.Height;
+                data[count++] = new VertexPositionTexture(new Vector3(dx1, dy1, 0), new Vector2(sx1, sy1));
+                data[count++] = new VertexPositionTexture(new Vector3(dx1, dy2, 0), new Vector2(sx1, sy2));
+                data[count++] = new VertexPositionTexture(new Vector3(dx2, dy2, 0), new Vector2(sx2, sy2));
+                data[count++] = new VertexPositionTexture(new Vector3(dx2, dy1, 0), new Vector2(sx2, sy1));
             });
+
+            if (count > 0)
+            {
+                using (
+                    VertexBuffer vertexBuffer =
+                        new VertexBuffer(GraphicsDevice, VertexPositionTexture.VertexDeclaration, count, BufferUsage.None))
+                {
+                    vertexBuffer.SetData<VertexPositionTexture>(data);
+                    vertexBuffer._Activate();
+                    GL.DisableClientState(ArrayCap.ColorArray);
+                    GL.EnableClientState(ArrayCap.TextureCoordArray);
+                    GL.DrawArrays(BeginMode.Quads, 0, count);
+                    GL.DisableClientState(ArrayCap.TextureCoordArray);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+                }
+            }
         }
     }
 }
