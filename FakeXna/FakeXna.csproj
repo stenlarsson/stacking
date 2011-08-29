@@ -84,6 +84,7 @@
     <Compile Include="Graphics\VertexElementFormat.cs" />
     <Compile Include="Graphics\VertexElementUsage.cs" />
     <Compile Include="Graphics\VertexPositionColor.cs" />
+    <Compile Include="Graphics\VertexPositionTexture.cs" />
     <Compile Include="Graphics\Viewport.cs" />
     <Compile Include="Input\Touch\GestureSample.cs" />
     <Compile Include="Input\Touch\GestureType.cs" />
