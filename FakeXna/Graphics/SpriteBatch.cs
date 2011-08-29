@@ -93,11 +93,16 @@ namespace Microsoft.Xna.Framework.Graphics
                 SetupTexture(texture);
         }
 
-        void SetupModelview(float x, float y, float rotation = 0, float ox = 0, float oy = 0, float scale = 1)
+        void SetupModelview(float x, float y)
         {
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
             GL.Translate(x, y, 0);
+        }
+
+        void SetupModelview(float x, float y, float rotation, float ox = 0, float oy = 0, float scale = 1)
+        {
+            SetupModelview(x, y);
             GL.Rotate(180 * rotation / Math.PI, 0, 0, 1);
             GL.Scale(scale, scale, 1);
             GL.Translate(-ox, -oy, 0);
