@@ -10,7 +10,7 @@ namespace Microsoft.Xna.Framework.Graphics
         public BufferUsage BufferUsage { get; private set; }
         public int VertexCount { get; private set; }
 
-        uint buffer;
+        internal uint buffer;
         VertexDeclaration decl;
 
         public VertexBuffer(GraphicsDevice device, Type type, int count, BufferUsage usage)
@@ -25,7 +25,13 @@ namespace Microsoft.Xna.Framework.Graphics
             VertexCount = count;
             this.decl = decl;
 
+            if (usage != BufferUsage.None)
+                throw new NotImplementedException();
+
             GL.GenBuffers(1, out buffer);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+            GL.BufferData(BufferTarget.ArrayBuffer, new IntPtr(count * decl.VertexStride), IntPtr.Zero, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
         protected override void Dispose (bool disposing)
@@ -39,30 +45,36 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetData<T>(T[] data) where T : struct
         {
-            // TODO: Check that count/size agrees with the data array
-            int size = decl.VertexStride;
             GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-            GL.BufferData<T>(BufferTarget.ArrayBuffer, new IntPtr(VertexCount * size), data, BufferUsageHint.StaticDraw);
+            GL.BufferSubData<T>(
+                BufferTarget.ArrayBuffer, IntPtr.Zero, new IntPtr(Math.Min(VertexCount, data.Length) * decl.VertexStride), data);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+        }
+
+        internal void _Activate()
+        {
+            GL.BindBuffer(BufferTarget.ArrayBuffer, buffer);
+            int size = decl.VertexStride;
             foreach (VertexElement e in decl.GetVertexElements())
             {
-                switch(e.ElementFormat)
+                switch(e.ElementUsage)
                 {
-                case VertexElementFormat.Color:
-                    GL.ColorPointer(4, ColorPointerType.UnsignedByte, size, new IntPtr(e.Offset));
+                case VertexElementUsage.Color:
+                    if (e.ElementFormat != VertexElementFormat.Color)
+                        throw new NotSupportedException();
+                    GL.ColorPointer(4, ColorPointerType.UnsignedByte, size, e._Offset);
                     break;
-                case VertexElementFormat.Vector3:
-                    GL.VertexPointer(3, VertexPointerType.Float, size, new IntPtr(e.Offset));
+                case VertexElementUsage.Position:
+                    GL.VertexPointer(e._ComponentCount, VertexPointerType.Float, size, e._Offset);
+                    break;
+                case VertexElementUsage.TextureCoordinate:
+                    GL.TexCoordPointer(e._ComponentCount, TexCoordPointerType.Float, size, e._Offset);
                     break;
                 default:
                     throw new NotImplementedException();
                 }
             }
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-        }
-
-        internal void glBindBuffer(BufferTarget target)
-        {
-             GL.BindBuffer(target, buffer);
+            GL.EnableClientState(ArrayCap.VertexArray);
         }
     }
 }

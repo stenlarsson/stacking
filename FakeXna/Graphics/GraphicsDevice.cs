@@ -42,8 +42,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void SetVertexBuffer(VertexBuffer buffer)
         {
-            buffer.glBindBuffer(BufferTarget.ElementArrayBuffer);
-            GL.EnableClientState(ArrayCap.VertexArray);
+            buffer._Activate();
         }
 
         static readonly BeginMode[] glPrimitiveTypes = new BeginMode[4]

@@ -21,5 +21,8 @@ namespace Microsoft.Xna.Framework.Graphics
             this.ElementUsage = elementUsage;
             this.UsageIndex = usageIndex;
         }
+
+        internal IntPtr _Offset { get { return new IntPtr(Offset); } }
+        internal int _ComponentCount { get { return ElementFormat._ComponentCount(); } }
     }
 }
