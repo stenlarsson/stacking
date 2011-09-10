@@ -30,7 +30,7 @@ namespace Tetatt.Screens
         int iconTile;
 
         protected int SelectedEntry {
-            get; private set;
+            get; set;
         }
 
         protected TileSet MenuTiles {
