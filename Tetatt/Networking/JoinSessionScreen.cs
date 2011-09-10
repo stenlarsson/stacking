@@ -104,10 +104,11 @@ namespace Tetatt.Networking
         /// </summary>
         void JoinSessionOperationCompleted(object sender, OperationCompletedEventArgs e)
         {
+            NetworkSession networkSession = null;
             try
             {
                 // End the asynchronous join network session operation.
-                NetworkSession networkSession = NetworkSession.EndJoin(e.AsyncResult);
+                networkSession = NetworkSession.EndJoin(e.AsyncResult);
 
                 // Create a component that will manage the session we just joined.
                 NetworkSessionComponent.Create(ScreenManager, networkSession);
@@ -121,6 +122,9 @@ namespace Tetatt.Networking
             }
             catch (Exception exception)
             {
+                if (networkSession != null)
+                    networkSession.Dispose();
+
                 NetworkErrorScreen errorScreen = new NetworkErrorScreen(exception);
 
                 ScreenManager.AddScreen(errorScreen, ControllingPlayer);
