@@ -108,12 +108,22 @@ namespace Microsoft.Xna.Framework.Net
             waitingLocalGamers.Add(new LocalNetworkGamer(gamer.Gamertag, (byte)gamer.PlayerIndex));
         }
 
-
-        static NetworkSession Nop(NetworkSession session)
+        public static NetworkSession Create(
+            NetworkSessionType sessionType,
+            IEnumerable<SignedInGamer> localGamers,
+            int maxGamers,
+            int privateGamerSlots,
+            NetworkSessionProperties sessionProperties)
         {
-            return session;
+            if (sessionType != NetworkSessionType.Local)
+                throw new NotImplementedException();
+            if (nopDelegate != null)
+                throw new InvalidOperationException();
+
+            return new NetworkSession(localGamers, maxGamers);
         }
-        delegate NetworkSession NopDelegate(NetworkSession session);
+
+        delegate NetworkSession NopDelegate();
         static NopDelegate nopDelegate = null;
 
         public static IAsyncResult BeginCreate(
@@ -125,14 +135,9 @@ namespace Microsoft.Xna.Framework.Net
             AsyncCallback callback,
             Object asyncState)
         {
-            if (sessionType != NetworkSessionType.Local)
-                throw new NotImplementedException();
-            if (nopDelegate != null)
-                throw new InvalidOperationException();
 
-            nopDelegate = new NopDelegate(Nop);
-            NetworkSession session = new NetworkSession(localGamers, maxGamers);
-            return nopDelegate.BeginInvoke(session, callback, asyncState);
+            nopDelegate = () => Create(sessionType, localGamers, maxGamers, privateGamerSlots, sessionProperties);
+            return nopDelegate.BeginInvoke(callback, asyncState);
         }
 
         public static NetworkSession EndCreate(IAsyncResult result)

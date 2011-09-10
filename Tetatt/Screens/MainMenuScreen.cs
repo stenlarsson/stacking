@@ -9,10 +9,12 @@
 
 #region Using Statements
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Net;
 using Tetatt.Networking;
 using Tetatt.Graphics;
@@ -65,7 +67,23 @@ namespace Tetatt.Screens
         /// </summary>
         void LocalMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            CreateOrFindSession(NetworkSessionType.Local, e.PlayerIndex);
+            EnsureProfileSignedIn(e.PlayerIndex, NetworkSessionType.Local, delegate {
+                IEnumerable<SignedInGamer> localGamers =
+                    NetworkSessionComponent.ChooseGamers(NetworkSessionType.Local, e.PlayerIndex);
+
+                // Begin an asynchronous create network session operation.
+                NetworkSession session =
+                    NetworkSession.Create(
+                        NetworkSessionType.Local, localGamers, NetworkSessionComponent.MaxGamers, 0, null);
+
+                // Create a component that will manage the session we just created.
+                NetworkSessionComponent.Create(ScreenManager, session);
+
+                // Go to the gameplay screen. We pass null as the controlling player,
+                // because the gameplay screen accepts input from all local players
+                // who are in the session, not just a single controlling player.
+                ScreenManager.AddScreen(new GameplayScreen(ScreenManager, session), null);
+            });
         }
 
 
@@ -86,24 +104,26 @@ namespace Tetatt.Screens
             CreateOrFindSession(NetworkSessionType.SystemLink, e.PlayerIndex);
         }
 
-
         /// <summary>
         /// Helper method shared by the Live and System Link menu event handlers.
         /// </summary>
         void CreateOrFindSession(NetworkSessionType sessionType,
                                  PlayerIndex playerIndex)
         {
+            EnsureProfileSignedIn(
+                playerIndex, sessionType, delegate {
+                    ScreenManager.AddScreen(new CreateOrFindSessionScreen(sessionType), playerIndex);
+                });
+        }
+
+        void EnsureProfileSignedIn(PlayerIndex playerIndex, NetworkSessionType sessionType, EventHandler<EventArgs> handler)
+        {
             // First, we need to make sure a suitable gamer profile is signed in.
             ProfileSignInScreen profileSignIn = new ProfileSignInScreen(sessionType);
 
             // Hook up an event so once the ProfileSignInScreen is happy,
             // it will activate the CreateOrFindSessionScreen.
-            profileSignIn.ProfileSignedIn += delegate
-            {
-                GameScreen createOrFind = new CreateOrFindSessionScreen(sessionType);
-
-                ScreenManager.AddScreen(createOrFind, playerIndex);
-            };
+            profileSignIn.ProfileSignedIn += handler;
 
             // Activate the ProfileSignInScreen.
             ScreenManager.AddScreen(profileSignIn, playerIndex);
