@@ -28,9 +28,7 @@ namespace Tetatt.Screens
         #region Initialization
 
         string version;
-        TimeSpan timestamp;
-        int prevSelectedEntry = -1;
-        Vector2 selectedPosition;
+		float selectionOffset;
 
         /// <summary>
         /// Constructor fills in the menu contents.
@@ -45,8 +43,7 @@ namespace Tetatt.Screens
             AddSimpleEntry(Resources.Exit, OnCancel);
 
             version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            timestamp = TimeSpan.Zero;
-            selectedPosition = Vector2.Zero;
+            selectionOffset = SelectedEntry = 2;
         }
 
         #endregion
@@ -173,55 +170,38 @@ namespace Tetatt.Screens
             if (ScreenState == ScreenState.TransitionOff)
                 transitionOffset *= 2;
 
+            selectionOffset = MathHelper.Lerp(selectionOffset, SelectedEntry, 0.1f);
+
             const int width = 640;
+            int mid = MenuEntries.Count/2;
+            int begin = Math.Max(0, SelectedEntry - mid);
+            int end = Math.Min(MenuEntries.Count, SelectedEntry + mid + 1);
             float distanceX = (1 + transitionOffset) * 2 * (width - MenuTiles.TileSize) / MenuEntries.Count;
-            float startX =
-                ScreenManager.GraphicsDevice.Viewport.Width / 2 - // Center
-                (MenuEntries.Count / 2) * (distanceX + transitionOffset) + // Leftmost center
-                0.5f * transitionOffset; // Force center object to transition towards right...
+
+            float centerX = ScreenManager.GraphicsDevice.Viewport.Width / 2;
+
+            float onleftX = Math.Min(SelectedEntry, mid) * (distanceX + transitionOffset);
+            float startX = centerX - onleftX - distanceX * (selectionOffset - SelectedEntry);
 
             Color color = Color.White * TransitionAlpha;
-            Vector2 iconOffset = new Vector2(0, 96);
-            Vector2 position = new Vector2(startX, 500);
-            for (int i = 0; i < MenuEntries.Count; i++)
+            Vector2 position = new Vector2(startX, 400);
+            Vector2 textOffset = new Vector2(0, 96);
+            for (int i = begin; i < end; i++)
             {
                 MenuEntry menuEntry = MenuEntries[i];
-                bool isSelected = IsActive && SelectedEntry == i;
 
-                Vector2 origin = Font.MeasureString(menuEntry.Label) / 2;
-                SpriteBatch.DrawString(
-                    Font, menuEntry.Label, position, color, 0, origin,
-                    1.0f, SpriteEffects.None, 0);
-
-                float scale = 1.0f;
-                Vector2 iconPosition = position - iconOffset;
-                if (isSelected)
-                {
-                    selectedPosition = iconPosition;
-                    if (i != prevSelectedEntry)
-                    {
-                        prevSelectedEntry = i;
-                        timestamp = gameTime.TotalGameTime;
-                    }
-                    scale += .18f * (float)Math.Sin(0.008*(gameTime.TotalGameTime - timestamp).TotalMilliseconds);
-                }
+                float scale = 1f - 0.35f * Math.Abs((selectionOffset-i)/(float)(mid));
 
                 Vector2 iconOrigin = new Vector2(MenuTiles.TileSize / 2);
-                if (ScreenState == ScreenState.TransitionOff && SelectedEntry == i)
-                {
-                    iconPosition = new Vector2(
-                        MathHelper.Lerp(selectedPosition.X, LogoPosition.X-2, TransitionPosition),
-                        MathHelper.Lerp(selectedPosition.Y, LogoPosition.Y-2, TransitionPower));
-                    iconOrigin = new Vector2(
-                        MathHelper.Lerp(iconOrigin.X, 1, TransitionPosition),
-                        MathHelper.Lerp(iconOrigin.Y, 1, TransitionPosition));
-                    scale = MathHelper.Lerp(1f, 172f/(MenuTiles.TileSize - 2), TransitionPosition);
-                    color = Color.White;
-                }
-
                 SpriteBatch.Draw(
-                    MenuTiles.Texture, iconPosition, MenuTiles.SourceRectangle(i), color,
+                    MenuTiles.Texture, position, MenuTiles.SourceRectangle(i), color,
                     0, iconOrigin, scale, SpriteEffects.None, 0);
+
+                Vector2 textOrigin = Font.MeasureString(menuEntry.Label) / 2;
+                Vector2 textPosition = position + textOffset * scale;
+                SpriteBatch.DrawString(
+                    Font, menuEntry.Label, textPosition, color * scale, 0, textOrigin,
+                    scale, SpriteEffects.None, 0);
 
                 position.X += distanceX;
             }
