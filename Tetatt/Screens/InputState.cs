@@ -299,6 +299,58 @@ namespace Tetatt.Screens
 
 
         /// <summary>
+        /// Checks for a "menu down" input action.
+        /// The controllingPlayer parameter specifies which player to read
+        /// input for. If this is null, it will accept input from any player. When the action
+        /// is detected, the output playerIndex reports which player pressed it.
+        /// </summary>
+        public bool IsMenuLeft(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
+        {
+            if (IsNewKeyPress(Keys.Left, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.One;
+                return true;
+            }
+            else if (IsNewKeyPress(Keys.A, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.Two;
+                return true;
+            }
+            else
+            {
+                return IsNewButtonPress(Buttons.DPadLeft, controllingPlayer, out playerIndex) ||
+                       IsNewButtonPress(Buttons.LeftThumbstickLeft, controllingPlayer, out playerIndex);
+            }
+        }
+
+
+        /// <summary>
+        /// Checks for a "menu down" input action.
+        /// The controllingPlayer parameter specifies which player to read
+        /// input for. If this is null, it will accept input from any player. When the action
+        /// is detected, the output playerIndex reports which player pressed it.
+        /// </summary>
+        public bool IsMenuRight(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
+        {
+            if (IsNewKeyPress(Keys.Right, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.One;
+                return true;
+            }
+            else if (IsNewKeyPress(Keys.D, controllingPlayer, out playerIndex))
+            {
+                playerIndex = PlayerIndex.Two;
+                return true;
+            }
+            else
+            {
+                return IsNewButtonPress(Buttons.DPadRight, controllingPlayer, out playerIndex) ||
+                       IsNewButtonPress(Buttons.LeftThumbstickRight, controllingPlayer, out playerIndex);
+            }
+        }
+
+
+        /// <summary>
         /// Checks for a "menu toggle" input action.
         /// The controllingPlayer parameter specifies which player to read input for.
         /// If this is null, it will accept input from any player. When the action
