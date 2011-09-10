@@ -244,8 +244,10 @@ namespace Tetatt.Screens
             aiPlayer.SetDifficulty(Level, Stage);
 
             int seed = unchecked((int)DateTime.Now.Ticks);
+            playerPlayField.Level = Level * 2;
             playerPlayField.Reset();
             playerPlayField.Start(seed);
+            aiPlayField.Level = Level * 2;
             aiPlayField.Reset();
             aiPlayField.Start(seed);
 
