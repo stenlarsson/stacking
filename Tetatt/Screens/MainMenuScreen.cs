@@ -54,6 +54,40 @@ namespace Tetatt.Screens
 
 
         /// <summary>
+        /// Override to use left/right instead of up/down.
+        /// </summary>
+        public override void HandleInput(InputState input)
+        {
+            PlayerIndex playerIndex;
+
+            if (input.IsMenuLeft(ControllingPlayer, out playerIndex))
+            {
+                SelectedEntry--;
+
+                if (SelectedEntry < 0)
+                    SelectedEntry = MenuEntries.Count - 1;
+            }
+
+            if (input.IsMenuRight(ControllingPlayer, out playerIndex))
+            {
+                SelectedEntry++;
+
+                if (SelectedEntry >= MenuEntries.Count)
+                    SelectedEntry = 0;
+            }
+
+            if (input.IsMenuSelect(ControllingPlayer, out playerIndex))
+            {
+                OnSelectEntry(SelectedEntry, playerIndex);
+            }
+            else if (input.IsMenuCancel(ControllingPlayer, out playerIndex))
+            {
+                OnCancel(playerIndex);
+            }
+        }
+
+
+        /// <summary>
         /// Event handler for when the Versus AI menu entry is selected.
         /// </summary>
         void VersusAIMenuEntrySelected(object sender, PlayerIndexEventArgs e)
@@ -193,24 +227,21 @@ namespace Tetatt.Screens
             selectionOffset = MathHelper.Lerp(selectionOffset, SelectedEntry, 0.1f);
 
             const int width = 640;
-            int mid = MenuEntries.Count/2;
-            int begin = Math.Max(0, SelectedEntry - mid);
-            int end = Math.Min(MenuEntries.Count, SelectedEntry + mid + 1);
             float distanceX = (1 + transitionOffset) * 2 * (width - MenuTiles.TileSize) / MenuEntries.Count;
 
             float centerX = ScreenManager.GraphicsDevice.Viewport.Width / 2;
 
-            float onleftX = Math.Min(SelectedEntry, mid) * (distanceX + transitionOffset);
+            float onleftX = SelectedEntry * (distanceX + transitionOffset);
             float startX = centerX - onleftX - distanceX * (selectionOffset - SelectedEntry);
 
             Color color = Color.White * TransitionAlpha;
             Vector2 position = new Vector2(startX, 400);
             Vector2 textOffset = new Vector2(0, 96);
-            for (int i = begin; i < end; i++)
+            for (int i = 0; i < MenuEntries.Count; i++)
             {
                 MenuEntry menuEntry = MenuEntries[i];
 
-                float scale = 1f - 0.35f * Math.Abs((selectionOffset-i)/(float)(mid));
+                float scale = 1f - 0.35f * Math.Abs((selectionOffset-i)/(float)(MenuEntries.Count/2));
 
                 Vector2 iconOrigin = new Vector2(MenuTiles.TileSize / 2);
                 SpriteBatch.Draw(
