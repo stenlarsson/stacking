@@ -711,6 +711,7 @@ namespace Tetatt.Screens
         {
             packetWriter.Write((byte)PacketTypes.StartPlayfield);
             packetWriter.Write((int)seed);
+            gamer.SendData(packetWriter, SendDataOptions.ReliableInOrder);
         }
 
         /// <summary>
@@ -719,6 +720,7 @@ namespace Tetatt.Screens
         public void SendStopPlayfield(LocalNetworkGamer gamer)
         {
             packetWriter.Write((byte)PacketTypes.StopPlayfield);
+            gamer.SendData(packetWriter, SendDataOptions.ReliableInOrder);
         }
 
         /// <summary>
