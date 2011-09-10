@@ -12,10 +12,44 @@ namespace Tetatt.ArtificialIntelligence
         /// Parameters used on each stage. Currently only contains
         /// the InputDelay.
         /// </summary>
-        public readonly int[,] Stages = new int[,] {
-            {60, 59, 58, 57, 56, 55, 54, 53, 52, 51},
-            {30, 29, 28, 27, 26, 25, 24, 23, 22, 21},
-            {10,  9,  8,  7,  6,  5,  4,  3,  2,  1},
+        // InputDelay, RaiseHeight, RaiseHeightWithoutGarbage, ChainMultiplier
+        public readonly StageInfo[,] Stages = new StageInfo[,] {
+            {
+                new StageInfo(60, 8, 3, 1),
+                new StageInfo(56, 8, 3, 1),
+                new StageInfo(52, 8, 3, 1),
+                new StageInfo(49, 8, 3, 1),
+                new StageInfo(45, 8, 3, 1),
+                new StageInfo(42, 8, 3, 1),
+                new StageInfo(38, 8, 3, 1),
+                new StageInfo(35, 8, 3, 1),
+                new StageInfo(32, 8, 3, 1),
+                new StageInfo(29, 8, 3, 1),
+            },
+            {
+                new StageInfo(26, 10, 5, 1.5f),
+                new StageInfo(24, 10, 5, 1.5f),
+                new StageInfo(21, 10, 5, 1.5f),
+                new StageInfo(19, 10, 5, 1.5f),
+                new StageInfo(17, 10, 5, 1.5f),
+                new StageInfo(15, 10, 5, 1.5f),
+                new StageInfo(13, 10, 5, 1.5f),
+                new StageInfo(11, 10, 5, 1.5f),
+                new StageInfo(10, 10, 5, 1.5f),
+                new StageInfo(8, 10, 5, 1.5f),
+            },
+            {
+                new StageInfo(6, 12, 8, 2),
+                new StageInfo(5, 12, 8, 2),
+                new StageInfo(4, 12, 8, 2),
+                new StageInfo(3, 12, 8, 2),
+                new StageInfo(2, 12, 8, 2),
+                new StageInfo(2, 12, 8, 2),
+                new StageInfo(1, 12, 8, 2),
+                new StageInfo(1, 12, 8, 2),
+                new StageInfo(1, 12, 8, 2),
+                new StageInfo(1, 12, 8, 2),
+            },
         };
 
         /// <summary>
@@ -29,7 +63,7 @@ namespace Tetatt.ArtificialIntelligence
         /// <summary>
         /// Multiplier for making a chain
         /// </summary>
-        const float ChainMultiplier = 2;
+        float ChainMultiplier = 2;
         /// <summary>
         /// Multiplier for making a garbage chain
         /// </summary>
@@ -37,11 +71,11 @@ namespace Tetatt.ArtificialIntelligence
         /// <summary>
         /// Raise if field, counting garbage, is lower than this height
         /// </summary>
-        const int RaiseHeight = 12;
+        int RaiseHeight = 12;
         /// <summary>
         /// Raise if field, not counting garbage, is lower than this height
         /// </summary>
-        const int RaiseHeightWithoutGarbage = 8;
+        int RaiseHeightWithoutGarbage = 8;
         /// <summary>
         /// Number of frames between each input
         /// </summary>
@@ -65,7 +99,11 @@ namespace Tetatt.ArtificialIntelligence
         public void SetDifficulty(int level, int stage)
         {
             // TODO RaiseHeight and other values should also be modified
-            InputDelay = Stages[level, stage];
+            StageInfo stageInfo = Stages[level, stage];
+            InputDelay = stageInfo.InputDelay;
+            RaiseHeight = stageInfo.RaiseHeight;
+            RaiseHeightWithoutGarbage = stageInfo.RaiseHeightWithoutGarbage;
+            ChainMultiplier = stageInfo.ChainMultiplier;
         }
 
         /// <summary>
