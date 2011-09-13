@@ -9,6 +9,8 @@ namespace Tetatt.Screens
 {
     class StageScreen : GameScreen
     {
+        readonly string[] LevelNames = new string[] {Resources.Easy, Resources.Normal, Resources.Hard};
+
         VersusAIScreen versusAIScreen;
 
         public StageScreen(VersusAIScreen versusAIScreen)
@@ -58,9 +60,21 @@ namespace Tetatt.Screens
             SpriteBatch spriteBatch = ScreenManager.SpriteBatch;
             spriteBatch.Begin();
 
+            // Draw stage info time
+            string info = string.Format("{0}\n{1}\n\n{2}",
+                Resources.VersusAI,
+                LevelNames[versusAIScreen.Level],
+                versusAIScreen.GameOver ?
+                    Resources.GameOver :
+                    string.Format(Resources.Stage, versusAIScreen.Stage + 1));
+            spriteBatch.DrawString(
+                font,
+                info,
+                new Vector2(100, 200),
+                Color.White * TransitionAlpha);
 
             // Draw stage times
-            Vector2 position = new Vector2(500, 100);
+            Vector2 position = new Vector2(950, 200);
             int totalTime = 0;
             for (int i = 0; i < VersusAIScreen.NumStages; i++)
             {
@@ -105,7 +119,7 @@ namespace Tetatt.Screens
             spriteBatch.DrawString(
                 font,
                 Resources.PressAToContinue,
-                new Vector2(500, 600),
+                new Vector2(100, 600),
                 Color.White * TransitionAlpha);
 
             spriteBatch.End();

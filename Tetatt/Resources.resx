@@ -295,4 +295,7 @@ the lobby before you can join this session</value>
   <data name="Wins" xml:space="preserve">
     <value>Wins</value>
   </data>
+  <data name="GameOver" xml:space="preserve">
+    <value>GAME OVER!</value>
+  </data>
 </root>
