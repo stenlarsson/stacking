@@ -285,6 +285,15 @@ namespace Tetatt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GAME OVER!.
+        /// </summary>
+        internal static string GameOver {
+            get {
+                return ResourceManager.GetString("GameOver", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hard.
         /// </summary>
         internal static string Hard {
