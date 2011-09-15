@@ -96,10 +96,10 @@ namespace Tetatt.ArtificialIntelligence
         /// <summary>
         /// Set difficulty according to stage
         /// </summary>
-        public void SetDifficulty(int level, int stage)
+        public void SetDifficulty(Level level, int stage)
         {
             // TODO RaiseHeight and other values should also be modified
-            StageInfo stageInfo = Stages[level, stage];
+            StageInfo stageInfo = Stages[level.Number, stage];
             InputDelay = stageInfo.InputDelay;
             RaiseHeight = stageInfo.RaiseHeight;
             RaiseHeightWithoutGarbage = stageInfo.RaiseHeightWithoutGarbage;

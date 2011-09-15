@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace Tetatt.Screens
 {
     class StageScreen : GameScreen
     {
-        readonly string[] LevelNames = new string[] {Resources.Easy, Resources.Normal, Resources.Hard};
-
         VersusAIScreen versusAIScreen;
 
         public StageScreen(VersusAIScreen versusAIScreen)
@@ -41,6 +40,11 @@ namespace Tetatt.Screens
             {
                 if (versusAIScreen.GameOver)
                 {
+                    SignedInGamer gamer = Gamer.SignedInGamers[playerIndex];
+                    string gamertag = (gamer == null) ? gamer.Gamertag : "(no name)";
+                    RankingsStorage rankings = (RankingsStorage)ScreenManager.Game.Services.GetService(typeof(RankingsStorage));
+                    Result result = new Result { Gamertag = gamertag, Ticks = versusAIScreen.Times.Sum() };
+                    rankings.AddResult(versusAIScreen.Level, result, ControllingPlayer.Value);
                     ScreenManager.ReturnToMainMenu();
                 }
                 else
@@ -49,6 +53,11 @@ namespace Tetatt.Screens
                     ExitScreen();
                 }
             }
+        }
+
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
+        {
+            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
         }
 
         /// <summary>
@@ -63,7 +72,7 @@ namespace Tetatt.Screens
             // Draw stage info time
             string info = string.Format("{0}\n{1}\n\n{2}",
                 Resources.VersusAI,
-                LevelNames[versusAIScreen.Level],
+                versusAIScreen.Level.Name,
                 versusAIScreen.GameOver ?
                     Resources.GameOver :
                     string.Format(Resources.Stage, versusAIScreen.Stage + 1));
@@ -90,7 +99,7 @@ namespace Tetatt.Screens
                     totalTime += time;
                     spriteBatch.DrawString(
                         font,
-                        String.Format("{0}:{1:00}", time / (60 * 60), (time / 60) % 60),
+                        FormatTime(time),
                         position + new Vector2(200, 0),
                         Color.White * TransitionAlpha);
                 }
@@ -108,10 +117,12 @@ namespace Tetatt.Screens
                 position,
                 Color.White * TransitionAlpha);
 
+            ;
+
             // Draw total time
             spriteBatch.DrawString(
                 font,
-                string.Format("{0}:{1:00}", totalTime / (60 * 60), (totalTime / 60) % 60),
+                FormatTime(totalTime),
                 position + new Vector2(200, 0),
                 Color.White * TransitionAlpha);
 
@@ -125,6 +136,11 @@ namespace Tetatt.Screens
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        public static string FormatTime(int ticks)
+        {
+            return string.Format("{0}:{1:00}", ticks / (60 * 60), (ticks / 60) % 60);
         }
     }
 }

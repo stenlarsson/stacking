@@ -249,6 +249,15 @@ namespace Tetatt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to store rankings. Try again?.
+        /// </summary>
+        internal static string ErrorStoreRankings {
+            get {
+                return ResourceManager.GetString("ErrorStoreRankings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This functionality is not available in trial mode.
         /// </summary>
         internal static string ErrorTrialMode {
@@ -440,6 +449,15 @@ namespace Tetatt {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No entries.
+        /// </summary>
+        internal static string NoEntries {
+            get {
+                return ResourceManager.GetString("NoEntries", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Normal.
         /// </summary>
         internal static string Normal {
@@ -490,6 +508,15 @@ namespace Tetatt {
         internal static string QuitGame {
             get {
                 return ResourceManager.GetString("QuitGame", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rankings.
+        /// </summary>
+        internal static string Rankings {
+            get {
+                return ResourceManager.GetString("Rankings", resourceCulture);
             }
         }
         

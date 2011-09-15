@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtificialIntelligence\AIPlayer.cs" />
+    <Compile Include="ArtificialIntelligence\Level.cs" />
     <Compile Include="ArtificialIntelligence\Location.cs" />
     <Compile Include="ArtificialIntelligence\SimplifiedPlayField.cs" />
     <Compile Include="ArtificialIntelligence\StageInfo.cs" />
@@ -165,6 +166,7 @@
     <Compile Include="Screens\MenuEntry.cs" />
     <Compile Include="Screens\PacketTypes.cs" />
     <Compile Include="Screens\Player.cs" />
+    <Compile Include="Screens\RankingsScreen.cs" />
     <Compile Include="Screens\ScreenManager.cs" />
     <Compile Include="Screens\BackgroundScreen.cs" />
     <Compile Include="Screens\MainMenuScreen.cs" />
@@ -174,6 +176,7 @@
     <Compile Include="Screens\PlayerIndexEventArgs.cs" />
     <Compile Include="Screens\StageScreen.cs" />
     <Compile Include="Screens\VersusAIScreen.cs" />
+    <Compile Include="RankingsStorage.cs" />
     <Compile Include="TetattGame.cs" />
     <Compile Include="Graphics\TileSet.cs" />
   </ItemGroup>

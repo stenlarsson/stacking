@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using Tetatt.ArtificialIntelligence;
 
 namespace Tetatt.Screens
 {
@@ -11,12 +12,12 @@ namespace Tetatt.Screens
         public LevelScreen()
             : base(Resources.Level, 0)
         {
-            AddSimpleEntry(Resources.Easy, (player) => LevelMenuEntrySelected(0, player));
-            AddSimpleEntry(Resources.Normal, (player) => LevelMenuEntrySelected(1, player));
-            AddSimpleEntry(Resources.Hard, (player) => LevelMenuEntrySelected(2, player));
+            AddSimpleEntry(Resources.Easy, (player) => LevelMenuEntrySelected(Level.Easy, player));
+            AddSimpleEntry(Resources.Normal, (player) => LevelMenuEntrySelected(Level.Normal, player));
+            AddSimpleEntry(Resources.Hard, (player) => LevelMenuEntrySelected(Level.Hard, player));
         }
 
-        void LevelMenuEntrySelected(int level, PlayerIndex controllingPlayer)
+        void LevelMenuEntrySelected(Level level, PlayerIndex controllingPlayer)
         {
             VersusAIScreen versusAIScreen = new VersusAIScreen(level, ScreenManager);
 
