@@ -19,7 +19,7 @@ namespace Tetatt.Screens
     {
         public const int NumStages = 10;
 
-        public int Level { get; private set; }
+        public Level Level { get; private set; }
         public int Stage { get; private set; }
         public bool GameOver { get; private set; }
         public int[] Times { get; private set; }
@@ -42,7 +42,7 @@ namespace Tetatt.Screens
         /// <summary>
         /// Constructor.
         /// </summary>
-        public VersusAIScreen(int level, ScreenManager screenManager)
+        public VersusAIScreen(Level level, ScreenManager screenManager)
         {
             Level = level;
             Stage = 0;
@@ -65,6 +65,7 @@ namespace Tetatt.Screens
             // it must be passed as a paramter so that we can get the AudioComponent.
             audioComponent = (AudioComponent)screenManager.Game.Services.GetService(
                 typeof(AudioComponent));
+
             audioComponent.AddPlayField(playerPlayField);
             audioComponent.AddPlayField(aiPlayField);
         }
@@ -244,10 +245,11 @@ namespace Tetatt.Screens
             aiPlayer.SetDifficulty(Level, Stage);
 
             int seed = unchecked((int)DateTime.Now.Ticks);
-            playerPlayField.Level = Level * 2;
+            // We start at player level 0, 2, 4 for Easy, Normal, Hard
+            playerPlayField.Level = Level.Number * 2;
             playerPlayField.Reset();
             playerPlayField.Start(seed);
-            aiPlayField.Level = Level * 2;
+            aiPlayField.Level = Level.Number * 2;
             aiPlayField.Reset();
             aiPlayField.Start(seed);
 

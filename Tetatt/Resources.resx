@@ -298,4 +298,13 @@ the lobby before you can join this session</value>
   <data name="GameOver" xml:space="preserve">
     <value>GAME OVER!</value>
   </data>
+  <data name="NoEntries" xml:space="preserve">
+    <value>No entries</value>
+  </data>
+  <data name="Rankings" xml:space="preserve">
+    <value>Rankings</value>
+  </data>
+  <data name="ErrorStoreRankings" xml:space="preserve">
+    <value>Failed to store rankings. Try again?</value>
+  </data>
 </root>

@@ -38,6 +38,8 @@ namespace Tetatt.Screens
         public MainMenuScreen()
             : base(Resources.MainMenu)
         {
+
+            AddSimpleEntry(Resources.Rankings, RankingsMenuEntrySelected);
             AddSimpleEntry(Resources.VersusAI, VersusAIMenuEntrySelected);
             AddSimpleEntry(Resources.Local, LocalMenuEntrySelected);
             AddSimpleEntry(Resources.PlayerMatch, LiveMenuEntrySelected);
@@ -86,13 +88,21 @@ namespace Tetatt.Screens
             }
         }
 
+        void RankingsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        {
+            var rankings = (RankingsStorage)ScreenManager.Game.Services.GetService(typeof(RankingsStorage));
+            ScreenManager.AddScreen(new RankingsScreen(rankings, e.PlayerIndex), e.PlayerIndex);
+        }
+
 
         /// <summary>
         /// Event handler for when the Versus AI menu entry is selected.
         /// </summary>
         void VersusAIMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            ScreenManager.AddScreen(new LevelScreen(), e.PlayerIndex);
+            EnsureProfileSignedIn(e.PlayerIndex, NetworkSessionType.Local, delegate {
+                ScreenManager.AddScreen(new LevelScreen(), e.PlayerIndex);
+            });            
         }
 
 
@@ -245,7 +255,7 @@ namespace Tetatt.Screens
 
                 Vector2 iconOrigin = new Vector2(MenuTiles.TileSize / 2);
                 SpriteBatch.Draw(
-                    MenuTiles.Texture, position, MenuTiles.SourceRectangle(i), color,
+                    MenuTiles.Texture, position, MenuTiles.SourceRectangle(i % 5), color,
                     0, iconOrigin, scale, SpriteEffects.None, 0);
 
                 Vector2 textOrigin = Font.MeasureString(menuEntry.Label) / 2;

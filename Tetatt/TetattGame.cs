@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Net;
 using System.Reflection;
 using Tetatt.Networking;
 using Tetatt.Graphics;
+using Tetatt.ArtificialIntelligence;
 
 namespace Tetatt
 {
@@ -59,6 +60,7 @@ namespace Tetatt
             Components.Add(new MessageDisplayComponent(this));
             Components.Add(new GamerServicesComponent(this));
             Components.Add(new AudioComponent(this));
+            Components.Add(new RankingsStorage(this));
 
             // load the initial screens
             screenManager.AddScreen(new BackgroundScreen(), null);
