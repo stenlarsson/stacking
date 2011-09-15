@@ -295,7 +295,7 @@ namespace Tetatt.Networking
             }
             catch (Exception exception)
             {
-                screenManager.AddScreen(new MainMenuScreen(), null);
+                screenManager.ReturnToMainMenu();
                 screenManager.AddScreen(new NetworkErrorScreen(exception), null);
             }
         }
