@@ -141,6 +141,8 @@
     <Compile Include="Rectangle.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
+    <Compile Include="Storage\StorageDevice.cs" />
+    <Compile Include="Storage\StorageContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -179,8 +181,6 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy NoTabsAfterNonTabs="True" RemoveTrailingWhitespace="True" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentSwitchBody="True" PropertyBraceStyle="NextLine" StatementBraceStyle="NextLine" PlaceElseOnNewLine="True" PlaceElseIfOnNewLine="True" PlaceCatchOnNewLine="True" PlaceFinallyOnNewLine="True" PlaceWhileOnNewLine="True" BeforeMethodCallParentheses="False" BeforeMethodDeclarationParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
           <DotNetNamingPolicy DirectoryNamespaceAssociation="None" ResourceNamePolicy="FileFormatDefault" />
         </Policies>
       </Properties>
@@ -191,5 +191,8 @@
       <Project>{5C83C587-D7A1-4B76-A95C-9AF20174601B}</Project>
       <Name>FFmpeg</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Storage\" />
   </ItemGroup>
 </Project>

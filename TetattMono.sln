@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetattMono", "Tetatt\TetattMono.csproj", "{18FD06A8-7F62-439C-AA81-446E2B1BC16E}"
@@ -7,33 +7,54 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeXna", "FakeXna\FakeXna.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFmpeg", "FFmpeg\FFmpeg.csproj", "{5C83C587-D7A1-4B76-A95C-9AF20174601B}"
 EndProject
-Project("{9344bdbb-3e7f-41fc-a0dd-8665d75ee146}") = "TetattContent", "TetattContent\TetattContent.csproj", "{0275B22B-9170-4916-8A2A-72E375775FEE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TetattContent", "TetattContent\TetattContent.csproj", "{0275B22B-9170-4916-8A2A-72E375775FEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug = Debug
-		Release = Release
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0275B22B-9170-4916-8A2A-72E375775FEE}.Debug.ActiveCfg = Debug|Any CPU
-		{0275B22B-9170-4916-8A2A-72E375775FEE}.Debug.Build.0 = Debug|Any CPU
-		{0275B22B-9170-4916-8A2A-72E375775FEE}.Release.ActiveCfg = Release|Any CPU
-		{0275B22B-9170-4916-8A2A-72E375775FEE}.Release.Build.0 = Release|Any CPU
-		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Debug.ActiveCfg = Debug|Any CPU
-		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Debug.Build.0 = Debug|Any CPU
-		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Release.ActiveCfg = Release|Any CPU
-		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Release.Build.0 = Release|Any CPU
-		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Debug.ActiveCfg = Debug|Any CPU
-		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Debug.Build.0 = Debug|Any CPU
-		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Release.ActiveCfg = Release|Any CPU
-		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Release.Build.0 = Release|Any CPU
-		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Debug.ActiveCfg = Debug|Any CPU
-		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Debug.Build.0 = Debug|Any CPU
-		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Release.ActiveCfg = Release|Any CPU
-		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Release.Build.0 = Release|Any CPU
+		{0275B22B-9170-4916-8A2A-72E375775FEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0275B22B-9170-4916-8A2A-72E375775FEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0275B22B-9170-4916-8A2A-72E375775FEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0275B22B-9170-4916-8A2A-72E375775FEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18FD06A8-7F62-439C-AA81-446E2B1BC16E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47E3B0B0-247E-4EC7-B451-A7FF321BC900}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C83C587-D7A1-4B76-A95C-9AF20174601B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Tetatt\TetattMono.csproj
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = null
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.BeforeMethodDeclarationParentheses = False
+		$2.BeforeMethodCallParentheses = False
+		$2.BeforeConstructorDeclarationParentheses = False
+		$2.BeforeDelegateDeclarationParentheses = False
+		$2.NewParentheses = False
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 120
+		$3.NoTabsAfterNonTabs = True
+		$3.RemoveTrailingWhitespace = True
+		$3.EolMarker = Windows
+		$3.inheritsSet = VisualStudio
+		$3.inheritsScope = text/plain
+		$3.scope = text/plain
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
