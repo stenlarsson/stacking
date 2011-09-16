@@ -110,6 +110,10 @@
     <Compile Include="AudioComponent.cs" />
     <Compile Include="Screens\LevelScreen.cs" />
     <Compile Include="Screens\StageScreen.cs" />
+    <Compile Include="ArtificialIntelligence\StageInfo.cs" />
+    <Compile Include="ArtificialIntelligence\Level.cs" />
+    <Compile Include="Screens\RankingsScreen.cs" />
+    <Compile Include="RankingsStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -147,8 +151,8 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy NoTabsAfterNonTabs="True" RemoveTrailingWhitespace="True" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentSwitchBody="True" PropertyBraceStyle="NextLine" StatementBraceStyle="NextLine" PlaceElseOnNewLine="True" PlaceElseIfOnNewLine="True" PlaceCatchOnNewLine="True" PlaceFinallyOnNewLine="True" PlaceWhileOnNewLine="True" BeforeMethodCallParentheses="False" BeforeMethodDeclarationParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy inheritsSet="null" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentSwitchBody="True" PropertyBraceStyle="NextLine" StatementBraceStyle="NextLine" PlaceElseOnNewLine="True" PlaceElseIfOnNewLine="True" PlaceCatchOnNewLine="True" PlaceFinallyOnNewLine="True" PlaceWhileOnNewLine="True" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
         </Policies>
       </Properties>
     </MonoDevelop>

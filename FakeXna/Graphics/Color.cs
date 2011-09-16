@@ -30,6 +30,8 @@ namespace Microsoft.Xna.Framework.Graphics
         
         public static Color White { get { return new Color(255,255,255,255); } }
         
+        public static Color Gray { get { return new Color(128,128,128,255); } }
+
         public static Color DarkGray { get { return new Color(169,169,169,255); } }
 
         public static Color Yellow { get { return new Color(255, 255, 0, 255); } }
