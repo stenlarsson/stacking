@@ -529,25 +529,33 @@ namespace Tetatt.Screens
                     screen.ExitScreen();
             }
 
-            foreach (var gamer in networkSession.LocalGamers)
+            if (networkSession.IsHost)
             {
-                Player data = (Player)gamer.Tag;
                 int seed = unchecked((int)DateTime.Now.Ticks);
-                SendStartPlayfield(gamer, seed);
-                data.PlayField.Reset();
-                data.PlayField.Level = data.StartLevel;
-                data.PlayField.Start(seed);
-                data.InputQueue.Clear();
-                data.GarbageQueue.Clear();
-            }
-
-            foreach (var gamer in networkSession.RemoteGamers)
-            {
-                Player data = (Player)gamer.Tag;
-                data.PlayField.Reset();
+                SendStartSeed(seed);
+                StartGame(seed);
             }
 
             audioComponent.GameStarted();
+        }
+
+        /// <summary>
+        /// Start game when we have received the seed
+        /// </summary>
+        private void StartGame(int seed)
+        {
+            foreach (var gamer in networkSession.AllGamers)
+            {
+                Player data = (Player)gamer.Tag;
+                data.PlayField.Reset();
+                data.PlayField.Level = data.StartLevel;
+                data.PlayField.Start(seed);
+            }
+
+            foreach (var gamer in networkSession.LocalGamers)
+            {
+                SendStartPlayfield(gamer);
+            }
         }
 
         /// <summary>
@@ -660,9 +668,12 @@ namespace Tetatt.Screens
                     PacketTypes packetType = (PacketTypes)packetReader.ReadByte();
                     switch (packetType)
                     {
+                        case PacketTypes.StartSeed:
+                            StartGame(packetReader.ReadInt32());
+                            break;
+
                         case PacketTypes.StartPlayfield:
                             senderData.PlayField.Level = senderData.StartLevel;
-                            senderData.PlayField.Start(packetReader.ReadInt32());
                             senderData.InputQueue.Clear();
                             senderData.GarbageQueue.Clear();
                             break;
@@ -709,10 +720,19 @@ namespace Tetatt.Screens
         /// <summary>
         /// Send random seed used to start
         /// </summary>
-        public void SendStartPlayfield(LocalNetworkGamer gamer, int seed)
+        public void SendStartSeed(int seed)
+        {
+            packetWriter.Write((byte)PacketTypes.StartSeed);
+            packetWriter.Write((int)seed);
+            networkSession.LocalGamers[0].SendData(packetWriter, SendDataOptions.ReliableInOrder);
+        }
+
+        /// <summary>
+        /// Send message signalling start
+        /// </summary>
+        public void SendStartPlayfield(LocalNetworkGamer gamer)
         {
             packetWriter.Write((byte)PacketTypes.StartPlayfield);
-            packetWriter.Write((int)seed);
             gamer.SendData(packetWriter, SendDataOptions.ReliableInOrder);
         }
 
