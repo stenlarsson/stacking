@@ -386,12 +386,12 @@ namespace Tetatt.Screens
                 {
                     spriteBatch.Draw(
                         data.GamerPicture,
-                        new Vector2(32, -170) + data.PlayField.Offset,
+                        new Vector2(0, -160) + data.PlayField.Offset,
                         Color.White * TransitionAlpha);
                 }
 
                 // Draw the "is muted", "is talking", or "has voice" icon.
-                Vector2 iconPosition = new Vector2(0, -170) + data.PlayField.Offset;
+                Vector2 iconPosition = new Vector2(70, -160) + data.PlayField.Offset;
                 if (gamer.IsMutedByLocalUser)
                 {
                     spriteBatch.Draw(voiceMutedTexture, iconPosition,
