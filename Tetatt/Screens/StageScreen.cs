@@ -9,11 +9,12 @@ using Tetatt.ArtificialIntelligence;
 
 namespace Tetatt.Screens
 {
-    class StageScreen : GameScreen
+    class StageScreen : Screen
     {
         VersusAIScreen versusAIScreen;
 
-        public StageScreen(VersusAIScreen versusAIScreen)
+        public StageScreen(ScreenManager manager, VersusAIScreen versusAIScreen)
+            : base(manager)
         {
             this.versusAIScreen = versusAIScreen;
 

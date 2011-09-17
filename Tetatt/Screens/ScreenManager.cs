@@ -30,8 +30,8 @@ namespace Tetatt.Screens
     {
         #region Fields
 
-        List<GameScreen> screens = new List<GameScreen>();
-        List<GameScreen> screensToUpdate = new List<GameScreen>();
+        List<Screen> screens = new List<Screen>();
+        List<Screen> screensToUpdate = new List<Screen>();
 
         InputState input = new InputState();
 
@@ -126,7 +126,7 @@ namespace Tetatt.Screens
             blankTexture = content.Load<Texture2D>("blank");
 
             // Tell each of the screens to load their content.
-            foreach (GameScreen screen in screens)
+            foreach (Screen screen in screens)
             {
                 screen.LoadContent();
             }
@@ -139,7 +139,7 @@ namespace Tetatt.Screens
         protected override void UnloadContent()
         {
             // Tell each of the screens to unload their content.
-            foreach (GameScreen screen in screens)
+            foreach (Screen screen in screens)
             {
                 screen.UnloadContent();
             }
@@ -163,7 +163,7 @@ namespace Tetatt.Screens
             // the process of updating one screen adds or removes others.
             screensToUpdate.Clear();
 
-            foreach (GameScreen screen in screens)
+            foreach (Screen screen in screens)
                 screensToUpdate.Add(screen);
 
             bool otherScreenHasFocus = !Game.IsActive;
@@ -173,7 +173,7 @@ namespace Tetatt.Screens
             while (screensToUpdate.Count > 0)
             {
                 // Pop the topmost screen off the waiting list.
-                GameScreen screen = screensToUpdate[screensToUpdate.Count - 1];
+                Screen screen = screensToUpdate[screensToUpdate.Count - 1];
 
                 screensToUpdate.RemoveAt(screensToUpdate.Count - 1);
 
@@ -214,7 +214,7 @@ namespace Tetatt.Screens
         {
             List<string> screenNames = new List<string>();
 
-            foreach (GameScreen screen in screens)
+            foreach (Screen screen in screens)
                 screenNames.Add(screen.GetType().Name);
 
             Debug.WriteLine(string.Join(", ", screenNames.ToArray()));
@@ -226,7 +226,7 @@ namespace Tetatt.Screens
         /// </summary>
         public override void Draw(GameTime gameTime)
         {
-            foreach (GameScreen screen in screens)
+            foreach (Screen screen in screens)
             {
                 if (screen.ScreenState == ScreenState.Hidden)
                     continue;
@@ -256,10 +256,9 @@ namespace Tetatt.Screens
         /// <summary>
         /// Adds a new screen to the screen manager.
         /// </summary>
-        public void AddScreen(GameScreen screen, PlayerIndex? controllingPlayer)
+        public void AddScreen(Screen screen, PlayerIndex? controllingPlayer)
         {
             screen.ControllingPlayer = controllingPlayer;
-            screen.ScreenManager = this;
             screen.IsExiting = false;
 
             // If we have a graphics device, tell the screen to load content.
@@ -281,7 +280,7 @@ namespace Tetatt.Screens
         /// the screen can gradually transition off rather than just being
         /// instantly removed.
         /// </summary>
-        public void RemoveScreen(GameScreen screen)
+        public void RemoveScreen(Screen screen)
         {
             // If we have a graphics device, tell the screen to unload content.
             if (isInitialized)
@@ -320,7 +319,7 @@ namespace Tetatt.Screens
         /// than the real master list, because screens should only ever be added
         /// or removed using the AddScreen and RemoveScreen methods.
         /// </summary>
-        public GameScreen[] GetScreens()
+        public Screen[] GetScreens()
         {
             return screens.ToArray();
         }

@@ -28,8 +28,8 @@ namespace Tetatt.Networking
         /// <summary>
         /// Constructs an error message box from the specified exception.
         /// </summary>
-        public NetworkErrorScreen(Exception exception)
-            : base(GetErrorMessage(exception), false)
+        public NetworkErrorScreen(ScreenManager manager, Exception exception)
+            : base(manager, GetErrorMessage(exception), false)
         { }
 
 

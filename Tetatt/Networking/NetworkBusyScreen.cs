@@ -31,7 +31,7 @@ namespace Tetatt.Networking
     /// operation is in progress, it automatically takes over all user input,
     /// preventing any other menu entries being selected until the operation completes.
     /// </summary>
-    class NetworkBusyScreen : GameScreen
+    class NetworkBusyScreen : Screen
     {
         #region Fields
 
@@ -53,7 +53,8 @@ namespace Tetatt.Networking
         /// <summary>
         /// Constructs a network busy screen for the specified asynchronous operation.
         /// </summary>
-        public NetworkBusyScreen(IAsyncResult asyncResult)
+        public NetworkBusyScreen(ScreenManager manager, IAsyncResult asyncResult)
+            : base(manager)
         {
             this.asyncResult = asyncResult;
 

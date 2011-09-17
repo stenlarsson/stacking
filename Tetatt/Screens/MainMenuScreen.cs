@@ -35,8 +35,8 @@ namespace Tetatt.Screens
         /// <summary>
         /// Constructor fills in the menu contents.
         /// </summary>
-        public MainMenuScreen()
-            : base(Resources.MainMenu, true)
+        public MainMenuScreen(ScreenManager manager)
+            : base(manager, Resources.MainMenu, true)
         {
 
             AddSimpleEntry(Resources.Rankings, RankingsMenuEntrySelected);
@@ -57,7 +57,7 @@ namespace Tetatt.Screens
         void RankingsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
             var rankings = (RankingsStorage)ScreenManager.Game.Services.GetService(typeof(RankingsStorage));
-            ScreenManager.AddScreen(new RankingsScreen(rankings, e.PlayerIndex), e.PlayerIndex);
+            ScreenManager.AddScreen(new RankingsScreen(ScreenManager, rankings, e.PlayerIndex), e.PlayerIndex);
         }
 
 
@@ -67,7 +67,7 @@ namespace Tetatt.Screens
         void VersusAIMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
             EnsureProfileSignedIn(e.PlayerIndex, NetworkSessionType.Local, delegate {
-                ScreenManager.AddScreen(new LevelScreen(), e.PlayerIndex);
+                ScreenManager.AddScreen(new LevelScreen(ScreenManager), e.PlayerIndex);
             });            
         }
 
@@ -122,14 +122,14 @@ namespace Tetatt.Screens
         {
             EnsureProfileSignedIn(
                 playerIndex, sessionType, delegate {
-                    ScreenManager.AddScreen(new CreateOrFindSessionScreen(sessionType), playerIndex);
+                    ScreenManager.AddScreen(new CreateOrFindSessionScreen(ScreenManager, sessionType), playerIndex);
                 });
         }
 
         void EnsureProfileSignedIn(PlayerIndex playerIndex, NetworkSessionType sessionType, EventHandler<EventArgs> handler)
         {
             // First, we need to make sure a suitable gamer profile is signed in.
-            ProfileSignInScreen profileSignIn = new ProfileSignInScreen(sessionType);
+            ProfileSignInScreen profileSignIn = new ProfileSignInScreen(ScreenManager, sessionType);
 
             // Hook up an event so once the ProfileSignInScreen is happy,
             // it will activate the CreateOrFindSessionScreen.
@@ -146,7 +146,7 @@ namespace Tetatt.Screens
         protected override void OnCancel(PlayerIndex playerIndex)
         {
             MessageBoxScreen confirmExitMessageBox =
-                                    new MessageBoxScreen(Resources.ConfirmExitGame);
+                                    new MessageBoxScreen(ScreenManager, Resources.ConfirmExitGame);
 
             confirmExitMessageBox.Accepted += ConfirmExitMessageBoxAccepted;
 

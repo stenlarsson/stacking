@@ -63,8 +63,8 @@ namespace Tetatt
             Components.Add(new RankingsStorage(this));
 
             // load the initial screens
-            screenManager.AddScreen(new BackgroundScreen(), null);
-            screenManager.AddScreen(new MainMenuScreen(), null);
+            screenManager.AddScreen(new BackgroundScreen(screenManager), null);
+            screenManager.AddScreen(new MainMenuScreen(screenManager), null);
 
             // Listen for invite notification events.
             NetworkSession.InviteAccepted += (sender, e)

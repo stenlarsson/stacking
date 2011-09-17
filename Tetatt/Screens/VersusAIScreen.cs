@@ -15,7 +15,7 @@ namespace Tetatt.Screens
     /// <summary>
     /// This screen implements the actual game logic.
     /// </summary>
-    class VersusAIScreen : GameScreen
+    class VersusAIScreen : Screen
     {
         public const int NumStages = 10;
 
@@ -42,7 +42,8 @@ namespace Tetatt.Screens
         /// <summary>
         /// Constructor.
         /// </summary>
-        public VersusAIScreen(Level level, ScreenManager screenManager)
+        public VersusAIScreen(ScreenManager screenManager, Level level)
+            : base(screenManager)
         {
             Level = level;
             Stage = 0;
@@ -61,10 +62,7 @@ namespace Tetatt.Screens
 
             aiPlayer = new AIPlayer(aiPlayField);
 
-            // Cannot use ScreenManager here yet because we're not yet added, therefore
-            // it must be passed as a paramter so that we can get the AudioComponent.
-            audioComponent = (AudioComponent)screenManager.Game.Services.GetService(
-                typeof(AudioComponent));
+            audioComponent = (AudioComponent)ScreenManager.Game.Services.GetService(typeof(AudioComponent));
 
             audioComponent.AddPlayField(playerPlayField);
             audioComponent.AddPlayField(aiPlayField);
@@ -107,7 +105,7 @@ namespace Tetatt.Screens
                 aiPlayField.State == PlayFieldState.Dead &&
                 !coveredByOtherScreen)
             {
-                ScreenManager.AddScreen(new StageScreen(this), ControllingPlayer);
+                ScreenManager.AddScreen(new StageScreen(ScreenManager, this), ControllingPlayer);
             }
 
 
@@ -209,7 +207,7 @@ namespace Tetatt.Screens
 
             message = Resources.ConfirmEndSession;
 
-            MessageBoxScreen confirmMessageBox = new MessageBoxScreen(message);
+            MessageBoxScreen confirmMessageBox = new MessageBoxScreen(ScreenManager, message);
 
             // Hook the messge box ok event to actually leave the session.
             confirmMessageBox.Accepted += delegate

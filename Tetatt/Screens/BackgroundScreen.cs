@@ -11,7 +11,7 @@ namespace Tetatt.Screens
     /// It draws a background image that remains fixed in place regardless
     /// of whatever transitions the screens on top of it may be doing.
     /// </summary>
-    class BackgroundScreen : GameScreen
+    class BackgroundScreen : Screen
     {
         VertexBuffer vertexBuffer;
         BasicEffect effect;
@@ -19,7 +19,8 @@ namespace Tetatt.Screens
         /// <summary>
         /// Constructor.
         /// </summary>
-        public BackgroundScreen()
+        public BackgroundScreen(ScreenManager manager)
+            : base(manager)
         {
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
