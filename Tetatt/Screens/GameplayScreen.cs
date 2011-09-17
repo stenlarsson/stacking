@@ -195,7 +195,7 @@ namespace Tetatt.Screens
                     SendGarbage(gamer);
                     foreach (var garbage in data.GarbageQueue)
                     {
-                        data.PlayField.AddGarbage(garbage.Item2, garbage.Item3);
+                        data.PlayField.AddGarbage(garbage.Size, garbage.Type);
                     }
                     data.GarbageQueue.Clear();
                 }
@@ -226,9 +226,9 @@ namespace Tetatt.Screens
                     {
                         // Check if we should add the garbage this frame
                         var garbage = data.GarbageQueue.Peek();
-                        if (garbage.Item1 <= data.PlayField.Time)
+                        if (garbage.Time <= data.PlayField.Time)
                         {
-                            data.PlayField.AddGarbage(garbage.Item2, garbage.Item3);
+                            data.PlayField.AddGarbage(garbage.Size, garbage.Type);
                             data.GarbageQueue.Dequeue();
                         }
                         else
@@ -255,9 +255,9 @@ namespace Tetatt.Screens
                     {
                         var input = data.InputQueue.Peek();
                         //System.Diagnostics.Debug.Assert(input.Item1 >= data.PlayField.Time);
-                        if (input.Item1 <= data.PlayField.Time)
+                        if (input.Time <= data.PlayField.Time)
                         {
-                            data.PlayField.Input(input.Item2);
+                            data.PlayField.Input(input.Input);
                             data.InputQueue.Dequeue();
                         }
                         else
@@ -312,7 +312,7 @@ namespace Tetatt.Screens
                 if (playerInput != PlayerInput.None)
                 {
                     data.PlayField.Input(playerInput);
-                    data.InputQueue.Enqueue(new Tuple<int, PlayerInput>(data.PlayField.Time, playerInput));
+                    data.InputQueue.Enqueue(new InputQueueItem(data.PlayField.Time, playerInput));
                 }
             }
         }
@@ -454,14 +454,14 @@ namespace Tetatt.Screens
                 Player data = (Player)receiver.Tag;
                 foreach (GarbageInfo info in chain.garbage)
                 {
-                    data.GarbageQueue.Enqueue(new Tuple<int, int, GarbageType>(
+                    data.GarbageQueue.Enqueue(new GarbageQueueItem(
                         data.PlayField.Time,
                         info.size,
                         info.type));
                 }
                 if (chain.length > 1)
                 {
-                    data.GarbageQueue.Enqueue(new Tuple<int, int, GarbageType>(
+                    data.GarbageQueue.Enqueue(new GarbageQueueItem(
                         data.PlayField.Time,
                         chain.length - 1,
                         GarbageType.Chain));
@@ -681,7 +681,7 @@ namespace Tetatt.Screens
                             {
                                 int time = packetReader.ReadInt32();
                                 PlayerInput input = (PlayerInput)packetReader.ReadByte();
-                                senderData.InputQueue.Enqueue(new Tuple<int, PlayerInput>(
+                                senderData.InputQueue.Enqueue(new InputQueueItem(
                                     time,
                                     input));
                             }
@@ -693,7 +693,7 @@ namespace Tetatt.Screens
                                 int time = packetReader.ReadInt32();
                                 int size = packetReader.ReadByte();
                                 GarbageType type = (GarbageType)packetReader.ReadByte();
-                                senderData.GarbageQueue.Enqueue(new Tuple<int, int, GarbageType>(
+                                senderData.GarbageQueue.Enqueue(new GarbageQueueItem(
                                     time,
                                     size,
                                     type));
@@ -760,8 +760,8 @@ namespace Tetatt.Screens
             {
                 foreach (var input in data.InputQueue)
                 {
-                    packetWriter.Write((int)input.Item1);
-                    packetWriter.Write((byte)input.Item2);
+                    packetWriter.Write((int)input.Time);
+                    packetWriter.Write((byte)input.Input);
                 }
                 data.InputQueue.Clear();
                 // Real input needs to be sent reliably to avoid desyncing.
@@ -781,9 +781,9 @@ namespace Tetatt.Screens
             packetWriter.Write((byte)PacketTypes.Garbage);
             foreach (var garbage in data.GarbageQueue)
             {
-                packetWriter.Write((int)garbage.Item1);
-                packetWriter.Write((byte)garbage.Item2);
-                packetWriter.Write((byte)garbage.Item3);
+                packetWriter.Write((int)garbage.Time);
+                packetWriter.Write((byte)garbage.Size);
+                packetWriter.Write((byte)garbage.Type);
             }
             // Send reliably to avoid desyncing.
             gamer.SendData(packetWriter, SendDataOptions.ReliableInOrder);

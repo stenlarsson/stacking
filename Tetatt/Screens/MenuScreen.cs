@@ -50,7 +50,12 @@ namespace Tetatt.Screens
             get { return menuEntries; }
         }
 
-        public MenuScreen(string menuTitle, int iconTile = -1)
+        public MenuScreen(string menuTitle)
+            : this(menuTitle, -1)
+        {
+        }
+
+        public MenuScreen(string menuTitle, int iconTile)
         {
             this.menuTitle = menuTitle;
             this.iconTile = iconTile;

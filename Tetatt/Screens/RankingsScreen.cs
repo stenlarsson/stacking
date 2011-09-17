@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Tetatt.ArtificialIntelligence;
 
 namespace Tetatt.Screens
 {
@@ -54,7 +55,7 @@ namespace Tetatt.Screens
 
                 // Draw level header (Easy, Normal, Hard)
                 float scale = 1.2f;
-                spriteBatch.DrawString(font, level.Key.Name, position, normalColor, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                spriteBatch.DrawString(font, level.Key.Name(), position, normalColor, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
                 position.Y += scale * font.LineSpacing;
 
                 // Draw each gamertag adjusted left, and each time adjusted right

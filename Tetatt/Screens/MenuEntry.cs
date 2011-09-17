@@ -31,7 +31,12 @@ namespace Tetatt.Screens
         /// </summary>
         public event EventHandler<PlayerIndexEventArgs> Selected;
 
-        public MenuEntry(string label, EventHandler<PlayerIndexEventArgs> handler = null)
+        public MenuEntry(string label)
+            : this(label, (PlayerIndexDelegate)null)
+        {
+        }
+
+        public MenuEntry(string label, EventHandler<PlayerIndexEventArgs> handler)
         {
             Label = label;
             if (handler != null)

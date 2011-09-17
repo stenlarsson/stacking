@@ -118,7 +118,7 @@ namespace Tetatt.GamePlay
                     StateDelay = -1;
                     break;
                 default:
-                    Debug.Fail(string.Format("Unexpected state {0}", state));
+                    Debug.Assert(false, string.Format("Unexpected state {0}", state));
                     break;
             }
         }

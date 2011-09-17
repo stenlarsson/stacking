@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.GamerServices;
+using Tetatt.ArtificialIntelligence;
 
 namespace Tetatt.Screens
 {
@@ -40,11 +41,14 @@ namespace Tetatt.Screens
             {
                 if (versusAIScreen.GameOver)
                 {
-                    SignedInGamer gamer = Gamer.SignedInGamers[playerIndex];
-                    string gamertag = (gamer == null) ? gamer.Gamertag : "(no name)";
-                    RankingsStorage rankings = (RankingsStorage)ScreenManager.Game.Services.GetService(typeof(RankingsStorage));
-                    Result result = new Result { Gamertag = gamertag, Ticks = versusAIScreen.Times.Sum() };
-                    rankings.AddResult(versusAIScreen.Level, result, ControllingPlayer.Value);
+                    if (versusAIScreen.Stage == VersusAIScreen.NumStages)
+                    {
+                        SignedInGamer gamer = Gamer.SignedInGamers[playerIndex];
+                        string gamertag = (gamer == null) ? gamer.Gamertag : "(no name)";
+                        RankingsStorage rankings = (RankingsStorage)ScreenManager.Game.Services.GetService(typeof(RankingsStorage));
+                        Result result = new Result { Gamertag = gamertag, Ticks = versusAIScreen.Times.Sum() };
+                        rankings.AddResult(versusAIScreen.Level, result, ControllingPlayer.Value);
+                    }
                     ScreenManager.ReturnToMainMenu();
                 }
                 else
@@ -72,7 +76,7 @@ namespace Tetatt.Screens
             // Draw stage info time
             string info = string.Format("{0}\n{1}\n\n{2}",
                 Resources.VersusAI,
-                versusAIScreen.Level.Name,
+                versusAIScreen.Level.Name(),
                 versusAIScreen.GameOver ?
                     Resources.GameOver :
                     string.Format(Resources.Stage, versusAIScreen.Stage + 1));

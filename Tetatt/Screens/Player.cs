@@ -47,12 +47,12 @@ namespace Tetatt.Screens
         /// is the input to send, and for remote players it is the input to
         /// process. Tuples with (frame, input).
         /// </summary>
-        public Queue<Tuple<int, PlayerInput>> InputQueue;
+        public Queue<InputQueueItem> InputQueue;
         /// <summary>
         /// The garbage received by this player on certain frames. This is used
         /// for both local and remote players. Tuples with (frame, size, type).
         /// </summary>
-        public Queue<Tuple<int, int, GarbageType>> GarbageQueue;
+        public Queue<GarbageQueueItem> GarbageQueue;
 
         /// <summary>
         /// Create new data with default values.
@@ -65,8 +65,8 @@ namespace Tetatt.Screens
             GamerPicture = null;
 
             SendInputTimer = 0;
-            InputQueue = new Queue<Tuple<int, PlayerInput>>();
-            GarbageQueue = new Queue<Tuple<int, int, GarbageType>>();
+            InputQueue = new Queue<InputQueueItem>();
+            GarbageQueue = new Queue<GarbageQueueItem>();
         }
     }
 }
