@@ -36,7 +36,7 @@ namespace Tetatt.Screens
         /// Constructor fills in the menu contents.
         /// </summary>
         public MainMenuScreen()
-            : base(Resources.MainMenu)
+            : base(Resources.MainMenu, true)
         {
 
             AddSimpleEntry(Resources.Rankings, RankingsMenuEntrySelected);
@@ -53,40 +53,6 @@ namespace Tetatt.Screens
         #endregion
 
         #region Handle Input
-
-
-        /// <summary>
-        /// Override to use left/right instead of up/down.
-        /// </summary>
-        public override void HandleInput(InputState input)
-        {
-            PlayerIndex playerIndex;
-
-            if (input.IsMenuLeft(ControllingPlayer, out playerIndex))
-            {
-                SelectedEntry--;
-
-                if (SelectedEntry < 0)
-                    SelectedEntry = MenuEntries.Count - 1;
-            }
-
-            if (input.IsMenuRight(ControllingPlayer, out playerIndex))
-            {
-                SelectedEntry++;
-
-                if (SelectedEntry >= MenuEntries.Count)
-                    SelectedEntry = 0;
-            }
-
-            if (input.IsMenuSelect(ControllingPlayer, out playerIndex))
-            {
-                OnSelectEntry(SelectedEntry, playerIndex);
-            }
-            else if (input.IsMenuCancel(ControllingPlayer, out playerIndex))
-            {
-                OnCancel(playerIndex);
-            }
-        }
 
         void RankingsMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {

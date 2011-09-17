@@ -28,6 +28,7 @@ namespace Tetatt.Screens
         TileSet tileSet;
         Texture2D logo;
         int iconTile;
+        MenuInput prevInput, nextInput;
 
         protected int SelectedEntry {
             get; set;
@@ -51,11 +52,21 @@ namespace Tetatt.Screens
         }
 
         public MenuScreen(string menuTitle)
-            : this(menuTitle, -1)
+            : this(menuTitle, -1, false)
+        {
+        }
+
+        public MenuScreen(string menuTitle, bool horizontal)
+            : this(menuTitle, -1, horizontal)
         {
         }
 
         public MenuScreen(string menuTitle, int iconTile)
+            : this(menuTitle, iconTile, false)
+        {
+        }
+
+        public MenuScreen(string menuTitle, int iconTile, bool horizontal)
         {
             this.menuTitle = menuTitle;
             this.iconTile = iconTile;
@@ -63,6 +74,9 @@ namespace Tetatt.Screens
             TransitionOnTime = TimeSpan.FromSeconds(0.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
             SelectedEntry = 0;
+
+            prevInput = horizontal ? MenuInput.Left : MenuInput.Up;
+            nextInput = horizontal ? MenuInput.Right : MenuInput.Down;
         }
 
         public override void LoadContent()
@@ -86,7 +100,7 @@ namespace Tetatt.Screens
         {
             PlayerIndex playerIndex;
 
-            if (input.IsMenuUp(ControllingPlayer, out playerIndex))
+            if (input.IsMenuInput(prevInput, ControllingPlayer, out playerIndex))
             {
                 SelectedEntry--;
 
@@ -94,7 +108,7 @@ namespace Tetatt.Screens
                     SelectedEntry = menuEntries.Count - 1;
             }
 
-            if (input.IsMenuDown(ControllingPlayer, out playerIndex))
+            if (input.IsMenuInput(nextInput, ControllingPlayer, out playerIndex))
             {
                 SelectedEntry++;
 
