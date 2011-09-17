@@ -47,23 +47,9 @@ namespace Tetatt.Graphics
 
             Vector2 position = Offset;
             position.Y -= 32; // Adjust for the frame
-            position.Y -= font.LineSpacing * 2;
+            position.Y -= font.LineSpacing;
 
             // Draw statistics
-            string score = Score.ToString();
-            spriteBatch.DrawString(
-                font,
-                Resources.Score,
-                position,
-                Color.White * transitionAlpha);
-            spriteBatch.DrawString(
-                font,
-                score,
-                position + new Vector2(200 - font.MeasureString(score).X, 0),
-                Color.White * transitionAlpha);
-
-            position.Y += font.LineSpacing;
-
             string time = String.Format("{0}:{1:00}", Time / (60 * 60), (Time / 60) % 60);
             spriteBatch.DrawString(
                 font,
