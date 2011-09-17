@@ -120,7 +120,6 @@
     <Compile Include="Screens\GameplayScreen.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Screens\GameScreen.cs" />
     <Compile Include="Screens\InputQueueItem.cs" />
     <Compile Include="Screens\InputState.cs" />
     <Compile Include="Screens\LevelScreen.cs" />
@@ -130,6 +129,7 @@
     <Compile Include="Screens\PacketTypes.cs" />
     <Compile Include="Screens\Player.cs" />
     <Compile Include="Screens\RankingsScreen.cs" />
+    <Compile Include="Screens\Screen.cs" />
     <Compile Include="Screens\ScreenManager.cs" />
     <Compile Include="Screens\BackgroundScreen.cs" />
     <Compile Include="Screens\MainMenuScreen.cs" />

@@ -9,7 +9,8 @@ namespace Tetatt.Screens
     {
         RankingsStorage rankings;
 
-        public RankingsScreen(RankingsStorage rankings, PlayerIndex player) : base(Resources.Rankings)
+        public RankingsScreen(ScreenManager manager, RankingsStorage rankings, PlayerIndex player)
+            : base(manager, Resources.Rankings)
         {
             this.rankings = rankings;
 

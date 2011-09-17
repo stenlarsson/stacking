@@ -20,7 +20,7 @@ namespace Tetatt.Screens
     /// A popup message box screen, used to display "are you sure?"
     /// confirmation messages.
     /// </summary>
-    class MessageBoxScreen : GameScreen
+    class MessageBoxScreen : Screen
     {
         #region Fields
 
@@ -43,8 +43,8 @@ namespace Tetatt.Screens
         /// Constructor automatically includes the standard "A=ok, B=cancel"
         /// usage text prompt.
         /// </summary>
-        public MessageBoxScreen(string message)
-            : this(message, true)
+        public MessageBoxScreen(ScreenManager manager, string message)
+            : this(manager, message, true)
         { }
 
 
@@ -52,7 +52,8 @@ namespace Tetatt.Screens
         /// Constructor lets the caller specify whether to include the standard
         /// "A=ok, B=cancel" usage text prompt.
         /// </summary>
-        public MessageBoxScreen(string message, bool includeUsageText)
+        public MessageBoxScreen(ScreenManager manager, string message, bool includeUsageText)
+            : base(manager)
         {
             if (includeUsageText)
                 this.message = message + Resources.MessageBoxUsage;

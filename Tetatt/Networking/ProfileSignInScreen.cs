@@ -45,7 +45,7 @@ namespace Tetatt.Networking
     /// Update, so the user just sees a transition directly from the MainMenuScreen
     /// to the CreateOrFindSessionScreen.
     /// </summary>
-    class ProfileSignInScreen : GameScreen
+    class ProfileSignInScreen : Screen
     {
         #region Fields
 
@@ -67,7 +67,8 @@ namespace Tetatt.Networking
         /// <summary>
         /// Constructs a new profile sign in screen.
         /// </summary>
-        public ProfileSignInScreen(NetworkSessionType sessionType)
+        public ProfileSignInScreen(ScreenManager manager, NetworkSessionType sessionType)
+            : base(manager)
         {
             this.sessionType = sessionType;
 
@@ -172,7 +173,7 @@ namespace Tetatt.Networking
         void ShowMarketplace()
         {
             MessageBoxScreen confirmMarketplaceMessageBox =
-                                    new MessageBoxScreen(Resources.ConfirmMarketplace);
+                                    new MessageBoxScreen(ScreenManager, Resources.ConfirmMarketplace);
 
             confirmMarketplaceMessageBox.Accepted += delegate
             {

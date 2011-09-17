@@ -36,8 +36,8 @@ namespace Tetatt.Networking
         /// <summary>
         /// Constructor fills in the menu contents.
         /// </summary>
-        public CreateOrFindSessionScreen(NetworkSessionType sessionType)
-            : base(GetMenuTitle(sessionType), GetIconTile(sessionType))
+        public CreateOrFindSessionScreen(ScreenManager manager, NetworkSessionType sessionType)
+            : base(manager, GetMenuTitle(sessionType), GetIconTile(sessionType))
         {
             this.sessionType = sessionType;
 
@@ -112,7 +112,7 @@ namespace Tetatt.Networking
 
                 // Activate the network busy screen, which will display
                 // an animation until this operation has completed.
-                NetworkBusyScreen busyScreen = new NetworkBusyScreen(asyncResult);
+                NetworkBusyScreen busyScreen = new NetworkBusyScreen(ScreenManager, asyncResult);
 
                 busyScreen.OperationCompleted += CreateSessionOperationCompleted;
 
@@ -120,7 +120,7 @@ namespace Tetatt.Networking
             }
             catch (Exception exception)
             {
-                NetworkErrorScreen errorScreen = new NetworkErrorScreen(exception);
+                NetworkErrorScreen errorScreen = new NetworkErrorScreen(ScreenManager, exception);
 
                 ScreenManager.AddScreen(errorScreen, ControllingPlayer);
             }
@@ -157,7 +157,7 @@ namespace Tetatt.Networking
                 if (networkSession != null)
                     networkSession.Dispose();
 
-                NetworkErrorScreen errorScreen = new NetworkErrorScreen(exception);
+                NetworkErrorScreen errorScreen = new NetworkErrorScreen(ScreenManager, exception);
 
                 ScreenManager.AddScreen(errorScreen, ControllingPlayer);
             }
@@ -182,7 +182,7 @@ namespace Tetatt.Networking
 
                 // Activate the network busy screen, which will display
                 // an animation until this operation has completed.
-                NetworkBusyScreen busyScreen = new NetworkBusyScreen(asyncResult);
+                NetworkBusyScreen busyScreen = new NetworkBusyScreen(ScreenManager, asyncResult);
 
                 busyScreen.OperationCompleted += FindSessionsOperationCompleted;
 
@@ -190,7 +190,7 @@ namespace Tetatt.Networking
             }
             catch (Exception exception)
             {
-                NetworkErrorScreen errorScreen = new NetworkErrorScreen(exception);
+                NetworkErrorScreen errorScreen = new NetworkErrorScreen(ScreenManager, exception);
 
                 ScreenManager.AddScreen(errorScreen, ControllingPlayer);
             }
@@ -204,7 +204,7 @@ namespace Tetatt.Networking
         void FindSessionsOperationCompleted(object sender,
                                             OperationCompletedEventArgs e)
         {
-            GameScreen nextScreen;
+            Screen nextScreen;
 
             try
             {
@@ -217,17 +217,17 @@ namespace Tetatt.Networking
                     // If we didn't find any sessions, display an error.
                     availableSessions.Dispose();
 
-                    nextScreen = new MessageBoxScreen(Resources.NoSessionsFound, false);
+                    nextScreen = new MessageBoxScreen(ScreenManager, Resources.NoSessionsFound, false);
                 }
                 else
                 {
                     // If we did find some sessions, proceed to the JoinSessionScreen.
-                    nextScreen = new JoinSessionScreen(availableSessions);
+                    nextScreen = new JoinSessionScreen(ScreenManager, availableSessions);
                 }
             }
             catch (Exception exception)
             {
-                nextScreen = new NetworkErrorScreen(exception);
+                nextScreen = new NetworkErrorScreen(ScreenManager, exception);
             }
 
             ScreenManager.AddScreen(nextScreen, ControllingPlayer);

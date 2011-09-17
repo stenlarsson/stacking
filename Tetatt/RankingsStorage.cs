@@ -111,8 +111,9 @@ namespace Tetatt
                     catch (IOException e)
                     {
                         ScreenManager screenManager = (ScreenManager)Game.Services.GetService(typeof(ScreenManager));
-                        MessageBoxScreen msg = new MessageBoxScreen(Resources.ErrorStoreRankings + "\n" + e.Message);
+                        MessageBoxScreen msg = new MessageBoxScreen(screenManager, Resources.ErrorStoreRankings + "\n" + e.Message);
                         msg.Accepted += (_,arg) => BeginDiskSync(arg.PlayerIndex);
+                        screenManager.AddScreen(msg, null);
                     }
                 }
             }

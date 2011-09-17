@@ -9,8 +9,8 @@ namespace Tetatt.Screens
 {
     class LevelScreen : MenuScreen
     {
-        public LevelScreen()
-            : base(Resources.Level, 0)
+        public LevelScreen(ScreenManager manager)
+            : base(manager, Resources.Level, 0)
         {
             AddSimpleEntry(Resources.Easy, (player) => LevelMenuEntrySelected(Level.Easy, player));
             AddSimpleEntry(Resources.Normal, (player) => LevelMenuEntrySelected(Level.Normal, player));
@@ -19,7 +19,7 @@ namespace Tetatt.Screens
 
         void LevelMenuEntrySelected(Level level, PlayerIndex controllingPlayer)
         {
-            VersusAIScreen versusAIScreen = new VersusAIScreen(level, ScreenManager);
+            VersusAIScreen versusAIScreen = new VersusAIScreen(ScreenManager, level);
 
             ScreenManager.AddScreen(versusAIScreen, controllingPlayer);
         }

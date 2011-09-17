@@ -11,12 +11,13 @@ using Microsoft.Xna.Framework.GamerServices;
 
 namespace Tetatt.Screens
 {
-    class LobbyScreen : GameScreen
+    class LobbyScreen : Screen
     {
         private GameplayScreen gameplayScreen;
         private NetworkSession networkSession;
 
-        public LobbyScreen(GameplayScreen gameplayScreen, NetworkSession networkSession)
+        public LobbyScreen(ScreenManager manager, GameplayScreen gameplayScreen, NetworkSession networkSession)
+            : base(manager)
         {
             this.gameplayScreen = gameplayScreen;
             this.networkSession = networkSession;

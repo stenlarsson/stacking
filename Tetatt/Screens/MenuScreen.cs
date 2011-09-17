@@ -21,7 +21,7 @@ namespace Tetatt.Screens
     /// Base class for screens that contain a menu of options. The user can
     /// move up and down to select an entry, or cancel to back out of the screen.
     /// </summary>
-    abstract class MenuScreen : GameScreen
+    abstract class MenuScreen : Screen
     {
         List<MenuEntry> menuEntries = new List<MenuEntry>();
         string menuTitle;
@@ -51,22 +51,23 @@ namespace Tetatt.Screens
             get { return menuEntries; }
         }
 
-        public MenuScreen(string menuTitle)
-            : this(menuTitle, -1, false)
+        public MenuScreen(ScreenManager manager, string menuTitle)
+            : this(manager, menuTitle, -1, false)
         {
         }
 
-        public MenuScreen(string menuTitle, bool horizontal)
-            : this(menuTitle, -1, horizontal)
+        public MenuScreen(ScreenManager manager, string menuTitle, bool horizontal)
+            : this(manager, menuTitle, -1, horizontal)
         {
         }
 
-        public MenuScreen(string menuTitle, int iconTile)
-            : this(menuTitle, iconTile, false)
+        public MenuScreen(ScreenManager manager, string menuTitle, int iconTile)
+            : this(manager, menuTitle, iconTile, false)
         {
         }
 
-        public MenuScreen(string menuTitle, int iconTile, bool horizontal)
+        public MenuScreen(ScreenManager manager, string menuTitle, int iconTile, bool horizontal)
+            : base(manager)
         {
             this.menuTitle = menuTitle;
             this.iconTile = iconTile;

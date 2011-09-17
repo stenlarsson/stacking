@@ -37,8 +37,8 @@ namespace Tetatt.Networking
         /// <summary>
         /// Constructs a menu screen listing the available network sessions.
         /// </summary>
-        public JoinSessionScreen(AvailableNetworkSessionCollection availableSessions)
-            : base(Resources.JoinSession)
+        public JoinSessionScreen(ScreenManager manager, AvailableNetworkSessionCollection availableSessions)
+            : base(manager, Resources.JoinSession)
         {
             this.availableSessions = availableSessions;
 
@@ -83,7 +83,7 @@ namespace Tetatt.Networking
 
                 // Activate the network busy screen, which will display
                 // an animation until this operation has completed.
-                NetworkBusyScreen busyScreen = new NetworkBusyScreen(asyncResult);
+                NetworkBusyScreen busyScreen = new NetworkBusyScreen(ScreenManager, asyncResult);
 
                 busyScreen.OperationCompleted += JoinSessionOperationCompleted;
 
@@ -91,7 +91,7 @@ namespace Tetatt.Networking
             }
             catch (Exception exception)
             {
-                NetworkErrorScreen errorScreen = new NetworkErrorScreen(exception);
+                NetworkErrorScreen errorScreen = new NetworkErrorScreen(ScreenManager, exception);
 
                 ScreenManager.AddScreen(errorScreen, ControllingPlayer);
             }
@@ -125,7 +125,7 @@ namespace Tetatt.Networking
                 if (networkSession != null)
                     networkSession.Dispose();
 
-                NetworkErrorScreen errorScreen = new NetworkErrorScreen(exception);
+                NetworkErrorScreen errorScreen = new NetworkErrorScreen(ScreenManager, exception);
 
                 ScreenManager.AddScreen(errorScreen, ControllingPlayer);
             }

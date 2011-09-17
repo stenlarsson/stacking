@@ -35,11 +35,8 @@ namespace Tetatt.Screens
     /// want to quit" message box, and the main game itself are all implemented
     /// as screens.
     /// </summary>
-    public abstract class GameScreen
+    public abstract class Screen
     {
-        #region Properties
-
-
         /// <summary>
         /// Normally when one screen is brought up over the top of another,
         /// the first screen will transition off to make room for the new
@@ -220,11 +217,10 @@ namespace Tetatt.Screens
 
         GestureType enabledGestures = GestureType.None;
 
-
-        #endregion
-
-        #region Initialization
-
+        protected Screen(ScreenManager screenManager)
+        {
+            ScreenManager = screenManager;
+        }
 
         /// <summary>
         /// Load graphics content for the screen.
@@ -236,11 +232,6 @@ namespace Tetatt.Screens
         /// Unload content for the screen.
         /// </summary>
         public virtual void UnloadContent() { }
-
-
-        #endregion
-
-        #region Update and Draw
 
 
         /// <summary>
@@ -343,11 +334,6 @@ namespace Tetatt.Screens
         public virtual void Draw(GameTime gameTime) { }
 
 
-        #endregion
-
-        #region Public Methods
-
-
         /// <summary>
         /// Tells the screen to go away. Unlike ScreenManager.RemoveScreen, which
         /// instantly kills the screen, this method respects the transition timings
@@ -366,8 +352,5 @@ namespace Tetatt.Screens
                 isExiting = true;
             }
         }
-
-
-        #endregion
     }
 }

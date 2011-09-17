@@ -256,7 +256,7 @@ namespace Tetatt.Networking
 
                 // The network busy screen displays an animation as it waits for
                 // the join operation to complete.
-                NetworkBusyScreen busyScreen = new NetworkBusyScreen(asyncResult);
+                NetworkBusyScreen busyScreen = new NetworkBusyScreen(screenManager, asyncResult);
 
                 busyScreen.OperationCompleted += JoinInvitedOperationCompleted;
 
@@ -264,7 +264,7 @@ namespace Tetatt.Networking
             }
             catch (Exception exception)
             {
-                NetworkErrorScreen errorScreen = new NetworkErrorScreen(exception);
+                NetworkErrorScreen errorScreen = new NetworkErrorScreen(screenManager, exception);
 
                 screenManager.ReturnToMainMenu();
                 screenManager.AddScreen(errorScreen, e.Gamer.PlayerIndex);
@@ -279,7 +279,7 @@ namespace Tetatt.Networking
         static void JoinInvitedOperationCompleted(object sender,
                                                   OperationCompletedEventArgs e)
         {
-            ScreenManager screenManager = ((GameScreen)sender).ScreenManager;
+            ScreenManager screenManager = ((Screen)sender).ScreenManager;
 
             try
             {
@@ -296,7 +296,7 @@ namespace Tetatt.Networking
             catch (Exception exception)
             {
                 screenManager.ReturnToMainMenu();
-                screenManager.AddScreen(new NetworkErrorScreen(exception), null);
+                screenManager.AddScreen(new NetworkErrorScreen(screenManager, exception), null);
             }
         }
 
@@ -410,7 +410,7 @@ namespace Tetatt.Networking
                 else
                     message = Resources.ConfirmLeaveSession;
 
-                MessageBoxScreen confirmMessageBox = new MessageBoxScreen(message);
+                MessageBoxScreen confirmMessageBox = new MessageBoxScreen(screenManager, message);
 
                 // Hook the messge box ok event to actually leave the session.
                 confirmMessageBox.Accepted += delegate
@@ -441,7 +441,7 @@ namespace Tetatt.Networking
 
             if (!string.IsNullOrEmpty(sessionEndMessage))
             {
-                MessageBoxScreen messageBox = new MessageBoxScreen(sessionEndMessage, false);
+                MessageBoxScreen messageBox = new MessageBoxScreen(screenManager, sessionEndMessage, false);
                 screenManager.AddScreen(messageBox, null);
             }
         }

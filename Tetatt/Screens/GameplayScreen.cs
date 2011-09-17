@@ -18,7 +18,7 @@ namespace Tetatt.Screens
     /// <summary>
     /// This screen implements the actual game logic.
     /// </summary>
-    class GameplayScreen : GameScreen
+    class GameplayScreen : Screen
     {
         /// <summary>
         /// Number of frames between sending input to other players.
@@ -61,14 +61,12 @@ namespace Tetatt.Screens
         /// Constructor.
         /// </summary>
         public GameplayScreen(ScreenManager screenManager, NetworkSession networkSession)
+            : base(screenManager)
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
 
-            // Cannot use ScreenManager here yet because we're not yet added, therefore
-            // it must be passed as a paramter so that we can get the AudioComponent.
-            audioComponent = (AudioComponent)screenManager.Game.Services.GetService(
-                typeof(AudioComponent));
+            audioComponent = (AudioComponent)ScreenManager.Game.Services.GetService(typeof(AudioComponent));
 
             this.networkSession = networkSession;
 
@@ -121,7 +119,7 @@ namespace Tetatt.Screens
                 // Show lobby screen if we're not playing and not already showing it
                 if (!coveredByOtherScreen)
                 {
-                    ScreenManager.AddScreen(new LobbyScreen(this, networkSession), null);
+                    ScreenManager.AddScreen(new LobbyScreen(ScreenManager, this, networkSession), null);
                 }
 
                 // Check is game should start
