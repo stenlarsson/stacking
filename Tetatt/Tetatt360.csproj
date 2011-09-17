@@ -126,6 +126,7 @@
     <Compile Include="Screens\LevelScreen.cs" />
     <Compile Include="Screens\LobbyScreen.cs" />
     <Compile Include="Screens\MenuEntry.cs" />
+    <Compile Include="Screens\MenuInput.cs" />
     <Compile Include="Screens\PacketTypes.cs" />
     <Compile Include="Screens\Player.cs" />
     <Compile Include="Screens\RankingsScreen.cs" />

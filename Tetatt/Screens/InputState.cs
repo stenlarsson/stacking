@@ -49,6 +49,9 @@ namespace Tetatt.Screens
         private Dictionary<Buttons, int>[] heldButtons;
         private Dictionary<Keys, int> heldKeys;
 
+        Dictionary<MenuInput, Buttons[]> menuButtons;
+        Dictionary<MenuInput, Keys[]>[] menuKeys;
+
         /// <summary>
         /// Constructs a new input state.
         /// </summary>
@@ -112,8 +115,49 @@ namespace Tetatt.Screens
                 new Dictionary<Buttons, int>(),
             };
             heldKeys = new Dictionary<Keys, int>();
+
+            menuButtons = new Dictionary<MenuInput, Buttons[]>();
+            AddMenuButtons(MenuInput.Up, Buttons.DPadUp, Buttons.LeftThumbstickUp);
+            AddMenuButtons(MenuInput.Down, Buttons.DPadDown, Buttons.LeftThumbstickDown);
+            AddMenuButtons(MenuInput.Left, Buttons.DPadLeft, Buttons.LeftThumbstickLeft);
+            AddMenuButtons(MenuInput.Right, Buttons.DPadRight, Buttons.LeftThumbstickRight);
+            AddMenuButtons(MenuInput.Select, Buttons.A, Buttons.Start);
+            AddMenuButtons(MenuInput.Cancel, Buttons.B, Buttons.Back);
+            AddMenuButtons(MenuInput.Toggle, Buttons.X);
+            AddMenuButtons(MenuInput.Pause, Buttons.Start, Buttons.Back);
+
+            menuKeys = new Dictionary<MenuInput, Keys[]>[MaxInputs];
+            for (int i = 0; i < menuKeys.Length; i++)
+                menuKeys[i] = new Dictionary<MenuInput, Keys[]>();
+            AddMenuKeys(PlayerIndex.One, MenuInput.Up, Keys.Up);
+            AddMenuKeys(PlayerIndex.One, MenuInput.Down, Keys.Down);
+            AddMenuKeys(PlayerIndex.One, MenuInput.Left, Keys.Left);
+            AddMenuKeys(PlayerIndex.One, MenuInput.Right, Keys.Right);
+            AddMenuKeys(PlayerIndex.One, MenuInput.Select, Keys.RightControl);
+            AddMenuKeys(PlayerIndex.One, MenuInput.Cancel, Keys.Escape);
+            AddMenuKeys(PlayerIndex.One, MenuInput.Toggle, Keys.RightShift);
+            AddMenuKeys(PlayerIndex.One, MenuInput.Pause, Keys.Escape);
+
+            AddMenuKeys(PlayerIndex.Two, MenuInput.Up, Keys.W);
+            AddMenuKeys(PlayerIndex.Two, MenuInput.Down, Keys.S);
+            AddMenuKeys(PlayerIndex.Two, MenuInput.Left, Keys.A);
+            AddMenuKeys(PlayerIndex.Two, MenuInput.Right, Keys.D);
+            AddMenuKeys(PlayerIndex.Two, MenuInput.Select, Keys.LeftControl);
+            AddMenuKeys(PlayerIndex.Two, MenuInput.Cancel, Keys.Escape);
+            AddMenuKeys(PlayerIndex.Two, MenuInput.Toggle, Keys.LeftShift);
+            AddMenuKeys(PlayerIndex.Two, MenuInput.Pause, Keys.Escape);
         }
 
+        void AddMenuButtons(MenuInput input, params Buttons[] buttons)
+        {
+            menuButtons.Add(input, buttons);
+        }
+
+        void AddMenuKeys(PlayerIndex player, MenuInput input, params Keys[] keys)
+        {
+            menuKeys[(int)player].Add(input, keys);
+        }
+        
         /// <summary>
         /// Reads the latest state of the keyboard and gamepad.
         /// </summary>
@@ -205,6 +249,44 @@ namespace Tetatt.Screens
 
 
         /// <summary>
+        /// Checks for the specified menu input action.
+        /// The controllingPlayer parameter specifies which player to read input for.
+        /// If this is null, it will accept input from any player. When the action
+        /// is detected, the output playerIndex reports which player pressed it,
+        /// otherwise the value is unspecified.
+        /// </summary>
+        public bool IsMenuInput(MenuInput input, PlayerIndex? controllingPlayer,
+                                 out PlayerIndex playerIndex)
+        {
+            if (controllingPlayer.HasValue)
+            {
+                foreach (var item in menuKeys[(int)controllingPlayer][input])
+                    if (IsNewKeyPress(item, controllingPlayer, out playerIndex))
+                        return true;
+
+                foreach (var item in menuButtons[input])
+                    if (IsNewButtonPress(item, controllingPlayer, out playerIndex))
+                        return true;            
+            }
+            else
+            {
+                Keys[] keys;
+                for (int i = 0; i < MaxInputs; i++)
+                    if (menuKeys[i].TryGetValue(input, out keys))
+                        foreach (var item in keys)
+                            if (IsNewKeyPress(item, (PlayerIndex)i, out playerIndex))
+                                return true;
+
+                for (int i = 0; i < MaxInputs; i++)
+                    foreach (var item in menuButtons[input])
+                        if (IsNewButtonPress(item, (PlayerIndex)i, out playerIndex))
+                            return true;
+            }
+            playerIndex = PlayerIndex.One; 
+            return false;
+        }
+
+        /// <summary>
         /// Checks for a "menu select" input action.
         /// The controllingPlayer parameter specifies which player to read input for.
         /// If this is null, it will accept input from any player. When the action
@@ -213,21 +295,7 @@ namespace Tetatt.Screens
         public bool IsMenuSelect(PlayerIndex? controllingPlayer,
                                  out PlayerIndex playerIndex)
         {
-            if (IsNewKeyPress(Keys.RightControl, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.One;
-                return true;
-            }
-            else if (IsNewKeyPress(Keys.LeftControl, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.Two;
-                return true;
-            }
-            else
-            {
-                return IsNewButtonPress(Buttons.A, controllingPlayer, out playerIndex) ||
-                       IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
-            }
+            return IsMenuInput(MenuInput.Select, controllingPlayer, out playerIndex);
         }
 
 
@@ -240,9 +308,7 @@ namespace Tetatt.Screens
         public bool IsMenuCancel(PlayerIndex? controllingPlayer,
                                  out PlayerIndex playerIndex)
         {
-            return IsNewKeyPress(Keys.Escape, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.B, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.Back, controllingPlayer, out playerIndex);
+            return IsMenuInput(MenuInput.Cancel, controllingPlayer, out playerIndex);
         }
 
 
@@ -254,21 +320,7 @@ namespace Tetatt.Screens
         /// </summary>
         public bool IsMenuUp(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            if (IsNewKeyPress(Keys.Up, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.One;
-                return true;
-            }
-            else if (IsNewKeyPress(Keys.W, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.Two;
-                return true;
-            }
-            else
-            {
-                return IsNewButtonPress(Buttons.DPadUp, controllingPlayer, out playerIndex) ||
-                       IsNewButtonPress(Buttons.LeftThumbstickUp, controllingPlayer, out playerIndex);
-            }
+            return IsMenuInput(MenuInput.Up, controllingPlayer, out playerIndex);
         }
 
 
@@ -280,21 +332,7 @@ namespace Tetatt.Screens
         /// </summary>
         public bool IsMenuDown(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            if (IsNewKeyPress(Keys.Down, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.One;
-                return true;
-            }
-            else if (IsNewKeyPress(Keys.S, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.Two;
-                return true;
-            }
-            else
-            {
-                return IsNewButtonPress(Buttons.DPadDown, controllingPlayer, out playerIndex) ||
-                       IsNewButtonPress(Buttons.LeftThumbstickDown, controllingPlayer, out playerIndex);
-            }
+            return IsMenuInput(MenuInput.Down, controllingPlayer, out playerIndex);
         }
 
 
@@ -306,21 +344,7 @@ namespace Tetatt.Screens
         /// </summary>
         public bool IsMenuLeft(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            if (IsNewKeyPress(Keys.Left, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.One;
-                return true;
-            }
-            else if (IsNewKeyPress(Keys.A, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.Two;
-                return true;
-            }
-            else
-            {
-                return IsNewButtonPress(Buttons.DPadLeft, controllingPlayer, out playerIndex) ||
-                       IsNewButtonPress(Buttons.LeftThumbstickLeft, controllingPlayer, out playerIndex);
-            }
+            return IsMenuInput(MenuInput.Left, controllingPlayer, out playerIndex);
         }
 
 
@@ -332,21 +356,7 @@ namespace Tetatt.Screens
         /// </summary>
         public bool IsMenuRight(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            if (IsNewKeyPress(Keys.Right, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.One;
-                return true;
-            }
-            else if (IsNewKeyPress(Keys.D, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.Two;
-                return true;
-            }
-            else
-            {
-                return IsNewButtonPress(Buttons.DPadRight, controllingPlayer, out playerIndex) ||
-                       IsNewButtonPress(Buttons.LeftThumbstickRight, controllingPlayer, out playerIndex);
-            }
+            return IsMenuInput(MenuInput.Right, controllingPlayer, out playerIndex);
         }
 
 
@@ -359,20 +369,7 @@ namespace Tetatt.Screens
         public bool IsMenuToggle(PlayerIndex? controllingPlayer,
                                  out PlayerIndex playerIndex)
         {
-            if (IsNewKeyPress(Keys.RightShift, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.One;
-                return true;
-            }
-            else if (IsNewKeyPress(Keys.LeftShift, controllingPlayer, out playerIndex))
-            {
-                playerIndex = PlayerIndex.Two;
-                return true;
-            }
-            else
-            {
-                return IsNewButtonPress(Buttons.X, controllingPlayer, out playerIndex);
-            }
+            return IsMenuInput(MenuInput.Toggle, controllingPlayer, out playerIndex);
         }
 
         /// <summary>
@@ -383,9 +380,7 @@ namespace Tetatt.Screens
         /// </summary>
         public bool IsPauseGame(PlayerIndex? controllingPlayer, out PlayerIndex playerIndex)
         {
-            return IsNewKeyPress(Keys.Escape, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.Back, controllingPlayer, out playerIndex) ||
-                   IsNewButtonPress(Buttons.Start, controllingPlayer, out playerIndex);
+            return IsMenuInput(MenuInput.Pause, controllingPlayer, out playerIndex);
         }
 
         /// <summary>
