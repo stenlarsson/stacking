@@ -650,7 +650,9 @@ namespace Tetatt.Screens
                     receiver.ReceiveData(packetReader, out sender);
                     Player senderData = (Player)sender.Tag;
 
-                    if (sender.IsLocal)
+                    // Don't receive packets from local players, and only process
+                    // packets once.
+                    if (sender.IsLocal || receiver != networkSession.LocalGamers[0])
                     {
                         continue;
                     }
