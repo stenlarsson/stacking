@@ -376,12 +376,24 @@ namespace Tetatt.Screens
 
                 spriteBatch.Begin();
 
+                Vector2 gamertagMeasure = font.MeasureString(gamer.Gamertag);
+                Vector2 gamertagScale = Vector2.One;
+                if (gamertagMeasure.X > 288)
+                {
+                    gamertagScale.X = 288 / gamertagMeasure.X;
+                }
+
                 // Draw gamertag and picture
                 spriteBatch.DrawString(
                     font,
                     gamer.Gamertag,
                     new Vector2(0, -200) + data.PlayField.Offset,
-                    Color.White * TransitionAlpha);
+                    Color.White * TransitionAlpha,
+                    0,
+                    Vector2.Zero,
+                    gamertagScale,
+                    SpriteEffects.None,
+                    0);
                 if (data.GamerPicture != null)
                 {
                     spriteBatch.Draw(
