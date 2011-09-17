@@ -32,7 +32,7 @@ namespace Tetatt.Screens
         public event EventHandler<PlayerIndexEventArgs> Selected;
 
         public MenuEntry(string label)
-            : this(label, (PlayerIndexDelegate)null)
+            : this(label, (EventHandler<PlayerIndexEventArgs>)null)
         {
         }
 
