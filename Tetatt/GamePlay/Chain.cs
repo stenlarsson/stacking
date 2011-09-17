@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,15 +8,7 @@ namespace Tetatt.GamePlay
 {
     public class Chain
     {
-        private class DescendingComparer<T> : IComparer<T> where T : IComparable<T>
-        {
-            public int Compare(T x, T y)
-            {
-                return y.CompareTo(x);
-            }
-        }
-
-        private SortedDictionary<int,Block> blocks;
+        private List<BlockListItem> blocks;
         public int numBlocks {
             get {
                 return blocks.Count;
@@ -30,7 +23,7 @@ namespace Tetatt.GamePlay
 
         public Chain()
         {
-            blocks = new SortedDictionary<int, Block>(new DescendingComparer<int>());
+            blocks = new List<BlockListItem>();
             length = 0;
             activeBlocks = 0;
             sentCombo = false;
@@ -52,7 +45,7 @@ namespace Tetatt.GamePlay
 
         public void AddBlock(Block block, int blocknum)
         {
-            blocks[blocknum] = block;
+            blocks.Add(new BlockListItem(blocknum, block));
             if (!usedThisFrame)
             {
                 // Increases chain length every frame it's involved in popping new blocks
@@ -69,20 +62,21 @@ namespace Tetatt.GamePlay
 
         public int PopAllAndCountEvil(int popStartOffset, int popTime, int flashTime) {
             int any = 0, evil = 0;
-            foreach( KeyValuePair<int, Block> cur in blocks )
+            blocks.Sort();
+            foreach (var cur in blocks)
             {
-                cur.Value.Pop(any++, blocks.Count, popStartOffset, popTime, flashTime);
-                if (cur.Value.Type == BlockType.Gray)
+                cur.Block.Pop(any++, blocks.Count, popStartOffset, popTime, flashTime);
+                if (cur.Block.Type == BlockType.Gray)
                     evil++;
             }
             return evil;
         }
         
         public int TopMostBlockIndex {
-            get {
-                foreach( KeyValuePair<int, Block> cur in blocks )
-                    return cur.Key;
-                return -1; // No block...
+            get
+            {
+                var top = blocks.Max();
+                return top == null ? -1 : top.Index;
             }
         }        
     }

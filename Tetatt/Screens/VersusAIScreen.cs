@@ -246,10 +246,10 @@ namespace Tetatt.Screens
 
             int seed = unchecked((int)DateTime.Now.Ticks);
             // We start at player level 0, 2, 4 for Easy, Normal, Hard
-            playerPlayField.Level = Level.Number * 2;
+            playerPlayField.Level = (int)Level * 2;
             playerPlayField.Reset();
             playerPlayField.Start(seed);
-            aiPlayField.Level = Level.Number * 2;
+            aiPlayField.Level = (int)Level * 2;
             aiPlayField.Reset();
             aiPlayField.Start(seed);
 

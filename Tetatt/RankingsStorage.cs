@@ -4,14 +4,12 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Storage;
 using Tetatt.ArtificialIntelligence;
+using Tetatt.Screens;
 
 namespace Tetatt
 {
-    using System.Runtime.Serialization.Formatters.Binary;
-    using Tetatt.Screens;
     using Rankings = Dictionary<Level, List<Result>>;
     
-    [Serializable]
     struct Result : IComparable<Result>
     {
         public int Ticks;
@@ -60,8 +58,6 @@ namespace Tetatt
         // for getting the storage container when device != null.
         IAsyncResult result; 
         
-        readonly BinaryFormatter serializer = new BinaryFormatter();
-
         /// <summary>
         /// Describes to what extent the rankings are synchronized with their on-disk counterpart.
         /// </summary>
@@ -81,7 +77,7 @@ namespace Tetatt
             Enabled = false;
             State = RankingsState.Session;
             Rankings = new Rankings();
-            foreach (var level in Level.All)
+            foreach (var level in Levels.All)
                 Rankings.Add(level, new List<Result>(20));
 
             game.Services.AddService(typeof(RankingsStorage), this);
@@ -96,7 +92,7 @@ namespace Tetatt
                 if (device == null)
                 {
                     device = StorageDevice.EndShowSelector(result);
-                    result = device.BeginOpenContainer(containerName, null, null);
+                    result = (device == null) ? null : device.BeginOpenContainer(containerName, null, null);
                 }
                 else
                 {
@@ -134,7 +130,7 @@ namespace Tetatt
                     // Change stored rather than Rankings, so that we haven't changed
                     // anything when an exception occurs.
                     bool changed = false;
-                    Rankings stored = (Rankings)serializer.Deserialize(file);
+                    Rankings stored = Deserialize(new StreamReader(file));
                     foreach (var kvp in Rankings)
                     {
                         foreach (var result in kvp.Value)
@@ -152,8 +148,44 @@ namespace Tetatt
             if (State != RankingsState.Storage)
             {
                 file.SetLength(0);
-                serializer.Serialize(file, Rankings);
+                Serialize(new StreamWriter(file), Rankings);
             }
+        }
+
+        static void Serialize(StreamWriter file, Rankings rankings)
+        {
+            foreach (var ranking in rankings)
+            {
+                file.WriteLine(ranking.Key);
+                foreach (var entry in ranking.Value)
+                {
+                    file.WriteLine("{0} {1}", entry.Ticks, entry.Gamertag);
+                }
+            }
+        }
+
+        static Rankings Deserialize(StreamReader file)
+        {
+            Rankings rankings = new Rankings();
+            List<Result> ranking = null;
+            string line;
+            while ((line = file.ReadLine()) != null)
+            {
+                int index = line.IndexOf(' ');
+                if (index < 0)
+                {
+                    ranking = new List<Result>();
+                    rankings[(Level)Enum.Parse(typeof(Level), line, false)] = ranking;
+                }
+                else
+                {
+                    Result result = new Result();
+                    result.Ticks = int.Parse(line.Substring(0, index));
+                    result.Gamertag = line.Substring(index + 1);
+                    ranking.Add(result);
+                }
+            }
+            return rankings;
         }
 
         static bool AddIfBetter(List<Result> ranking, Result entry)

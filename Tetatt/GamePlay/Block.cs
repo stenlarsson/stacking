@@ -35,7 +35,18 @@ namespace Tetatt.GamePlay
         private const int tileFlashOffset = 4;
         private const int tileEyesOffset = 5;
 
-        public Block(BlockType type, BlockState state = BlockState.Idle, Chain chain = null, bool needPopCheck = true, Anim anim = null)
+        public Block(BlockType type)
+            : this(type, BlockState.Idle, null, true)
+        {
+        }
+
+
+        public Block(BlockType type, BlockState state, Chain chain, bool needPopCheck)
+            : this(type, state, chain, needPopCheck, null)
+        {
+        }
+        
+        public Block(BlockType type, BlockState state, Chain chain, bool needPopCheck, Anim anim)
         {
             this.anim = anim != null ? anim : new Anim((int)type);
             this.type = type;

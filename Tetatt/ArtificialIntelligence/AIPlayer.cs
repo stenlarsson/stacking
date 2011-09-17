@@ -47,8 +47,8 @@ namespace Tetatt.ArtificialIntelligence
                 new StageInfo(2, 12, 8, 2),
                 new StageInfo(1, 12, 8, 2),
                 new StageInfo(1, 12, 8, 2),
-                new StageInfo(1, 12, 8, 2),
-                new StageInfo(1, 12, 8, 2),
+                new StageInfo(0, 12, 8, 2),
+                new StageInfo(0, 12, 8, 2),
             },
         };
 
@@ -99,7 +99,7 @@ namespace Tetatt.ArtificialIntelligence
         public void SetDifficulty(Level level, int stage)
         {
             // TODO RaiseHeight and other values should also be modified
-            StageInfo stageInfo = Stages[level.Number, stage];
+            StageInfo stageInfo = Stages[(int)level, stage];
             InputDelay = stageInfo.InputDelay;
             RaiseHeight = stageInfo.RaiseHeight;
             RaiseHeightWithoutGarbage = stageInfo.RaiseHeightWithoutGarbage;
@@ -172,7 +172,8 @@ namespace Tetatt.ArtificialIntelligence
         /// </summary>
         public Pos CalculateBestSwap(SimplifiedPlayField sim, out float result)
         {
-            SortedDictionary<float, Pos> moves = new SortedDictionary<float, Pos>();
+            result = 0;
+            Pos bestSwap = new Pos();
 
             // Each row except the top and bottom rows, they can't be reached
             for (int row = 1; row < sim.Field.GetLength(0) - 1; row++)
@@ -229,20 +230,15 @@ namespace Tetatt.ArtificialIntelligence
                         Math.Abs(playField.markerPos.Col - col);
                     score -= distance;
 
-                    if (!moves.ContainsKey(score))
+                    if (score > result)
                     {
-                        moves.Add(score, new Pos(row, col));
+                        bestSwap = new Pos(row, col);
+                        result = score;
                     }
                 }
             }
 
-            foreach (var items in moves.Reverse())
-            {
-                result = items.Key;
-                return items.Value;
-            }
-
-            throw new Exception("Supposedly unreachable code");
+            return bestSwap;
         }
 
         /// <summary>
