@@ -154,6 +154,11 @@ namespace Tetatt.GamePlay
                 }
             }
 
+            for (int col = 0; col < fieldHeight.Length; col++)
+            {
+                fieldHeight[col] = 0;
+            }
+
             gh.Reset();
             state = PlayFieldState.Init;
         }
