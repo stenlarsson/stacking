@@ -100,11 +100,11 @@ namespace Microsoft.Xna.Framework.Graphics
             GL.Translate(x, y, 0);
         }
 
-        void SetupModelview(float x, float y, float rotation, float ox = 0, float oy = 0, float scale = 1)
+        void SetupModelview(float x, float y, float rotation, float ox = 0, float oy = 0, float sx = 1, float sy = 1)
         {
             SetupModelview(x, y);
             GL.Rotate(180 * rotation / Math.PI, 0, 0, 1);
-            GL.Scale(scale, scale, 1);
+            GL.Scale(sx, sy, 1);
             GL.Translate(-ox, -oy, 0);
         }
 
@@ -188,7 +188,7 @@ namespace Microsoft.Xna.Framework.Graphics
             SetupTextureSourceMaybeRectangle(texture, sourceRectangle);
             SetupSpriteEffects(effects);
 
-            SetupModelview(position.X, position.Y, rotation, origin.X, origin.Y, scale);
+            SetupModelview(position.X, position.Y, rotation, origin.X, origin.Y, scale, scale);
             GL.Translate(0, 0, layerDepth); // TODO: Could we handle layerDepth like this?
 
             FillSourceRectangle(texture, sourceRectangle);
@@ -197,7 +197,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         public void DrawString (SpriteFont spriteFont, string text, Vector2 position, Color color)
         {
-            DrawString(spriteFont, text, position, color, 0.0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0.0f);
+            DrawString(spriteFont, text, position, color, 0.0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0.0f);
         }
 
         public void DrawString(
@@ -211,8 +211,22 @@ namespace Microsoft.Xna.Framework.Graphics
             SpriteEffects effects,
             float layerDepth)
         {
+            DrawString(spriteFont, text, position, color, rotation, origin, new Vector2(scale), effects, layerDepth);
+        }
+
+        public void DrawString(
+            SpriteFont spriteFont,
+            string text,
+            Vector2 position,
+            Color color,
+            float rotation,
+            Vector2 origin,
+            Vector2 scale,
+            SpriteEffects effects,
+            float layerDepth)
+        {
             SetupColor(color);
-            SetupModelview(position.X, position.Y, rotation, origin.X, origin.Y, scale);
+            SetupModelview(position.X, position.Y, rotation, origin.X, origin.Y, scale.X, scale.Y);
             SetupTexture(spriteFont.texture);
             GL.Scale(1.0f / spriteFont.texture.Width, 1.0f / spriteFont.texture.Height, 1);
 
